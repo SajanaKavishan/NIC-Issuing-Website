@@ -177,6 +177,11 @@ function updateDashboardData() {
 // Users management logic
 function initUsersManagement() {
     const API_BASE = '/api/users';
+    const authHeaders = () => {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { 'X-Auth-Token': token } : {};
+    };
     const btnAdd = document.getElementById('btnAddUser');
     const formWrap = document.getElementById('userFormContainer');
     const form = document.getElementById('userForm');
@@ -250,7 +255,7 @@ function initUsersManagement() {
                 // Update
                 res = await fetch(`${API_BASE}/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
                     body: JSON.stringify(payload)
                 });
                 text = await res.text();
@@ -296,7 +301,7 @@ function initUsersManagement() {
     window.__deleteUser = async (id) => {
         if (!confirm('Are you sure you want to delete this user?')) return;
         try {
-            const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+            const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE', headers: authHeaders() });
             const text = await res.text();
             if (!res.ok) throw new Error(text || `Status ${res.status}`);
             alert(text || 'User deleted');
@@ -310,11 +315,16 @@ function initUsersManagement() {
 
 async function loadUsers() {
     const API_BASE = '/api/users';
+    const authHeaders = () => {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { 'X-Auth-Token': token } : {};
+    };
     const tbody = document.querySelector('#usersTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
     try {
-        const res = await fetch(API_BASE);
+        const res = await fetch(API_BASE, { headers: authHeaders() });
         if (!res.ok) throw new Error(await res.text() || `Status ${res.status}`);
         const data = await res.json();
         const list = Array.isArray(data) ? data : [];

@@ -23,6 +23,7 @@ public class NewNicForm {
 
     private String birthCertificatePath;
     private String photoPath;
+    private String status = "PENDING";
 
     // Getters
     public Long getId() {
@@ -69,6 +70,10 @@ public class NewNicForm {
         return photoPath;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     // Setters
     public void setNameWithInitials(String nameWithInitials) {
         this.nameWithInitials = nameWithInitials;
@@ -108,5 +113,9 @@ public class NewNicForm {
 
     public void setPhotoPath(String photoPath) {
         this.photoPath = photoPath;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -18,6 +18,7 @@ public class RenewNic {
     private String contactNumber;
     private String birthCertificatePath;
     private String photoPath;
+    private String status = "PENDING";
 
     public RenewNic() {
     }
@@ -84,5 +85,13 @@ public class RenewNic {
 
     public void setPhotoPath(String photoPath) {
         this.photoPath = photoPath;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

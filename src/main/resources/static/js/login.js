@@ -59,118 +59,53 @@ form.addEventListener('submit', (e) => {
     submitBtn.disabled = true;
     const old = submitBtn.textContent;
     submitBtn.textContent = 'Signing in...';
-    // Check for admin credentials (hardcoded)
-    if (email.value === 'admin@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist admin session flags for navbar
-            try {
-                localStorage.setItem('isAdmin', 'true');
-                localStorage.setItem('loggedInEmail', 'admin');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'admin-dashboard.html';
-        }, 800);
-    } else if (email.value === 'finance@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist finance session flags for navbar (if needed)
-            try {
-                localStorage.setItem('isFinance', 'true');
-                localStorage.setItem('loggedInEmail', 'finance');
-                localStorage.removeItem('isAdmin');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'finance.html';
-        }, 800);
-    } else if (email.value === 'delivery@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist delivery session flags for navbar (if needed)
-            try {
-                localStorage.setItem('isDelivery', 'true');
-                localStorage.setItem('loggedInEmail', 'delivery');
-                localStorage.removeItem('isAdmin');
-                localStorage.removeItem('isFinance');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'delivery.html';
-        }, 800);
-    } else if (email.value === 'pro@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist pro session flags for navbar (if needed)
-            try {
-                localStorage.setItem('isPro', 'true');
-                localStorage.setItem('loggedInEmail', 'pro');
-                localStorage.removeItem('isAdmin');
-                localStorage.removeItem('isFinance');
-                localStorage.removeItem('isDelivery');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'PRO_dashboard.html';
-        }, 800);
-    } else if (email.value === 'recovery@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist recovery session flags for navbar (if needed)
-            try {
-                localStorage.setItem('isRecovery', 'true');
-                localStorage.setItem('loggedInEmail', 'recovery');
-                localStorage.removeItem('isAdmin');
-                localStorage.removeItem('isFinance');
-                localStorage.removeItem('isDelivery');
-                localStorage.removeItem('isPro');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'recovery-dashboard.html';
-        }, 800);
-    } else if (email.value === 'assistant@gmail.com' && pw.value === '1234') {
-        setTimeout(() => {
-            // Persist assistant session flags for navbar (if needed)
-            try {
-                localStorage.setItem('isAssistant', 'true');
-                localStorage.setItem('loggedInEmail', 'assistant');
-                localStorage.removeItem('isAdmin');
-                localStorage.removeItem('isFinance');
-                localStorage.removeItem('isDelivery');
-                localStorage.removeItem('isPro');
-                localStorage.removeItem('isRecovery');
-            } catch (e) {}
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-            window.location.href = 'assistant-dashboard.html';
-        }, 800);
-    } else {
-        fetch('http://localhost:8080/api/users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.value, password: pw.value })
-        })
-        .then(res => res.text())
-        .then(text => {
-            if (text && text.toLowerCase().includes('success')) {
-                // Successful login
-                submitBtn.textContent = old;
-                submitBtn.disabled = false;
-                // Store a simple flag or email (replace with real auth token later)
-                try {
-                    localStorage.setItem('loggedInEmail', email.value);
-                    localStorage.removeItem('isAdmin'); // ensure admin flag is cleared for normal users
-                } catch (e) {}
-                alert('Login successful');
-                window.location.href = redirectTarget || 'home.html';
-            } else {
-                alert(text || 'Invalid credentials');
-                submitBtn.textContent = old;
-                submitBtn.disabled = false;
-            }
-        })
-        .catch(err => {
-            console.error('Login error:', err);
-            alert('Login failed. Please try again.');
-            submitBtn.textContent = old;
-            submitBtn.disabled = false;
-        });
-    }
+
+    fetch('http://localhost:8080/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value, password: pw.value })
+    })
+    .then(async res => {
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data || !data.success) {
+            throw new Error((data && data.message) || 'Invalid credentials');
+        }
+        return data;
+    })
+    .then(data => {
+        const role = (data.user && data.user.role ? data.user.role : 'CITIZEN').toUpperCase();
+        const targetByRole = {
+            ADMIN: 'admin-dashboard.html',
+            FINANCE: 'finance.html',
+            DELIVERY: 'delivery.html',
+            PRO: 'PRO_dashboard.html',
+            RECOVERY: 'recovery-dashboard.html',
+            ASSISTANT: 'assistant-dashboard.html',
+            CITIZEN: redirectTarget || 'home.html'
+        };
+
+        try {
+            ['isAdmin', 'isFinance', 'isDelivery', 'isPro', 'isRecovery', 'isAssistant'].forEach(key => localStorage.removeItem(key));
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('userRole', role);
+            localStorage.setItem('loggedInEmail', data.user.email || email.value);
+            if (role === 'ADMIN') localStorage.setItem('isAdmin', 'true');
+            if (role === 'FINANCE') localStorage.setItem('isFinance', 'true');
+            if (role === 'DELIVERY') localStorage.setItem('isDelivery', 'true');
+            if (role === 'PRO') localStorage.setItem('isPro', 'true');
+            if (role === 'RECOVERY') localStorage.setItem('isRecovery', 'true');
+            if (role === 'ASSISTANT') localStorage.setItem('isAssistant', 'true');
+        } catch (e) {}
+
+        submitBtn.textContent = old;
+        submitBtn.disabled = false;
+        alert('Login successful');
+        window.location.href = targetByRole[role] || 'home.html';
+    })
+    .catch(err => {
+        console.error('Login error:', err);
+        alert(err.message || 'Login failed. Please try again.');
+        submitBtn.textContent = old;
+        submitBtn.disabled = false;
+    });
 });
