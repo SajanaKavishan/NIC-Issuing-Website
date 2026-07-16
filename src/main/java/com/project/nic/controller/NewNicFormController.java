@@ -82,6 +82,15 @@ public class NewNicFormController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<?> getMyApplications(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+        return ResponseEntity.ok(service.findByUserId(sessionUser.get().userId()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
             @PathVariable Long id,

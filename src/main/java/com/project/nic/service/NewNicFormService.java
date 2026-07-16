@@ -27,6 +27,10 @@ public class NewNicFormService {
         return repository.findAll();
     }
 
+    public List<NewNicForm> findByUserId(Long userId) {
+        return repository.findByUserId(userId);
+    }
+
     public Optional<NewNicForm> findById(Long id) {
         return repository.findById(id);
     }

@@ -28,6 +28,10 @@ public class LostNicService {
         return repository.findAll();
     }
 
+    public List<LostNic> findByUserId(Long userId) {
+        return repository.findByUserId(userId);
+    }
+
     public Optional<LostNic> findById(Long id) {
         return repository.findById(id);
     }

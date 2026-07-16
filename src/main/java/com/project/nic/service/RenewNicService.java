@@ -27,6 +27,10 @@ public class RenewNicService {
         return repository.findAll();
     }
 
+    public List<RenewNic> findByUserId(Long userId) {
+        return repository.findByUserId(userId);
+    }
+
     public Optional<RenewNic> findById(Long id) {
         return repository.findById(id);
     }
