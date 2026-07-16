@@ -52,12 +52,18 @@ const searchInput = document.getElementById('searchFilter');
 const typeSelect = document.getElementById('typeFilter');
 const statusSelect = document.getElementById('statusFilter');
 
+function authHeaders(extra = {}) {
+    let token = '';
+    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+    return token ? { ...extra, 'X-Auth-Token': token } : extra;
+}
+
 /**
  * Fetch feedbacks from backend and update items array
  */
 async function fetchFeedbacks() {
     try {
-        const response = await fetch('/api/feedback');
+        const response = await fetch('/api/feedback', { headers: authHeaders() });
         if (!response.ok) throw new Error('Failed to fetch feedbacks');
         const data = await response.json();
         // Map backend feedbacks to dashboard format
@@ -243,7 +249,7 @@ async function deleteRecord(id) {
     try {
         // Extract numeric ID
         const numericId = id.replace(/^F0*/, '');
-        const response = await fetch(`/api/feedback/${numericId}`, { method: 'DELETE' });
+        const response = await fetch(`/api/feedback/${numericId}`, { method: 'DELETE', headers: authHeaders() });
         if (!response.ok) throw new Error('Failed to delete record');
         // Remove from items and refresh table
         items = items.filter(c => c.id !== id);
@@ -266,7 +272,7 @@ async function saveUpdate() {
     try {
         const response = await fetch(`/api/feedback/${numericId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ message: description, status })
         });
         if (!response.ok) throw new Error('Failed to update record');

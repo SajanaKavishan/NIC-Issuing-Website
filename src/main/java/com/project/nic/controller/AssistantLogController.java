@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.AssistantLog;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistantLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,19 +19,41 @@ public class AssistantLogController {
     @Autowired
     private AssistantLogService assistantLogService;
 
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageAssistance(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "ASSISTANT");
+    }
+
     @GetMapping
-    public List<AssistantLog> listAll() {
-        return assistantLogService.getAll();
+    public ResponseEntity<?> listAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
+        return ResponseEntity.ok(assistantLogService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AssistantLog> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
-        return opt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return opt.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<AssistantLog> create(@RequestBody AssistantLog log) {
+    public ResponseEntity<?> create(
+            @RequestBody AssistantLog log,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         if (log.getDate() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -39,7 +62,14 @@ public class AssistantLogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AssistantLog> update(@PathVariable Long id, @RequestBody AssistantLog update) {
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @RequestBody AssistantLog update,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         AssistantLog existing = opt.get();
@@ -50,7 +80,13 @@ public class AssistantLogController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         assistantLogService.delete(id);

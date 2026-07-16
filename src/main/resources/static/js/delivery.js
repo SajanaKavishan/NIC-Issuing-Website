@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableBody = document.querySelector('#deliveredTable tbody');
     const noResultsDiv = document.querySelector('.no-results');
 
+    function authHeaders(extra = {}) {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { ...extra, 'X-Auth-Token': token } : extra;
+    }
+
     // --- Modal Elements ---
     const modal = document.getElementById('detailsModal');
     const closeModalBtn = document.getElementById('closeModal');
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const proceed = confirm(`Delete delivery record for NIC ${nic}? This cannot be undone.`);
                 if (!proceed) return;
                 try {
-                    const resp = await fetch(`/api/delivery/nics/${nic}`, { method: 'DELETE' });
+                    const resp = await fetch(`/api/delivery/nics/${nic}`, { method: 'DELETE', headers: authHeaders() });
                     if (!resp.ok) {
                         let body = null;
                         try { body = await resp.text(); } catch (e) { /* ignore */ }
@@ -124,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.debug('[delivery.filterTable] filters ->', { dateRange, deliveryMethod, searchTerm, url });
 
         try {
-            const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            const response = await fetch(url, { headers: authHeaders({ 'Accept': 'application/json' }) });
             console.debug('[delivery.filterTable] response status:', response.status);
             if (!response.ok) throw new Error('Failed to fetch deliveries');
             const data = await response.json();
@@ -157,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to generate weekly report
     async function generateWeeklyReport() {
         try {
-            const response = await fetch('/api/delivery/nics?dateRange=week', { headers: { 'Accept': 'application/json' } });
+            const response = await fetch('/api/delivery/nics?dateRange=week', { headers: authHeaders({ 'Accept': 'application/json' }) });
              if (!response.ok) throw new Error('Failed to fetch weekly deliveries');
              const data = await response.json();
 
@@ -222,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to generate monthly report (last 30 days)
     async function generateMonthlyReport() {
         try {
-            const response = await fetch('/api/delivery/nics?dateRange=month', { headers: { 'Accept': 'application/json' } });
+            const response = await fetch('/api/delivery/nics?dateRange=month', { headers: authHeaders({ 'Accept': 'application/json' }) });
             if (!response.ok) throw new Error('Failed to fetch monthly deliveries');
             const data = await response.json();
 
@@ -309,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function showModal(nicNumber) {
         try {
-            const response = await fetch(`/api/delivery/nics/${nicNumber}`, { headers: { 'Accept': 'application/json' } });
+            const response = await fetch(`/api/delivery/nics/${nicNumber}`, { headers: authHeaders({ 'Accept': 'application/json' }) });
             if (!response.ok) throw new Error('Failed to fetch delivery details');
             const data = await response.json();
 
@@ -367,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (es) Array.from(es.querySelectorAll('option[data-temp="true"]')).forEach(o => o.remove());
                     }
                     removeTempOptions();
-                    const response = await fetch(`/api/delivery/nics/${nicNumber}`, { headers: { 'Accept': 'application/json' } });
+                    const response = await fetch(`/api/delivery/nics/${nicNumber}`, { headers: authHeaders({ 'Accept': 'application/json' }) });
                      if (!response.ok) throw new Error('Failed to fetch delivery details');
                      const data = await response.json();
 
@@ -464,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.debug('[delivery.saveEdit] sending update for', nic, updatedData);
              const response = await fetch(`/api/delivery/nics/${nic}`, {
                  method: 'PUT',
-                 headers: { 'Content-Type': 'application/json' },
+                 headers: authHeaders({ 'Content-Type': 'application/json' }),
                  body: JSON.stringify(updatedData)
              });
              if (!response.ok) {
@@ -534,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadAllDeliveries() {
         try {
             console.debug('[delivery.loadAll] trying /api/delivery/nics/all');
-            let response = await fetch('/api/delivery/nics/all', {headers: {'Accept': 'application/json'}});
+            let response = await fetch('/api/delivery/nics/all', {headers: authHeaders({'Accept': 'application/json'})});
             let data = null;
             if (response.ok) {
                 try {
@@ -547,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fallback to /api/delivery/nics if /all endpoint missing or returned unexpected data
             if (!response.ok || !Array.isArray(data)) {
                 console.debug('[delivery.loadAll] /nics/all failed or returned non-array, falling back to /api/delivery/nics');
-                response = await fetch('/api/delivery/nics', {headers: {'Accept': 'application/json'}});
+                response = await fetch('/api/delivery/nics', {headers: authHeaders({'Accept': 'application/json'})});
                 if (!response.ok) throw new Error('Failed to fetch deliveries from fallback endpoint');
                 data = await response.json();
             }

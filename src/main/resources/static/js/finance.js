@@ -1,6 +1,12 @@
 // Backend API base
 const API_BASE_URL = window.API_BASE_URL || '/api/payments';
 
+function authHeaders(extra = {}) {
+    let token = '';
+    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+    return token ? { ...extra, 'X-Auth-Token': token } : extra;
+}
+
 // Payments loaded from backend
 let payments = [];
 // Cached stats from backend
@@ -209,7 +215,7 @@ async function handleFormSubmit(e) {
         if (currentEditDbId) {
             const res = await fetch(`${API_BASE_URL}/${currentEditDbId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(body)
             });
             if (!res.ok) throw new Error('Update failed');
@@ -217,7 +223,7 @@ async function handleFormSubmit(e) {
         } else {
             const res = await fetch(API_BASE_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(body)
             });
             if (!res.ok) throw new Error('Create failed');
@@ -234,7 +240,7 @@ async function handleFormSubmit(e) {
 async function confirmDelete() {
     if (!currentEditDbId) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/${currentEditDbId}`, { method: 'DELETE' });
+        const res = await fetch(`${API_BASE_URL}/${currentEditDbId}`, { method: 'DELETE', headers: authHeaders() });
         if (!res.ok) throw new Error('Delete failed');
         showNotification('Payment deleted successfully!', 'success');
         closeDeleteModal();
@@ -262,13 +268,13 @@ function handleFilter() {
 }
 
 async function fetchPayments() {
-    const res = await fetch(API_BASE_URL);
+    const res = await fetch(API_BASE_URL, { headers: authHeaders() });
     if (!res.ok) throw new Error('Failed to load payments');
     payments = await res.json();
 }
 
 async function fetchStats() {
-    const res = await fetch(`${API_BASE_URL}/stats`);
+    const res = await fetch(`${API_BASE_URL}/stats`, { headers: authHeaders() });
     if (!res.ok) throw new Error('Failed to load stats');
     stats = await res.json();
 }

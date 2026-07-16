@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.LostNic;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,13 @@ public class LostNicController {
     @Autowired
     private LostNicService service;
 
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageLostNic(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "RECOVERY");
+    }
+
     @PostMapping("/submit")
     public String submitLostNic(
         @RequestParam String nicNumber,
@@ -59,20 +67,38 @@ public class LostNicController {
 
     // New endpoints for admin operations
     @GetMapping("/all")
-    public List<LostNic> getAll() {
-        return service.findAll();
+    public ResponseEntity<?> getAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
+        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public LostNic getById(@PathVariable Long id) {
-        return service.findById(id).orElseThrow(() -> new IllegalArgumentException("LostNic with id " + id + " not found"));
+    public ResponseEntity<?> getById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
+        return service.findById(id)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public LostNic update(@PathVariable Long id, @RequestBody LostNic updates) {
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @RequestBody LostNic updates,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
         logger.info("Received update request for ID: {} with data: {}", id, updates);
         try {
-            return service.update(id, updates);
+            return ResponseEntity.ok(service.update(id, updates));
         } catch (Exception e) {
             logger.error("Error updating LostNic with ID: {}", id, e);
             throw e;
@@ -80,7 +106,13 @@ public class LostNicController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
         logger.info("Received delete request for ID: {}", id);
         try {
             service.deleteById(id);
@@ -96,13 +128,23 @@ public class LostNicController {
     }
 
     @GetMapping("/requests")
-    public List<LostNic> getAllLostNicRequests() {
-        return service.findAll();
+    public ResponseEntity<?> getAllLostNicRequests(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
+        return ResponseEntity.ok(service.findAll());
     }
 
     // New endpoint to update only the status of a LostNic request
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
         logger.info("Received status update for ID: {} with payload: {}", id, payload);
         try {
             String status = payload.get("status");
@@ -119,7 +161,14 @@ public class LostNicController {
 
     // New endpoint to serve uploaded files (birthCertificate or policeReport)
     @GetMapping("/{id}/file")
-    public ResponseEntity<?> serveFile(@PathVariable Long id, @RequestParam String type) {
+    public ResponseEntity<?> serveFile(
+            @PathVariable Long id,
+            @RequestParam String type,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageLostNic(token)) {
+            return ResponseEntity.status(403).body("Recovery access required");
+        }
         try {
             LostNic lostNic = service.findById(id).orElseThrow(() -> new IllegalArgumentException("LostNic with id " + id + " not found"));
 

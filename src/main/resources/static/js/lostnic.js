@@ -1,8 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("lostnic-table-body");
 
+    function authHeaders(extra = {}) {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { ...extra, 'X-Auth-Token': token } : extra;
+    }
+
     // Fetch data from the backend
-    fetch("/api/lost-nic/requests")
+    fetch("/api/lost-nic/requests", { headers: authHeaders() })
         .then(response => {
             if (!response.ok) {
                 throw new Error("Failed to fetch lost NIC requests");
@@ -97,9 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Send update request to the backend (fixed path)
                         fetch(`/api/lost-nic/${id}`, {
                             method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
+                            headers: authHeaders({ "Content-Type": "application/json" }),
                             body: JSON.stringify({
                                 nicNumber: newNicNumber,
                                 contactNumber: newContactNumber,
@@ -133,7 +137,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (confirm("Are you sure you want to delete this request?")) {
                         // Send delete request to backend (fixed path)
                         fetch(`/api/lost-nic/${id}`, {
-                            method: "DELETE"
+                            method: "DELETE",
+                            headers: authHeaders()
                         })
                         .then(response => {
                             if (!response.ok) {
@@ -187,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // (e.g., PUT /api/lost-nic/{id} with a full object), we can adapt this easily.
         return fetch(`/api/lost-nic/${id}/status`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ status })
         }).then(async res => {
             if (!res.ok) {
@@ -204,15 +209,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalCloseBtn = document.getElementById('modalCloseBtn');
     const modalOverlay = document.querySelector('#filePreviewModal .modal-overlay');
 
-    function openPreview(url) {
+    let previewObjectUrl = null;
+
+    async function openPreview(url) {
+        if (previewObjectUrl) {
+            URL.revokeObjectURL(previewObjectUrl);
+            previewObjectUrl = null;
+        }
         if (!modal || !previewFrame) {
-            // fallback: open in new tab
-            window.open(url, '_blank', 'noopener');
+            const response = await fetch(url, { headers: authHeaders() });
+            if (!response.ok) {
+                alert('Failed to load file preview');
+                return;
+            }
+            previewObjectUrl = URL.createObjectURL(await response.blob());
+            window.open(previewObjectUrl, '_blank', 'noopener');
             return;
         }
-        previewFrame.src = url;
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        try {
+            const response = await fetch(url, { headers: authHeaders() });
+            if (!response.ok) throw new Error('Failed to load file preview');
+            previewObjectUrl = URL.createObjectURL(await response.blob());
+            previewFrame.src = previewObjectUrl;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        } catch (error) {
+            console.error(error);
+            alert('Failed to load file preview');
+        }
     }
 
     function closePreview() {
@@ -220,6 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = 'none';
         // clear src to stop loading/playing
         previewFrame.src = '';
+        if (previewObjectUrl) {
+            URL.revokeObjectURL(previewObjectUrl);
+            previewObjectUrl = null;
+        }
         document.body.style.overflow = '';
     }
 

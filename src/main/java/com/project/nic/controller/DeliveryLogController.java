@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.DeliveryLog;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.DeliveryLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,19 +19,41 @@ public class DeliveryLogController {
     @Autowired
     private DeliveryLogService deliveryLogService;
 
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageDelivery(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "DELIVERY");
+    }
+
     @GetMapping
-    public List<DeliveryLog> listAll() {
-        return deliveryLogService.getAll();
+    public ResponseEntity<?> listAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
+        return ResponseEntity.ok(deliveryLogService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeliveryLog> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         Optional<DeliveryLog> opt = deliveryLogService.getById(id);
-        return opt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return opt.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<DeliveryLog> create(@RequestBody DeliveryLog log) {
+    public ResponseEntity<?> create(
+            @RequestBody DeliveryLog log,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         if (log.getDate() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -39,7 +62,14 @@ public class DeliveryLogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DeliveryLog> update(@PathVariable Long id, @RequestBody DeliveryLog update) {
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @RequestBody DeliveryLog update,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         Optional<DeliveryLog> opt = deliveryLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         DeliveryLog existing = opt.get();
@@ -50,7 +80,13 @@ public class DeliveryLogController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         Optional<DeliveryLog> opt = deliveryLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         deliveryLogService.delete(id);

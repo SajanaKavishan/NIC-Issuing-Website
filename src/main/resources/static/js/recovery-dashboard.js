@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationBox = document.getElementById('notification-box');
     const lostNicTableBody = document.getElementById('lostnic-table-body');
 
+    function authHeaders(extra = {}) {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { ...extra, 'X-Auth-Token': token } : extra;
+    }
+
     // Function to check if element is in viewport
     function isInViewport(element) {
         const rect = element.getBoundingClientRect();
@@ -58,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- 3. FETCH AND DISPLAY LOST NIC DATA ---
     function fetchLostNicData() {
         if (!lostNicTableBody) return;
-        fetch('/api/lost-nic/all')
+        fetch('/api/lost-nic/all', { headers: authHeaders() })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -168,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     const resp = await fetch(`/api/lost-nic/${id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: authHeaders({ 'Content-Type': 'application/json' }),
                         body: JSON.stringify({ nicNumber, lostDate, contactNumber })
                     });
                     if (!resp.ok) throw new Error('Failed to update');
@@ -188,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const id = this.getAttribute('data-id');
                 if (!confirm(`Delete lost NIC request #${id}? This cannot be undone.`)) return;
                 try {
-                    const resp = await fetch(`/api/lost-nic/${id}`, { method: 'DELETE' });
+                    const resp = await fetch(`/api/lost-nic/${id}`, { method: 'DELETE', headers: authHeaders() });
                     if (!resp.ok) throw new Error('Failed to delete');
                     showNotification('Record deleted');
                     fetchLostNicData();

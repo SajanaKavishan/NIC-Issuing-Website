@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.Delivery;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,33 +23,67 @@ public class DeliveryController {
     @Autowired
     private DeliveryService deliveryService;
 
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageDelivery(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "DELIVERY");
+    }
+
     @GetMapping("/nics")
-    public List<Delivery> getAllDeliveries(
+    public ResponseEntity<?> getAllDeliveries(
             @RequestParam(required = false) String dateRange,
             @RequestParam(required = false) String deliveryMethod,
-            @RequestParam(required = false) String search) {
+            @RequestParam(required = false) String search,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         logger.info("GET /api/delivery/nics called with dateRange='{}', deliveryMethod='{}', search='{}',",
                 dateRange, deliveryMethod, search);
-        return deliveryService.getAllDeliveries(dateRange, deliveryMethod, search);
+        return ResponseEntity.ok(deliveryService.getAllDeliveries(dateRange, deliveryMethod, search));
     }
 
     @GetMapping("/nics/all")
-    public List<Delivery> getAllDeliveries() {
-        return deliveryService.getAll();
+    public ResponseEntity<?> getAllDeliveries(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
+        return ResponseEntity.ok(deliveryService.getAll());
     }
 
     @GetMapping("/nics/{nic}")
-    public Optional<Delivery> getDeliveryByNic(@PathVariable String nic) {
-        return deliveryService.getDeliveryByNic(nic);
+    public ResponseEntity<?> getDeliveryByNic(
+            @PathVariable String nic,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
+        Optional<Delivery> delivery = deliveryService.getDeliveryByNic(nic);
+        return delivery.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/nics")
-    public Delivery createDelivery(@RequestBody Delivery delivery) {
-        return deliveryService.saveDelivery(delivery);
+    public ResponseEntity<?> createDelivery(
+            @RequestBody Delivery delivery,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
+        return ResponseEntity.ok(deliveryService.saveDelivery(delivery));
     }
 
     @PutMapping("/nics/{nic}")
-    public Delivery updateMethodAndStatus(@PathVariable String nic, @RequestBody Delivery update) {
+    public ResponseEntity<?> updateMethodAndStatus(
+            @PathVariable String nic,
+            @RequestBody Delivery update,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         logger.info("PUT /api/delivery/nics/{} called with payload method='{}', status='{}'", nic, update.getMethod(), update.getStatus());
         Delivery delivery = deliveryService.getDeliveryByNic(nic).orElseThrow();
         String method = update.getMethod() == null ? null : update.getMethod().trim();
@@ -57,11 +92,17 @@ public class DeliveryController {
         delivery.setStatus(status);
         Delivery saved = deliveryService.saveDelivery(delivery);
         logger.info("Saved delivery for nic='{}' with method='{}', status='{}'", nic, saved.getMethod(), saved.getStatus());
-        return saved;
+        return ResponseEntity.ok(saved);
     }
 
     @DeleteMapping("/nics/{nic}")
-    public ResponseEntity<Void> deleteDelivery(@PathVariable String nic) {
+    public ResponseEntity<?> deleteDelivery(
+            @PathVariable String nic,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         logger.info("DELETE /api/delivery/nics/{} called", nic);
         boolean deleted = deliveryService.deleteByNic(nic);
         if (deleted) return ResponseEntity.noContent().build();
@@ -69,8 +110,14 @@ public class DeliveryController {
     }
 
     @GetMapping("/weekly-report")
-    public List<Delivery> getWeeklyReport(@RequestParam String startDate) {
+    public ResponseEntity<?> getWeeklyReport(
+            @RequestParam String startDate,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageDelivery(token)) {
+            return ResponseEntity.status(403).body("Delivery access required");
+        }
         LocalDate start = LocalDate.parse(startDate);
-        return deliveryService.getWeeklyDeliveries(start);
+        return ResponseEntity.ok(deliveryService.getWeeklyDeliveries(start));
     }
 }

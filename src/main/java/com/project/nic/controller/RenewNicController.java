@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.RenewNic;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.RenewNicService;
 import com.project.nic.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,13 @@ import org.springframework.http.ResponseEntity;
 public class RenewNicController {
     @Autowired
     private RenewNicService service;
+
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageApplications(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "PRO", "RECOVERY");
+    }
 
     @PostMapping("/submit")
     public String submitRenewNic(
@@ -47,19 +55,35 @@ public class RenewNicController {
     }
 
     @GetMapping("/all")
-    public List<RenewNic> getAllRenewNics() {
-        return service.findAll();
+    public ResponseEntity<?> getAllRenewNics(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageApplications(token)) {
+            return ResponseEntity.status(403).body("Application review access required");
+        }
+        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageApplications(token)) {
+            return ResponseEntity.status(403).body("Application review access required");
+        }
         return service.findById(id)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageApplications(token)) {
+            return ResponseEntity.status(403).body("Application review access required");
+        }
         try {
             return ResponseEntity.ok(service.updateStatus(id, payload.get("status")));
         } catch (IllegalArgumentException e) {

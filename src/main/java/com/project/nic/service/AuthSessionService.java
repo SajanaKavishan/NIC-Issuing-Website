@@ -47,6 +47,19 @@ public class AuthSessionService {
                 .orElse(false);
     }
 
+    public boolean hasAnyRole(String token, String... requiredRoles) {
+        return findByToken(token)
+                .map(session -> {
+                    for (String role : requiredRoles) {
+                        if (role.equalsIgnoreCase(session.role())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .orElse(false);
+    }
+
     public record SessionUser(Long userId, String email, String role, Instant expiresAt) {
     }
 }

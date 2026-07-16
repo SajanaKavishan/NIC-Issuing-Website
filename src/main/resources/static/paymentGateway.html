@@ -972,6 +972,12 @@
     // API Configuration - UPDATE THIS URL TO MATCH YOUR BACKEND
     const API_BASE_URL = 'http://localhost:8080/api/payments';
 
+    function authHeaders(extra = {}) {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { ...extra, 'X-Auth-Token': token } : extra;
+    }
+
     function createParticles() {
         const container = document.querySelector('.bg-particles');
         for (let i = 0; i < 50; i++) {
@@ -997,9 +1003,7 @@
         try {
             const response = await fetch(API_BASE_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(paymentData)
             });
 

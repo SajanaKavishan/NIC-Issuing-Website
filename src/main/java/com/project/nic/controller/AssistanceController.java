@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.AssistanceRequest;
+import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,13 @@ public class AssistanceController {
     @Autowired
     private AssistanceService assistanceService;
 
+    @Autowired
+    private AuthSessionService authSessionService;
+
+    private boolean canManageAssistance(String token) {
+        return authSessionService.hasAnyRole(token, "ADMIN", "ASSISTANT");
+    }
+
     @PostMapping("/request")
     public ResponseEntity<String> createRequest(@RequestBody AssistanceRequest request) {
         AssistanceRequest saved = assistanceService.createRequest(request);
@@ -24,18 +32,34 @@ public class AssistanceController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Iterable<AssistanceRequest>> getAllRequests() {
+    public ResponseEntity<?> getAllRequests(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         return ResponseEntity.ok(assistanceService.getAllRequests());
     }
 
     @PostMapping("/reply/{id}")
-    public ResponseEntity<String> replyToRequest(@PathVariable Long id, @RequestBody String replyMessage) {
+    public ResponseEntity<String> replyToRequest(
+            @PathVariable Long id,
+            @RequestBody String replyMessage,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         assistanceService.replyToRequest(id, replyMessage);
         return ResponseEntity.ok("Reply sent successfully");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRequest(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!canManageAssistance(token)) {
+            return ResponseEntity.status(403).body("Assistant access required");
+        }
         try {
             assistanceService.deleteRequest(id);
             return ResponseEntity.ok("Request deleted successfully");
@@ -55,7 +79,7 @@ public class AssistanceController {
     }
 
     @PutMapping("/request/{id}")
-    public ResponseEntity<AssistanceRequest> updateRequest(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> updateRequest(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         String newQuery = body.getOrDefault("query", "").toString();
         try {
             AssistanceRequest updated = assistanceService.updateRequest(id, newQuery);

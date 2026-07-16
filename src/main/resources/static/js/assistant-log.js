@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const logDesc = document.getElementById('logDesc');
   const cancelBtn = document.getElementById('cancelBtn');
 
+  function authHeaders(extra = {}) {
+    let token = '';
+    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+    return token ? { ...extra, 'X-Auth-Token': token } : extra;
+  }
+
   function isoDate(d) {
     if (!d) return '';
     const dt = new Date(d);
@@ -21,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadLogs() {
     logsBody.innerHTML = '<tr><td colspan="3" class="muted">Loading...</td></tr>';
     try {
-      const res = await fetch(apiBase);
+      const res = await fetch(apiBase, { headers: authHeaders() });
       if (!res.ok) throw new Error('Failed to fetch logs');
       let data = await res.json();
       data.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function deleteLog(item) {
     if (!confirm('Delete this log?')) return;
     try {
-      const res = await fetch(`${apiBase}/${item.id}`, { method: 'DELETE' });
+      const res = await fetch(`${apiBase}/${item.id}`, { method: 'DELETE', headers: authHeaders() });
       if (res.status === 204) {
         await loadLogs();
         alert('Deleted');
@@ -112,13 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (id) {
         res = await fetch(`${apiBase}/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(payload)
         });
       } else {
         res = await fetch(apiBase, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(payload)
         });
       }

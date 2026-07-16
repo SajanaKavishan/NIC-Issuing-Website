@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allRequests = []; // Store all requests for filtering
 
+    function authHeaders(extra = {}) {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { ...extra, 'X-Auth-Token': token } : extra;
+    }
+
     // Set initial date
     initDateEl.textContent = new Date().toLocaleDateString();
 
@@ -58,7 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pendingRequests.innerHTML = '';
         completedRequests.innerHTML = '';
         try {
-            const response = await axios.get('http://localhost:8080/api/assistance/all');
+            const response = await axios.get('http://localhost:8080/api/assistance/all', {
+                headers: authHeaders()
+            });
             allRequests = response.data;
             if (allRequests.length === 0) {
                 messageEl.textContent = 'No assistance requests.';
@@ -115,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await axios.post(`http://localhost:8080/api/assistance/reply/${id}`, responseText, {
-                headers: { 'Content-Type': 'text/plain' }
+                headers: authHeaders({ 'Content-Type': 'text/plain' })
             });
             // Assuming API updates status, but if not, simulate
             request.status = newStatus;
@@ -140,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteRequest = async (id, liElement) => {
         if (!confirm('Are you sure you want to delete this request?')) return;
         try {
-            await axios.delete(`http://localhost:8080/api/assistance/${id}`);
+            await axios.delete(`http://localhost:8080/api/assistance/${id}`, {
+                headers: authHeaders()
+            });
             const p = document.createElement('p');
             p.textContent = `• Request ${id} deleted — ${new Date().toLocaleDateString()}`;
             notificationsEl.insertBefore(p, notificationsEl.firstChild);
