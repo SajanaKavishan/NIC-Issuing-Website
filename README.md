@@ -119,12 +119,12 @@ Install the following before running the project:
 
 ## Database Configuration
 
-The current SQL Server configuration is in `src/main/resources/application.properties`:
+The SQL Server connection values are read from environment variables in `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=nic_db;encrypt=true;trustServerCertificate=true
-spring.datasource.username=sa
-spring.datasource.password=123
+spring.datasource.url=${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=nic_db;encrypt=true;trustServerCertificate=true}
+spring.datasource.username=${DB_USERNAME:sa}
+spring.datasource.password=${DB_PASSWORD}
 spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
@@ -135,9 +135,18 @@ Before running the application:
 
 1. Start SQL Server.
 2. Create a database named `nic_db`.
-3. Update the username and password in `application.properties` if your local SQL Server credentials are different.
+3. Set the database password as an environment variable. Optionally set the URL and username if your SQL Server settings are different.
 
-For production use, move database credentials to environment variables or a secure configuration provider instead of committing plain-text passwords.
+PowerShell example:
+
+```powershell
+$env:DB_PASSWORD="your-sql-server-password"
+$env:DB_USERNAME="sa"
+$env:DB_URL="jdbc:sqlserver://localhost:1433;databaseName=nic_db;encrypt=true;trustServerCertificate=true"
+.\mvnw.cmd spring-boot:run
+```
+
+For production use, provide database credentials through environment variables or a secure configuration provider instead of committing plain-text passwords.
 
 ## Run Locally
 
