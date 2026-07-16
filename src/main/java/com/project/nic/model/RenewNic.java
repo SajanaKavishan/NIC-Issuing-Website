@@ -19,6 +19,8 @@ public class RenewNic {
     private String birthCertificatePath;
     private String photoPath;
     private String status = "PENDING";
+    private Long userId;
+    private String userEmail;
 
     public RenewNic() {
     }
@@ -93,5 +95,21 @@ public class RenewNic {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

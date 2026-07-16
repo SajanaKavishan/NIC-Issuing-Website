@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,24 @@ public class LostNicController {
         return authSessionService.hasAnyRole(token, "ADMIN", "RECOVERY");
     }
 
+    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
+        return authSessionService.findByToken(token);
+    }
+
     @PostMapping("/submit")
-    public String submitLostNic(
+    public ResponseEntity<String> submitLostNic(
         @RequestParam String nicNumber,
         @RequestParam String lostDate,
         @RequestParam String contactNumber,
         @RequestParam("birthCertificate") MultipartFile birthCertificate,
-        @RequestParam("policeReport") MultipartFile policeReport
+        @RequestParam("policeReport") MultipartFile policeReport,
+        @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) throws IOException {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+
         String birthCertPath = FileUploadUtil.saveFile("uploads", birthCertificate);
         String policeReportPath = FileUploadUtil.saveFile("uploads", policeReport);
 
@@ -60,9 +71,11 @@ public class LostNicController {
         lostNic.setContactNumber(contactNumber);
         lostNic.setBirthCertificatePath(birthCertPath);
         lostNic.setPoliceReportPath(policeReportPath);
+        lostNic.setUserId(sessionUser.get().userId());
+        lostNic.setUserEmail(sessionUser.get().email());
 
         service.save(lostNic);
-        return "Lost NIC report submitted successfully.";
+        return ResponseEntity.ok("Lost NIC report submitted successfully.");
     }
 
     // New endpoints for admin operations

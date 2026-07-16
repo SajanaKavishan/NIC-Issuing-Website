@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('/api/lost-nic/submit', {
                 method: 'POST',
+                headers: getAuthHeaders(),
                 body: formData
             });
 
@@ -153,3 +154,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for scroll events
     window.addEventListener('scroll', checkScroll);
 });
+
+function getAuthHeaders() {
+    try {
+        const token = localStorage.getItem('authToken');
+        return token ? { 'X-Auth-Token': token } : {};
+    } catch (_) {
+        return {};
+    }
+}

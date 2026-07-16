@@ -24,6 +24,8 @@ public class NewNicForm {
     private String birthCertificatePath;
     private String photoPath;
     private String status = "PENDING";
+    private Long userId;
+    private String userEmail;
 
     // Getters
     public Long getId() {
@@ -74,6 +76,14 @@ public class NewNicForm {
         return status;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
     // Setters
     public void setNameWithInitials(String nameWithInitials) {
         this.nameWithInitials = nameWithInitials;
@@ -117,5 +127,13 @@ public class NewNicForm {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

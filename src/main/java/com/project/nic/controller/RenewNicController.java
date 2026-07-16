@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 
@@ -28,16 +29,26 @@ public class RenewNicController {
         return authSessionService.hasAnyRole(token, "ADMIN", "PRO", "RECOVERY");
     }
 
+    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
+        return authSessionService.findByToken(token);
+    }
+
     @PostMapping("/submit")
-    public String submitRenewNic(
+    public ResponseEntity<String> submitRenewNic(
         @RequestParam String oldNicNumber,
         @RequestParam String birthdate,
         @RequestParam String reason,
         @RequestParam(required = false) String otherReason,
         @RequestParam String contactNumber,
         @RequestParam("birthCertificate") MultipartFile birthCertificate,
-        @RequestParam("photo") MultipartFile photo
+        @RequestParam("photo") MultipartFile photo,
+        @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) throws IOException {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+
         String birthCertPath = FileUploadUtil.saveFile("uploads", birthCertificate);
         String photoPath = FileUploadUtil.saveFile("uploads", photo);
 
@@ -49,9 +60,11 @@ public class RenewNicController {
         renewNic.setContactNumber(contactNumber);
         renewNic.setBirthCertificatePath(birthCertPath);
         renewNic.setPhotoPath(photoPath);
+        renewNic.setUserId(sessionUser.get().userId());
+        renewNic.setUserEmail(sessionUser.get().email());
 
         service.save(renewNic);
-        return "NIC renewal request submitted successfully.";
+        return ResponseEntity.ok("NIC renewal request submitted successfully.");
     }
 
     @GetMapping("/all")

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 
@@ -29,8 +30,12 @@ public class NewNicFormController {
         return authSessionService.hasAnyRole(token, "ADMIN", "PRO", "RECOVERY");
     }
 
+    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
+        return authSessionService.findByToken(token);
+    }
+
     @PostMapping("/submit")
-    public String submitForm(
+    public ResponseEntity<String> submitForm(
             @RequestParam String nameWithInitials,
             @RequestParam String gender,
             @RequestParam int age,
@@ -40,8 +45,13 @@ public class NewNicFormController {
             @RequestParam String address,
             @RequestParam String contactNumber,
             @RequestParam("birthCertificate") MultipartFile birthCertificate,
-            @RequestParam("photo") MultipartFile photo
+            @RequestParam("photo") MultipartFile photo,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) throws IOException {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
 
         String birthCertPath = FileUploadUtil.saveFile("uploads", birthCertificate);
         String photoPath = FileUploadUtil.saveFile("uploads", photo);
@@ -57,9 +67,11 @@ public class NewNicFormController {
         form.setContactNumber(contactNumber);
         form.setBirthCertificatePath(birthCertPath);
         form.setPhotoPath(photoPath);
+        form.setUserId(sessionUser.get().userId());
+        form.setUserEmail(sessionUser.get().email());
 
         service.save(form);
-        return "New NIC application submitted successfully.";
+        return ResponseEntity.ok("New NIC application submitted successfully.");
     }
 
     @GetMapping("/all")

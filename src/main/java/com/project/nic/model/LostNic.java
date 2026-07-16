@@ -18,6 +18,8 @@ public class LostNic {
 
     // New status field: PENDING / APPROVED / REJECTED
     private String status;
+    private Long userId;
+    private String userEmail;
 
     public LostNic() {
         // default status for new submissions
@@ -78,5 +80,21 @@ public class LostNic {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }
