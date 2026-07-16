@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Assistance</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+  <link rel="stylesheet" href="css/assistance.css">
+<!--  <link rel="stylesheet" href="css/nav.css">-->
+</head>
+<body>
+<div class="aurora"></div>
+<div class="glass">
+  <h1>Request Assistance</h1>
+  <form id="assistanceForm">
+    <div class="form-group">
+      <label for="email">Your Email</label>
+      <input type="email" id="email" name="email" required value="">
+      <input type="hidden" id="storedEmail" name="storedEmail">
+    </div>
+    <div class="form-group">
+      <label for="query">Describe the Issue</label>
+      <textarea id="query" name="query" required rows="5"></textarea>
+    </div>
+    <button type="submit">Submit Request</button>
+  </form>
+  <div id="conversation" class="conversation-list">
+    <h2>Your Assistance History</h2>
+    <ul id="requestList"></ul>
+  </div>
+  <div id="message" style="display: none;"></div>
+  <button id="backBtn">Back to New NIC</button>
+</div>
+<script src="js/assistance.js"></script>
+<!--<script src="js/nav.js"></script>-->
+</body>
+</html>

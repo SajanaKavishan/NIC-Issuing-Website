@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Manager Dashboard - NIC Services</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/finance.css">
+    <link rel="stylesheet" href="css/nav.css">
+
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass">
+        <div class="nav-brand">
+            <i class="fas fa-chart-line"></i>
+            <span>NIC Finance Dashboard</span>
+        </div>
+        <div class="nav-actions">
+            <button class="btn-ghost" id="refreshBtn">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-future" id="addPaymentBtn">
+                <i class="fas fa-plus"></i> Add Payment
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-container">
+        <!-- Statistics Overview -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card glass slide-in-left">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <div class="stat-value">LKR <span id="totalRevenue">0</span></div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i> 12.5% this month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card glass fade-in">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Pending Payments</h3>
+                        <div class="stat-value" id="pendingPayments">0</div>
+                        <div class="stat-trend negative">
+                            <i class="fas fa-arrow-up"></i> 3 pending verification
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card glass slide-in-right">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Completed</h3>
+                        <div class="stat-value" id="completedPayments">0</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i> 98% success rate
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment Records Table -->
+        <section class="table-section">
+            <div class="section-header">
+                <h2 class="display">Payment Records</h2>
+                <div class="table-controls">
+                    <div class="search-box glass">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search payments...">
+                    </div>
+                    <select class="filter-select glass" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container glass">
+                <table class="payments-table">
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Date</th>
+                            <th>Service Type</th>
+                            <th>Payment Method</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <!-- Payments will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add/Edit Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content glass scale-in">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Payment</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="paymentForm" class="modal-form">
+                <div class="form-group">
+                    <label for="paymentId">Payment ID</label>
+                    <input type="text" id="paymentId" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="serviceType">Service Type</label>
+                        <select id="serviceType" required>
+                            <option value="">Select Service</option>
+                            <option value="new">New NIC</option>
+                            <option value="lost">Lost NIC</option>
+                            <option value="renew">Renew NIC</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method</label>
+                        <select id="paymentMethod" required>
+                            <option value="">Select Method</option>
+                            <option value="card">Card Payment</option>
+                            <option value="online">Online Banking</option>
+                            <option value="deposit">Bank Deposit</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="amount">Amount (LKR)</label>
+                        <input type="number" id="amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerInfo">Customer Information</label>
+                    <textarea id="customerInfo" placeholder="Customer details..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-future" id="saveBtn">
+                        <i class="fas fa-save"></i> Save Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content glass scale-in">
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="modal-close" id="deleteModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <p>Are you sure you want to delete this payment record? This action cannot be undone.</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-ghost" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/finance.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Lost NIC - Online NIC Issuing Service</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <link rel="stylesheet" href="css/lost-nic.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<section class="form-section">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+    <div class="form-inner">
+        <div class="eyebrow fade-in">LOST NIC REPORT</div>
+        <h1 class="display fade-in">Report Lost National Identity Card</h1>
+        <p class="sub fade-in">If you have lost your NIC, please file a police report first and then complete this form. All fields are required.</p>
+
+        <!-- Need Help Button -->
+        <div class="top-actions fade-in">
+            <button id="helpBtn" class="btn-ghost" onclick="window.location.href='assistance.html'">
+                <span>Need Help?</span>
+            </button>
+        </div>
+
+        <div class="info-box glass">
+            <h3>Important Information</h3>
+            <p>Before filling this form, you must:</p>
+            <ol>
+                <li>File a report at your local police station about the lost NIC</li>
+                <li>Obtain the official police report document</li>
+                <li>Have your birth certificate ready for verification</li>
+            </ol>
+        </div>
+
+        <form id="lostNicForm" class="application-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fullName">Full Name with Initials</label>
+                    <input type="text" id="fullName" name="fullName" required placeholder="e.g., A.B. Perera">
+                </div>
+
+                <div class="form-group">
+                    <label for="nicNumber">NIC Number</label>
+                    <input type="text" id="nicNumber" name="nicNumber" required placeholder="e.g., 901234567V">
+                </div>
+
+                <div class="form-group">
+                    <label for="lostDate">Date NIC Was Lost</label>
+                    <input type="date" id="lostDate" name="lostDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="tel" id="contactNumber" name="contactNumber" required placeholder="e.g., 0712345678" pattern="[0-9]{10}">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">Current Address</label>
+                    <textarea id="address" name="address" required placeholder="Your current complete address" rows="3"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="birthCertificate">Birth Certificate (PDF only)</label>
+                    <input type="file" id="birthCertificate" name="birthCertificate" accept=".pdf" required>
+                    <div class="file-info">Maximum file size: 5MB</div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="policeReport">Police Report (PDF only)</label>
+                    <input type="file" id="policeReport" name="policeReport" accept=".pdf" required>
+                    <div class="file-info">Maximum file size: 5MB</div>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn-future">Submit Report</button>
+                <button type="reset" class="btn-ghost">Clear Form</button>
+            </div>
+        </form>
+
+        <div class="payment-section">
+            <h2 class="display">Payment</h2>
+            <p class="sub">After submitting your lost NIC report, please proceed to make the payment for replacement.</p>
+            <a href="paymentGateway.html">
+                <button id="paymentBtn" class="btn-future" disabled>Proceed to Payment</button>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script src="js/lost-nic.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>

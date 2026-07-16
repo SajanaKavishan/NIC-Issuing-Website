@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmed | NIC Service</title>
+    <!-- Use the same fonts as your homepage -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <!-- Link to the custom confirmation CSS -->
+    <link rel="stylesheet" href="css/confirmation.css">
+</head>
+<body>
+
+<!-- Reusing the background aesthetic from the home page -->
+<section class="neo-confirmation">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+
+    <div class="confirmation-container scale-in">
+        <div class="confirmation-card glass">
+            <div class="success-icon">
+                <!-- Icon for success confirmation, highly stylized -->
+                <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="circle-path" cx="26" cy="26" r="25" fill="none" />
+                    <path class="check-mark" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                </svg>
+            </div>
+
+            <div class="header-text fade-in">
+                <h1 class="display">Application Submitted!</h1>
+                <p class="sub">Your payment has been successfully processed, and your NIC application has been submitted for review.</p>
+            </div>
+
+            <div class="details-grid scale-in">
+                <div class="detail-item">
+                    <span class="label">Application Reference ID:</span>
+                    <strong id="ref-id">#NIC-2025-XXXXX</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="label">NIC Service Type:</span>
+                    <strong id="service-type">New NIC (First Time)</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Payment Method:</span>
+                    <strong id="payment-method">Card Payment</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Amount Paid:</span>
+                    <strong id="amount-paid">LKR 2,500.00</strong>
+                </div>
+            </div>
+
+            <div class="next-steps slide-in-left">
+                <h2>What Happens Next?</h2>
+                <p id="next-steps-text" class="next-steps-info">
+                    Your application and payment will be instantly verified. You will receive an email within **24 hours** with a link to track your application status.
+                </p>
+            </div>
+
+            <div class="cta-row slide-in-right">
+<!--                <button class="btn-future" onclick="window.location.href='/track-application'">Track Application Status</button>-->
+                <button class="btn-ghost" onclick="window.print()">Print Confirmation</button>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- Link to the custom confirmation JS -->
+<script src="js/confirmation.js"></script>
+
+</body>
+</html>

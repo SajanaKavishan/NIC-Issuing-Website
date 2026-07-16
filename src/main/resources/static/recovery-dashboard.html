@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Verification & Recovery Dashboard</title>
+    <!-- Importing the modern fonts (Orbitron for headings, Space Grotesk for body) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="css/recovery-dashboard.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <!-- Icon library for a modern touch -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<!-- Background effects carried over from homepage -->
+<div class="aurora"></div>
+<div class="noise"></div>
+
+<!-- Main Dashboard Container with Animation -->
+<div class="dashboard-container fade-in">
+    <!-- Main Content Area -->
+    <main class="main-content slide-in-up">
+        <h2 class="display-sm scale-in">ID Verification & Recovery Console</h2>
+        <div class="statbar scale-in glass">
+            <div class="stat">
+                <div class="value">12</div>
+                <div class="label">Pending</div>
+            </div>
+            <div class="stat">
+                <div class="value">4</div>
+                <div class="label">Escalated</div>
+            </div>
+            <div class="stat">
+                <div class="value">89%</div>
+                <div class="label">Auto-Verified</div>
+            </div>
+        </div>
+
+        <h3 class="fade-in">Lost NIC Requests</h3>
+        <div class="table-wrapper glass fade-in">
+            <table class="request-table" id="lostnic-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NIC Number</th>
+                    <th>Lost Date</th>
+                    <th>Contact Number</th>
+                    <th>Birth Certificate</th>
+                    <th>Police Report</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="lostnic-table-body">
+                <!-- Lost NIC data will be loaded here dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Selected Request Details Panel -->
+        <div class="selected-request glass scale-in" id="selectedRequest" style="display: none;">
+            <h3 class="display-sm"><i class="fas fa-id-card-clip"></i> Selected Request Details</h3>
+            <div class="details-grid">
+                <p><i class="fas fa-user"></i> Citizen Name: <span class="detail-value">J.R. De Silva</span></p>
+                <p><i class="fas fa-passport"></i> NIC Number: <span class="detail-value">912345678V</span></p>
+                <p><i class="fas fa-file-check"></i> Documents: <span class="detail-value status-verified">✔️ Verified</span></p>
+                <p><i class="fas fa-fingerprint"></i> Biometrics: <span class="detail-value status-pending">⚠️ Pending Check</span></p>
+            </div>
+            <div class="action-row">
+                <button class="btn-action btn-approve" title="Approve" aria-label="Approve"><i class="fas fa-check-circle"></i><span class="btn-label">Approve</span></button>
+                <button class="btn-action btn-reject" title="Reject" aria-label="Reject"><i class="fas fa-times-circle"></i><span class="btn-label">Reject</span></button>
+                <button class="btn-action btn-escalate" title="Escalate" aria-label="Escalate"><i class="fas fa-arrow-up-right-dots"></i><span class="btn-label">Escalate</span></button>
+                <button class="btn-action btn-manual-verify" title="Manual Verify" aria-label="Manual Verify"><i class="fas fa-hands-holding"></i><span class="btn-label">Manual Verify</span></button>
+            </div>
+        </div>
+    </main> <!-- Properly closing the main tag -->
+
+    <!-- Right Panel (Verification Tools) - Glass effect applied -->
+
+</div> <!-- Closing the dashboard-container div -->
+
+<!-- Themed Notification Box (Hidden by default) -->
+<div id="notification-box" class="notification-box"></div>
+
+<!-- File preview modal (hidden by default) -->
+<div id="filePreviewModal" class="modal" style="display:none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content glass">
+        <button class="modal-close" id="modalCloseBtn" title="Close preview" aria-label="Close preview">&times;</button>
+        <div class="modal-body">
+            <!-- We'll use an iframe to preview PDFs and images; iframe stays empty until used -->
+            <iframe id="previewFrame" src="" style="width:100%; height:80vh;"></iframe>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="noise"></div>
+    &copy; 2025 NIC Admin Console | Last Updated: September 28, 2025
+</footer>
+
+<script src="js/recovery-dashboard.js"></script>
+<script src="js/nav.js"></script>
+<script src="/js/lostnic.js"></script>
+</body>
+</html>

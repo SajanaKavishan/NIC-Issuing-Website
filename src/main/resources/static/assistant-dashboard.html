@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Assistance Dashboard</title>
+  <link rel="stylesheet" href="css/assistant-dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="neo-dashboard-bg">
+  <div class="aurora"></div>
+  <div class="noise"></div>
+  <div class="orbits">
+    <div class="dot d1"></div>
+    <div class="dot d2"></div>
+    <div class="dot d3"></div>
+  </div>
+</div>
+
+<!-- Header Navigation Bar -->
+<header class="admin-header">
+  <div class="header-content container">
+    <div class="logo">
+      <span class="logo-icon">A</span>
+      <span>Assistance Portal</span>
+    </div>
+    <nav class="user-menu">
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="avatar">A</div>
+      </div>
+      <button id="logoutBtn" class="btn-ghost">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-main">
+  <section class="content-header fade-in">
+    <h1>Assistance Dashboard</h1>
+    <p>Monitor, manage, and respond to all user assistance requests.</p>
+  </section>
+
+  <!-- Overview Cards -->
+  <section class="grid slide-in-left">
+    <div class="card glass">
+      <h3 id="totalRequests">0</h3>
+      <p>Total Requests</p>
+    </div>
+    <div class="card glass">
+      <h3 id="pendingRequestsCount">0</h3>
+      <p>Pending Review</p>
+    </div>
+    <div class="card glass">
+      <h3 id="completedRequestsCount">0</h3>
+      <p>Completed</p>
+    </div>
+  </section>
+
+  <!-- Search and Filters -->
+  <div class="toolbar slide-in-right">
+    <div>
+      <label for="searchInput">Search by ID</label>
+      <input type="text" id="searchInput" class="input" placeholder="Enter Request ID...">
+    </div>
+    <div class="dropdown">
+      <label for="statusFilter">Status</label>
+      <select id="statusFilter" class="input">
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+    <div class="button" id="searchBtn">Apply Filters</div>
+    <div class="button" onclick="resetFilters()">Reset</div>
+    <a id="assistantLogsBtn" href="/assistant-log.html" class="button" role="button" aria-label="Open Assistant Logs">Assistant Logs</a>
+  </div>
+
+  <!-- Loading and Messages -->
+  <div id="loading" class="fade-in">Loading requests...</div>
+  <div id="message" class="glass" style="display: none;"></div>
+  <div id="error" class="glass" style="display: none; color: #FF1F6A;"></div>
+
+  <!-- Requests Lists -->
+  <section class="panel">
+    <h3 class="font-orbitron" style="color: var(--a);">Pending Requests</h3>
+    <ul id="pendingRequests" class="fade-in"></ul>
+
+    <h3 class="font-orbitron" style="color: var(--a); margin-top: 2rem;">Completed Requests</h3>
+    <ul id="completedRequests" class="fade-in"></ul>
+  </section>
+
+  <!-- Notifications -->
+  <section class="panel">
+    <h2 class="font-orbitron">System Notifications</h2>
+    <div id="notifications">
+      <p>• Dashboard initialized. Ready for requests. — <span id="initDate"></span></p>
+    </div>
+  </section>
+</main>
+
+<!-- Response Modal -->
+<div id="responseModal" class="modal">
+  <div class="modal-content glass">
+    <div class="modal-header">
+      <h2 class="font-orbitron">Request Details: <span id="modalId"></span></h2>
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <h4>Details</h4>
+      <p><strong>Applicant ID:</strong> <span id="modalApplicantId"></span></p>
+      <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+      <p><strong>Query:</strong> <span id="modalQuery"></span></p>
+      <p><strong>Status:</strong> <span id="modalStatus" class="status"></span></p>
+
+      <h4>Respond & Update</h4>
+      <label for="updateStatus">New Status</label>
+      <select id="updateStatus" class="input">
+        <option value="pending">Pending</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <label for="responseText">Response Message</label>
+      <textarea id="responseText" class="input" placeholder="Type your response..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn-future" onclick="saveChanges()">Save & Respond</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="js/assistant-dashboard.js"></script>
+</body>
+</html>

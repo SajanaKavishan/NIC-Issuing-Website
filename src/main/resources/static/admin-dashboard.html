@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - NIC Online Service</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/admin-dashboard.css" />
+    <link rel="stylesheet" href="css/nav.css" />
+</head>
+<body>
+<div class="admin-container">
+    <!-- Main Content only (sidebar removed) -->
+    <main class="main-content" style="width:100%;">
+        <!-- Top Header -->
+        <header class="admin-header glass">
+            <div class="header-left">
+                <h1 class="display">Admin Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="btn-ghost notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="btn-ghost">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- User Management Section (only visible section) -->
+        <section id="users" class="dashboard-section active" style="padding:16px;">
+            <div class="section-header glass">
+                <h2 class="display">User Management</h2>
+                <div class="section-actions">
+                    <button id="btnAddUser" class="btn-future"><i class="fas fa-user-plus"></i> Add User</button>
+                </div>
+            </div>
+
+            <div class="glass" style="padding: 16px; margin-top: 12px;">
+                <div id="userFormContainer" class="fade-in" style="display:none; margin-bottom:16px;">
+                    <h3 id="userFormTitle">Add User</h3>
+                    <form id="userForm" class="user-form">
+                        <input type="hidden" id="userId" />
+                        <div class="form-row">
+                            <label>First Name
+                                <input type="text" id="ufFirst" required />
+                            </label>
+                            <label>Last Name
+                                <input type="text" id="ufLast" required />
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label>Email
+                                <input type="email" id="ufEmail" required />
+                            </label>
+                            <label>Password
+                                <input type="password" id="ufPassword" placeholder="Leave blank to keep current (edit)" />
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-future" id="btnSaveUser">Save</button>
+                            <button type="button" class="btn-ghost" id="btnCancelUser">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table" id="usersTable" style="width:100%;">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="js/admin-dashboard.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>

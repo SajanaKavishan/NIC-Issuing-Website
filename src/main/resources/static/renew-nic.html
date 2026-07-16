@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renew NIC - Online NIC Issuing Service</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <link rel="stylesheet" href="css/renew-nic.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<section class="form-section">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+    <div class="form-inner">
+        <div class="eyebrow fade-in">NIC RENEWAL SERVICE</div>
+        <h1 class="display fade-in">Renew or Replace Your NIC</h1>
+        <p class="sub fade-in">Use this service if your NIC is damaged, worn out, or if you need to upgrade to the new smart NIC format. Complete the form below to request a replacement.</p>
+
+        <!-- Need Help Button -->
+        <div class="top-actions fade-in">
+            <button id="helpBtn" class="btn-ghost" onclick="window.location.href='assistance.html'">
+                <span>Need Help?</span>
+            </button>
+        </div>
+
+        <div class="info-box glass">
+            <h3>When to Renew Your NIC</h3>
+            <ul>
+                <li>Your NIC is physically damaged or worn out</li>
+                <li>You need to update to the new smart NIC format</li>
+                <li>Your personal details have changed (use Update Details service instead)</li>
+                <li>Your NIC has expired (for certain older formats)</li>
+            </ul>
+            <p class="note">Note: If your NIC was lost or stolen, please use the <a href="lost-nic.html">Lost NIC service</a> instead.</p>
+        </div>
+
+        <form id="renewNicForm" class="application-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Name with Initials</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., A.B. Perera">
+                </div>
+
+                <!-- Gender Selection with Horizontal Radio Buttons -->
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group horizontal">
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="male" required>
+                            <span class="radio-custom"></span>
+                            Male
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="female">
+                            <span class="radio-custom"></span>
+                            Female
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="other">
+                            <span class="radio-custom"></span>
+                            Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="oldNicNumber">Old NIC Number</label>
+                    <input type="text" id="oldNicNumber" name="oldNicNumber" required placeholder="e.g., 901234567V">
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Birthdate</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">Current Address</label>
+                    <textarea id="address" name="address" required placeholder="Your current complete address" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="tel" id="contactNumber" name="contactNumber" required placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="birthCertificate">Birth Certificate (PDF only)</label>
+                    <input type="file" id="birthCertificate" name="birthCertificate" accept=".pdf" required>
+                    <div class="file-info">Maximum file size: 5MB</div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="photo">Passport Size Photo (JPEG or PNG)</label>
+                    <input type="file" id="photo" name="photo" accept=".jpeg,.jpg,.png" required>
+                    <div class="file-info">Maximum file size: 2MB</div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="reason">Reason for Renewal</label>
+                    <select id="reason" name="reason" required>
+                        <option value="">Select Reason</option>
+                        <option value="damaged">NIC is damaged</option>
+                        <option value="worn">NIC is worn out</option>
+                        <option value="upgrade">Upgrade to new smart NIC</option>
+                        <option value="expired">NIC has expired</option>
+                        <option value="other">Other reason</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width" id="otherReasonContainer" style="display: none;">
+                    <label for="otherReason">Please specify reason</label>
+                    <input type="text" id="otherReason" name="otherReason" placeholder="Specify your reason for renewal">
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn-future">Submit Renewal Request</button>
+                <button type="reset" class="btn-ghost">Clear Form</button>
+            </div>
+        </form>
+
+        <div class="payment-section">
+            <h2 class="display">Payment</h2>
+            <p class="sub">After submitting your renewal request, please proceed to make the payment for your new NIC.</p>
+            <a href="paymentGateway.html">
+                <button id="paymentBtn" class="btn-future" disabled>Proceed to Payment</button>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script src="js/renew-nic.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>

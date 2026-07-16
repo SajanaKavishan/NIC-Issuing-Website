@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - NIC Services</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <style>
+        :root {
+            --bg: #070818;
+            --fg: #E6F0FF;
+            --muted: #9DB2CE;
+            --a: #00E5FF;
+            --b: #7C3AED;
+            --c: #FF1F6A;
+            --glass-bg: rgba(255,255,255,.06);
+            --glass-border: rgba(255,255,255,.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Space Grotesk', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 229, 255, 0.5);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .checkout-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 229, 255, 0.15);
+            padding: 45px 35px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .checkout-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--fg), var(--a), var(--b));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.6));
+            }
+        }
+
+        .checkout-subtitle {
+            color: var(--muted);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--b), var(--a));
+            border-radius: 2px;
+            width: 33%;
+            transition: width 0.5s ease;
+        }
+
+        .checkout-summary {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .checkout-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .summary-value {
+            color: var(--fg);
+            font-weight: 600;
+        }
+
+        .total-value {
+            background: linear-gradient(135deg, var(--a), var(--b));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.3rem;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-method-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--fg);
+        }
+
+        .payment-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .payment-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .payment-tab.active {
+            background: linear-gradient(135deg, var(--b), var(--a));
+            color: var(--fg);
+            border: 1px solid rgba(124, 58, 237, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .payment-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .saved-cards {
+            margin-bottom: 25px;
+        }
+
+        .saved-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .saved-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .saved-card.selected {
+            border: 2px solid var(--b);
+            background: rgba(124, 58, 237, 0.15);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--b);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-number {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-type {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .add-new-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .add-new-card:hover {
+            border-color: var(--b);
+            color: var(--b);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .checkout-form {
+            display: none;
+        }
+
+        .checkout-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--fg);
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border: 2px solid var(--b);
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #34d399;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--b), var(--a));
+            border: none;
+            border-radius: 16px;
+            color: #001016;
+            padding: 18px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s;
+            margin-top: 25px;
+            box-shadow: 0 8px 30px rgba(0, 229, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.3);
+            filter: brightness(1.05);
+        }
+
+        .checkout-btn:active {
+            transform: translateY(0);
+        }
+
+        .checkout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .checkout-btn:hover::before {
+            left: 100%;
+        }
+
+        .checkout-success {
+            background: rgba(52, 211, 153, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading .checkout-btn {
+            background: #555;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .bank-details {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bank-details h4 {
+            margin-top: 0;
+            color: var(--b);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .bank-details p {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bank-details .label {
+            color: var(--muted);
+        }
+
+        .bank-details .value {
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--b);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: var(--b);
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            margin: 5px 0;
+            color: var(--muted);
+        }
+
+        .upload-area .browse {
+            color: var(--b);
+            text-decoration: underline;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .nic-selection {
+            margin-bottom: 30px;
+        }
+
+        .nic-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nic-option {
+            flex: 1;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nic-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .nic-option.selected {
+            border-color: var(--b);
+            background: rgba(124, 58, 237, 0.15);
+        }
+
+        .nic-option i {
+            font-size: 2rem;
+            color: var(--b);
+            margin-bottom: 15px;
+        }
+
+        .nic-option h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .nic-option p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            color: #34d399;
+            margin-bottom: 20px;
+        }
+
+        .modal h3 {
+            margin: 0 0 15px;
+            font-size: 1.8rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .modal p {
+            color: var(--muted);
+            margin-bottom: 25px;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--b), var(--a));
+            border: none;
+            border-radius: 12px;
+            color: #001016;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+            filter: brightness(1.05);
+        }
+
+        /* Aurora effect from home.css */
+        .aurora {
+            position: absolute;
+            inset: -25vmax;
+            z-index: 1;
+            background:
+                    radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,0.35) 0%, rgba(124,58,237,0.35) 35%, transparent 55%),
+                    radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,0.28) 0%, rgba(0,229,255,0.28) 30%, transparent 60%),
+                    radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,0.26) 0%, rgba(255,31,106,0.26) 25%, transparent 55%);
+
+            filter: blur(60px) saturate(120%);
+            animation: aurora-rotate 24s linear infinite;
+        }
+
+        @keyframes aurora-rotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.06); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .noise {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: .18;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+            mix-blend-mode: soft-light;
+        }
+
+        .orbits {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #7df2ff);
+            box-shadow: 0 0 18px rgba(0,229,255,.7);
+        }
+
+        .d1 { animation: orbit1 16s linear infinite; }
+        .d2 { animation: orbit2 22s linear infinite; }
+        .d3 { animation: orbit3 28s linear infinite; }
+
+        @keyframes orbit1 { from { transform: rotate(0deg) translateX(180px) rotate(0deg); } to { transform: rotate(360deg) translateX(180px) rotate(-360deg); } }
+        @keyframes orbit2 { from { transform: rotate(0deg) translateX(-240px) rotate(0deg); } to { transform: rotate(360deg) translateX(-240px) rotate(-360deg); } }
+        @keyframes orbit3 { from { transform: rotate(0deg) translateX(120px) rotate(0deg); } to { transform: rotate(360deg) translateX(120px) rotate(-360deg); } }
+
+        @media (max-width: 600px) {
+            .checkout-container {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+
+            .checkout-title {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .payment-tabs {
+                flex-direction: column;
+            }
+
+            .nic-options {
+                flex-direction: column;
+            }
+        }
+
+        /* Customer Information Form */
+        .customer-info-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .customer-info-section h4 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            color: var(--fg);
+        }
+    </style>
+</head>
+
+<body>
+<div class="aurora"></div>
+<div class="noise"></div>
+<div class="orbits">
+    <div class="dot d1"></div>
+    <div class="dot d2"></div>
+    <div class="dot d3"></div>
+</div>
+<div class="bg-particles"></div>
+
+<div class="checkout-container">
+    <div class="checkout-header">
+        <div class="checkout-title">
+            <i class="fas fa-id-card"></i> NIC Services Payment
+        </div>
+        <div class="checkout-subtitle">Complete your NIC application payment</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Customer Information Section -->
+    <div class="customer-info-section">
+        <h4><i class="fas fa-user"></i> Contact Email</h4>
+        <div class="form-group">
+            <label for="customerEmail">Email Address</label>
+            <input type="email" id="customerEmail" placeholder="Enter your email" required>
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">
+            We will use the application details you already submitted. Only your email is required here for the payment receipt.
+        </div>
+    </div>
+
+    <div class="nic-selection">
+        <div class="payment-method-title">
+            <i class="fas fa-id-card"></i> Select NIC Service Type
+        </div>
+
+        <div class="nic-options">
+            <div class="nic-option selected" data-type="new" data-price="2000">
+                <i class="fas fa-plus-circle"></i>
+                <h3>New NIC</h3>
+                <p>First time application</p>
+                <div class="summary-value">LKR 2,000</div>
+            </div>
+
+            <div class="nic-option" data-type="lost" data-price="3000">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Lost NIC</h3>
+                <p>Replacement for lost card</p>
+                <div class="summary-value">LKR 3,000</div>
+            </div>
+
+            <div class="nic-option" data-type="renew" data-price="1000">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Renew NIC</h3>
+                <p>Renewal of existing card</p>
+                <div class="summary-value">LKR 1,000</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-summary" id="checkoutSummary">
+        <div class="summary-row">
+            <span class="summary-label">NIC Service Fee</span>
+            <span class="summary-value">LKR 2,000</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Processing Fee</span>
+            <span class="summary-value">LKR 100</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Total</span>
+            <span class="summary-value total-value">LKR 2,100</span>
+        </div>
+    </div>
+
+    <div class="payment-methods">
+        <div class="payment-method-title">
+            <i class="fas fa-credit-card"></i> Payment Method
+        </div>
+
+        <div class="payment-tabs">
+            <div class="payment-tab active" data-tab="card">
+                <i class="fas fa-credit-card"></i> Card Payment
+            </div>
+            <div class="payment-tab" data-tab="online">
+                <i class="fas fa-university"></i> Online Banking
+            </div>
+            <div class="payment-tab" data-tab="deposit">
+                <i class="fas fa-landmark"></i> Bank Deposit
+            </div>
+        </div>
+
+        <div class="payment-content active" id="cardContent">
+            <div class="checkout-form active" id="cardForm">
+                <div class="form-group">
+                    <label for="cardName">Cardholder Name</label>
+                    <input type="text" id="cardName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <input type="text" id="expiryDate" maxlength="5" placeholder="MM/YY" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cvc">CVC</label>
+                        <input type="text" id="cvc" maxlength="4" placeholder="123" required>
+                    </div>
+                </div>
+
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secured with 256-bit SSL encryption</span>
+                </div>
+            </div>
+
+            <button class="checkout-btn" type="button" id="payNowBtn">
+                <i class="fas fa-lock"></i> Pay Now
+            </button>
+        </div>
+
+        <div class="payment-content" id="onlineContent" style="display: none;">
+            <div class="bank-details">
+                <h4>Bank Transfer Details</h4>
+                <p><span class="label">Bank Name:</span> <span class="value">People's Bank</span></p>
+                <p><span class="label">Account Name:</span> <span class="value">Department of Registration of Persons</span></p>
+                <p><span class="label">Account Number:</span> <span class="value">123-4567-8901234</span></p>
+                <p><span class="label">Branch:</span> <span class="value">Colombo Main</span></p>
+                <p><span class="label">Reference:</span> <span class="value">NIC-YourFullName</span></p>
+                <p><span class="label">Amount:</span> <span class="value total-value">LKR 2,100</span></p>
+            </div>
+
+            <div class="upload-area" id="onlineUploadArea">
+                <input type="file" id="onlineReceipt" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                <i class="fas fa-file-upload"></i>
+                <p>Upload your transfer receipt (PDF or Image)</p>
+                <p>Click here or <span class="browse">browse</span> to upload file</p>
+                <div class="file-name" id="onlineFileName"></div>
+            </div>
+
+            <button class="checkout-btn" type="button" id="submitOnlineBtn">
+                <i class="fas fa-paper-plane"></i> Submit Receipt
+            </button>
+        </div>
+
+        <div class="payment-content" id="depositContent" style="display: none;">
+            <div class="bank-details">
+                <h4>Bank Deposit Details</h4>
+                <p><span class="label">Bank Name:</span> <span class="value">Bank of Ceylon</span></p>
+                <p><span class="label">Account Name:</span> <span class="value">Department of Registration of Persons</span></p>
+                <p><span class="label">Account Number:</span> <span class="value">001-1234567-890</span></p>
+                <p><span class="label">Branch:</span> <span class="value">Colombo Main</span></p>
+                <p><span class="label">Reference:</span> <span class="value">NIC-YourFullName</span></p>
+                <p><span class="label">Amount:</span> <span class="value total-value">LKR 2,100</span></p>
+            </div>
+
+            <div class="upload-area" id="depositUploadArea">
+                <input type="file" id="depositSlip" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                <i class="fas fa-file-upload"></i>
+                <p>Upload your deposit slip (PDF or Image)</p>
+                <p>Click here or <span class="browse">browse</span> to upload file</p>
+                <div class="file-name" id="depositFileName"></div>
+            </div>
+
+            <button class="checkout-btn" type="button" id="submitDepositBtn">
+                <i class="fas fa-paper-plane"></i> Submit Deposit Slip
+            </button>
+        </div>
+    </div>
+
+    <div class="checkout-success" id="checkoutSuccess" style="display:none;">
+        <i class="fas fa-check-circle"></i>
+        <div>Payment successful!</div>
+        <div style="font-size: 1rem; margin-top: 10px; opacity: 0.8;">
+            Redirecting to confirmation page...
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+    <div class="modal-content">
+        <i class="fas fa-check-circle modal-icon"></i>
+        <h3>Payment Complete</h3>
+        <p>Your payment has been processed successfully.</p>
+        <button class="modal-btn" id="modalOkBtn">OK</button>
+    </div>
+</div>
+
+<!-- Submission Modal -->
+<div class="modal" id="submissionModal">
+    <div class="modal-content">
+        <i class="fas fa-check-circle modal-icon"></i>
+        <h3>Submission Successful</h3>
+        <p>Your receipt has been submitted successfully.</p>
+        <button class="modal-btn" id="submissionOkBtn">OK</button>
+    </div>
+</div>
+
+<script>
+    // API Configuration - UPDATE THIS URL TO MATCH YOUR BACKEND
+    const API_BASE_URL = 'http://localhost:8080/api/payments';
+
+    function createParticles() {
+        const container = document.querySelector('.bg-particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            container.appendChild(particle);
+        }
+    }
+    createParticles();
+
+    let currentStep = 1;
+    let selectedPaymentMethod = 'card';
+    let selectedNicType = 'new';
+    let nicPrice = 2000;
+    const processingFee = 100;
+
+    // Function to record payment in backend
+    async function recordPayment(paymentData) {
+        try {
+            const response = await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to record payment: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Payment recorded successfully:', result);
+            return result;
+        } catch (error) {
+            console.error('Error recording payment:', error);
+            throw error;
+        }
+    }
+
+    // Validate only contact email on payment page
+    function validateContactEmail() {
+        const email = (document.getElementById('customerEmail')?.value || '').trim();
+        if (!email) {
+            alert('Please enter your email address.');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        return true;
+    }
+
+    // Helper: get NIC from previous step (session/local storage or URL)
+    function getNicFromPreviousStep() {
+        try {
+            const urlNic = new URLSearchParams(window.location.search).get('nic');
+            const ssNic = sessionStorage.getItem('applicantNIC');
+            const lsNic = localStorage.getItem('applicantNIC');
+            return (urlNic && urlNic.trim()) || (ssNic && ssNic.trim()) || (lsNic && lsNic.trim()) || '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // Keep for backward compatibility if backend still reads customerInfo
+    function getContactEmail() {
+        return (document.getElementById('customerEmail')?.value || '').trim();
+    }
+
+    function updateSummary() {
+        const total = nicPrice + processingFee;
+        document.getElementById('checkoutSummary').innerHTML = `
+            <div class="summary-row">
+                <span class="summary-label">NIC Service Fee (${selectedNicType})</span>
+                <span class="summary-value">LKR ${nicPrice.toLocaleString()}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Processing Fee</span>
+                <span class="summary-value">LKR ${processingFee.toLocaleString()}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Total</span>
+                <span class="summary-value total-value">LKR ${total.toLocaleString()}</span>
+            </div>
+        `;
+
+        // Update amounts in bank details sections
+        document.querySelectorAll('.total-value').forEach(el => {
+            if (el.parentElement.classList.contains('value')) {
+                el.textContent = `LKR ${total.toLocaleString()}`;
+            }
+        });
+    }
+
+    function updateProgress() {
+        const progressFill = document.getElementById('progressFill');
+        const percentage = (currentStep / 3) * 100;
+        progressFill.style.width = percentage + '%';
+    }
+
+    // NIC type selection
+    document.querySelectorAll('.nic-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.nic-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedNicType = this.dataset.type;
+            nicPrice = parseInt(this.dataset.price);
+            updateSummary();
+            currentStep = 2;
+            updateProgress();
+        });
+    });
+
+    // Payment method tabs
+    document.querySelectorAll('.payment-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            selectedPaymentMethod = this.dataset.tab;
+            document.querySelectorAll('.payment-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(selectedPaymentMethod + 'Content').style.display = 'block';
+            currentStep = 3;
+            updateProgress();
+        });
+    });
+
+    // Card number formatting
+    document.getElementById('cardNumber').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+        e.target.value = formattedValue;
+    });
+
+    // Expiry date formatting
+    document.getElementById('expiryDate').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        e.target.value = value;
+    });
+
+    // File upload handling for online banking
+    const onlineUploadArea = document.getElementById('onlineUploadArea');
+    const onlineReceipt = document.getElementById('onlineReceipt');
+    const onlineFileName = document.getElementById('onlineFileName');
+
+    onlineUploadArea.addEventListener('click', function() {
+        onlineReceipt.click();
+    });
+
+    onlineReceipt.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            onlineFileName.textContent = this.files[0].name;
+        } else {
+            onlineFileName.textContent = '';
+        }
+    });
+
+    // File upload handling for bank deposit
+    const depositUploadArea = document.getElementById('depositUploadArea');
+    const depositSlip = document.getElementById('depositSlip');
+    const depositFileName = document.getElementById('depositFileName');
+
+    depositUploadArea.addEventListener('click', function() {
+        depositSlip.click();
+    });
+
+    depositSlip.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            depositFileName.textContent = this.files[0].name;
+        } else {
+            depositFileName.textContent = '';
+        }
+    });
+
+    // Pay Now button (card payment) - UPDATED WITH BACKEND INTEGRATION
+    document.getElementById('payNowBtn').addEventListener('click', async function() {
+        // Validate email only
+        if (!validateContactEmail()) {
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner"></div>Processing Payment...';
+        btn.disabled = true;
+        document.querySelector('.checkout-container').classList.add('loading');
+
+        try {
+            // Collect payment data
+            const paymentData = {
+                serviceType: selectedNicType,
+                paymentMethod: 'card',
+                amount: nicPrice + processingFee,
+                status: 'completed',
+                nic: getNicFromPreviousStep(),
+                email: getContactEmail(),
+                customerInfo: getContactEmail()
+            };
+
+            // Record payment in backend
+            await recordPayment(paymentData);
+
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+
+        } catch (error) {
+            alert('Payment processing failed. Please try again.');
+            console.error('Payment error:', error);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            document.querySelector('.checkout-container').classList.remove('loading');
+        }
+    });
+
+    // Submit buttons for online banking - UPDATED WITH BACKEND INTEGRATION
+    document.getElementById('submitOnlineBtn').addEventListener('click', async function() {
+        // Validate email only
+        if (!validateContactEmail()) {
+            return;
+        }
+
+        if (!onlineReceipt.files.length) {
+            alert('Please upload your transfer receipt first.');
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner"></div>Submitting...';
+        btn.disabled = true;
+
+        try {
+            const paymentData = {
+                serviceType: selectedNicType,
+                paymentMethod: 'online',
+                amount: nicPrice + processingFee,
+                status: 'pending',
+                nic: getNicFromPreviousStep(),
+                email: getContactEmail(),
+                customerInfo: getContactEmail() + ' - Online Banking Receipt'
+            };
+
+            await recordPayment(paymentData);
+            document.getElementById('submissionModal').classList.add('active');
+
+        } catch (error) {
+            alert('Submission failed. Please try again.');
+            console.error('Submission error:', error);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // Submit buttons for bank deposit - UPDATED WITH BACKEND INTEGRATION
+    document.getElementById('submitDepositBtn').addEventListener('click', async function() {
+        // Validate email only
+        if (!validateContactEmail()) {
+            return;
+        }
+
+        if (!depositSlip.files.length) {
+            alert('Please upload your deposit slip first.');
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner"></div>Submitting...';
+        btn.disabled = true;
+
+        try {
+            const paymentData = {
+                serviceType: selectedNicType,
+                paymentMethod: 'deposit',
+                amount: nicPrice + processingFee,
+                status: 'pending',
+                nic: getNicFromPreviousStep(),
+                email: getContactEmail(),
+                customerInfo: getContactEmail() + ' - Bank Deposit Slip'
+            };
+
+            await recordPayment(paymentData);
+            document.getElementById('submissionModal').classList.add('active');
+
+        } catch (error) {
+            alert('Submission failed. Please try again.');
+            console.error('Submission error:', error);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // Modal close buttons
+    document.getElementById('modalOkBtn').addEventListener('click', function() {
+        document.getElementById('successModal').classList.remove('active');
+        document.getElementById('checkoutSuccess').style.display = 'block';
+        setTimeout(() => {
+            window.location.href = "confirmation.html";
+        }, 3000);
+    });
+
+    document.getElementById('submissionOkBtn').addEventListener('click', function() {
+        document.getElementById('submissionModal').classList.remove('active');
+        document.getElementById('checkoutSuccess').style.display = 'block';
+        setTimeout(() => {
+            window.location.href = "confirmation.html";
+        }, 3000);
+    });
+
+    // Initialize
+    updateProgress();
+
+    // Auto-advance progress when email is filled
+    const customerInputs = document.querySelectorAll('#customerEmail');
+    customerInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            const allFilled = Array.from(customerInputs).every(i => (i.value || '').trim() !== '');
+            if (allFilled && currentStep === 1) {
+                currentStep = 2;
+                updateProgress();
+            }
+        });
+    });
+</script>
+</body>
+</html>

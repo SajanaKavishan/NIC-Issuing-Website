@@ -1,0 +1,491 @@
+:root {
+    --bg: #070818;
+    --fg: #E6F0FF;
+    --muted: #9DB2CE;
+    --a: #00E5FF;
+    --b: #7C3AED;
+    --c: #FF1F6A;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+}
+
+nav {
+    background: rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+nav ul li {
+    margin-right: 20px;
+    position: relative;
+}
+
+nav ul li a {
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    display: block;
+}
+
+nav ul li a:hover {
+    color: var(--a);
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropbtn {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgb(255, 255, 255);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 8px;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,.2);
+    z-index: 1000;
+    top: 100%;
+    right: 0;
+    transform: translateY(40px);
+    padding: 5px 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-content a {
+    color: var(--fg);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background: rgba(255,255,255,.1);
+    color: var(--a);
+}
+
+.auth-buttons button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.auth-buttons .btn-ghost,
+.auth-buttons .btn-future {
+    font-weight: 700;
+}
+
+.btn-ghost {
+    display: inline-flex;
+    padding: .8rem 1.1rem;
+    border-radius: 14px;
+    color: var(--fg);
+    text-decoration: none;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
+}
+
+.btn-ghost:hover {
+    background: rgba(255,255,255,.1);
+}
+
+.btn-future {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .8rem 1.1rem;
+    border-radius: 14px;
+    color: #001016;
+    background: linear-gradient(180deg, #7df2ff, #00bfe3);
+    box-shadow: 0 0 0 0 rgba(0,229,255,.6), 0 10px 30px rgba(0,229,255,.25);
+    font-weight: 700;
+    border: 0;
+    text-decoration: none;
+    transform: translateZ(0);
+}
+
+.btn-future:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 40px rgba(0,229,255,.35);
+}
+
+.btn-future:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.glass {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.form-section {
+    position: relative;
+    overflow: hidden;
+    color: var(--fg);
+    background: radial-gradient(circle 1200px at 20% 10%, #0b1229 0%, #0b1229 35%, transparent 40%),
+    linear-gradient(180deg, #070818 0%, #050611 100%);
+    padding: 3rem 0;
+    isolation: isolate;
+    min-height: 100vh;
+}
+
+.form-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.eyebrow {
+    display: inline-block;
+    letter-spacing: .18em;
+    font-size: .8rem;
+    color: rgba(255,255,255,.7);
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+}
+
+.display {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    letter-spacing: .5px;
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    line-height: 1.05;
+    margin: .25rem 0 .75rem;
+    background: linear-gradient(90deg, #fff, #d9e8ff 60%, #a8e7ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 8px 40px rgba(124,58,237,.25);
+}
+
+.sub {
+    max-width: 720px;
+    margin: 0 auto 1.25rem;
+    color: var(--muted);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+}
+
+.application-form {
+    margin: 2rem 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.06);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: "Space Grotesk", sans-serif;
+    resize: vertical;
+}
+
+.form-group select {
+    padding: 0.8rem;
+    border: 1px solid rgba(255,255,255,.18);
+    background: black;
+    border-radius: 8px;
+    color: white;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--a);
+    box-shadow: 0 0 0 2px rgba(0,229,255,.2);
+}
+
+.form-group input[type="file"] {
+    padding: 0.5rem;
+}
+
+.file-info {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.payment-section {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,.1);
+}
+
+/* Radio Button Styles */
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.radio-group.horizontal {
+    flex-direction: row;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.radio-option:hover {
+    background: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.2);
+}
+
+.radio-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-custom {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+    border-color: var(--a);
+}
+
+.radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--a);
+    transition: transform 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.radio-option input[type="radio"]:checked ~ span:last-child {
+    color: var(--a);
+    font-weight: 600;
+}
+
+/* Aurora background */
+.aurora {
+    position: absolute;
+    inset: -25vmax;
+    z-index: 1;
+    background:
+            radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0%, rgba(124,58,237,.35) 35%, transparent 55%),
+            radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0%, rgba(0,229,255,.28) 30%, transparent 60%),
+            radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0%, rgba(255,31,106,.26) 25%, transparent 55%);
+    filter: blur(60px) saturate(120%);
+    animation: aurora-rotate 24s linear infinite;
+}
+
+@keyframes aurora-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.06); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Subtle noise/scanlines */
+.noise {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: .18;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+    mix-blend-mode: soft-light;
+}
+
+/* Orbiting dots */
+.orbits {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #7df2ff);
+    box-shadow: 0 0 18px rgba(0,229,255,.7);
+}
+
+.d1 { animation: orbit1 16s linear infinite; }
+.d2 { animation: orbit2 22s linear infinite; }
+.d3 { animation: orbit3 28s linear infinite; }
+
+@keyframes orbit1 { from { transform: rotate(0deg) translateX(180px) rotate(0deg); } to { transform: rotate(360deg) translateX(180px) rotate(-360deg); } }
+@keyframes orbit2 { from { transform: rotate(0deg) translateX(-240px) rotate(0deg); } to { transform: rotate(360deg) translateX(-240px) rotate(-360deg); } }
+@keyframes orbit3 { from { transform: rotate(0deg) translateX(120px) rotate(0deg); } to { transform: rotate(360deg) translateX(120px) rotate(-360deg); } }
+
+/* Animation classes */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive tweaks */
+@media (max-width: 700px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    .radio-group.horizontal {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: none;
+    }
+
+    .dropdown {
+        width: 100%;
+    }
+
+    .dropbtn {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+    }
+
+    .dropdown-content a {
+        padding: 10px;
+        border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+
+    .dropdown-content a:last-child {
+        border-bottom: none;
+    }
+
+    .auth-buttons {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .auth-buttons button {
+        margin: 5px 0;
+        width: 100%;
+    }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .aurora, .orbits .dot { animation: none; }
+    .fade-in {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

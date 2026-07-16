@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create your account — MySite</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/signup.css" />
+</head>
+<body>
+  <!-- Futuristic Aurora Glass Hero -->
+  <section class="neo-hero signup-hero" aria-label="Sign up">
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="orbits" aria-hidden="true">
+      <span class="dot d1"></span>
+      <span class="dot d2"></span>
+      <span class="dot d3"></span>
+    </div>
+
+    <div class="container hero-inner">
+      <span class="eyebrow">JOIN THE PLATFORM</span>
+      <h1 class="display">Create your account</h1>
+      <p class="sub">Luminous UI. Private by default. Ready in seconds.</p>
+
+      <!-- Glass Sign-up Card -->
+      <div class="signup-card glass">
+        <form id="signup-form" novalidate>
+          <div class="grid-2">
+            <label class="field">
+              <span>First name</span>
+              <input id="firstName" name="given-name" autocomplete="given-name" type="text" placeholder="Ada" required />
+            </label>
+            <label class="field">
+              <span>Last name</span>
+              <input id="lastName" name="family-name" autocomplete="family-name" type="text" placeholder="Lovelace" required />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Email</span>
+            <input id="email" name="email" inputmode="email" autocomplete="email" type="email" placeholder="you@example.com" required />
+            <small class="hint" id="emailHint">We’ll send a verification link.</small>
+          </label>
+
+          <label class="field with-action">
+            <span>Password</span>
+            <div class="input-wrap">
+              <input id="password" name="new-password" autocomplete="new-password" type="password" placeholder="At least 8 characters" minlength="8" required aria-describedby="pwHelp pwStrengthText" />
+              <button class="icon-btn" type="button" aria-label="Show password" data-toggle="password">
+                <!-- eye icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="pw-meta">
+              <div class="pw-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-live="polite">
+                <div class="meter-fill" style="--hue: 0; width: 0%"></div>
+              </div>
+              <small id="pwStrengthText" class="hint">Strength: —</small>
+            </div>
+            <ul class="pw-req" id="pwHelp">
+              <li data-req="len">8+ characters</li>
+              <li data-req="upper">Uppercase letter</li>
+              <li data-req="num">Number</li>
+              <li data-req="sym">Symbol (!@#$…)</li>
+            </ul>
+          </label>
+
+          <label class="field with-action">
+            <span>Confirm password</span>
+            <div class="input-wrap">
+              <input id="confirm" name="confirm-password" type="password" autocomplete="new-password" placeholder="Re-enter password" required aria-describedby="confirmHint" />
+              <button class="icon-btn" type="button" aria-label="Show password" data-toggle="confirm">
+                <!-- eye icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </div>
+            <small class="hint" id="confirmHint">Must match the password.</small>
+          </label>
+
+          <label class="check">
+            <input id="terms" type="checkbox" required />
+            <span>I agree to the Terms and Privacy Policy</span>
+          </label>
+
+          <button class="btn-future" type="submit" id="submitBtn" disabled>Create account</button>
+
+          <p class="alt">
+            Already have an account?
+            <a class="link" href="./login.html">Log in</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="js/signup.js"></script>
+</body>
+</html>

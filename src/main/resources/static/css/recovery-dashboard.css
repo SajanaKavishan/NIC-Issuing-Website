@@ -1,0 +1,670 @@
+/* --- 1. CORE VARIABLES AND GLOBAL STYLES (From Homepage) --- */
+:root {
+    --bg: #070818; /* Deep Indigo/Navy */
+    --fg: #E6F0FF; /* Off-White/Light-Blue Tint */
+    --muted: #9DB2CE; /* Light Blue-Gray */
+    --a: #00E5FF; /* Accent Color A (Cyan/Aqua) */
+    --b: #7C3AED; /* Accent Color B (Purple) */
+    --c: #FF1F6A; /* Accent Color C (Pink/Red) */
+
+    /* Animation/Layout Variables */
+    --transition-speed: 0.4s;
+    --border-radius: 12px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+h1, h2, h3 {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    margin-top: 0;
+}
+
+.display {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    /* Neon Text Effect */
+    background: linear-gradient(135deg, var(--fg), var(--a), var(--fg));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); /* Subtle glow */
+}
+
+.display-sm {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--a);
+    text-shadow: 0 0 5px rgba(0, 229, 255, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+/* --- 2. GLASS MORPHISM AND BACKGROUND EFFECTS --- */
+
+/* Glass Effect Class for Panels and Cards */
+.glass {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all var(--transition-speed) ease;
+}
+
+/* Aurora Background (Cosmic Glow) */
+.aurora {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+.aurora::before {
+    content: '';
+    position: absolute;
+    width: 60vw; height: 60vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--a), transparent 50%);
+    opacity: 0.3;
+    top: 0; left: 10%;
+    filter: blur(80px);
+    animation: aurora-rotate 15s infinite alternate;
+}
+.aurora::after {
+    content: '';
+    position: absolute;
+    width: 50vw; height: 50vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--c), transparent 50%);
+    opacity: 0.3;
+    bottom: 5%; right: 5%;
+    filter: blur(80px);
+    animation: aurora-rotate 20s infinite reverse;
+}
+@keyframes aurora-rotate {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(10vw, -10vh) rotate(360deg); }
+}
+
+/* Noise Texture */
+.noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    background-size: cover;
+    pointer-events: none;
+}
+
+/* --- 3. NAVIGATION (Reusing/Adapting Homepage Nav) --- */
+
+nav {
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.5rem;
+    text-decoration: none;
+    line-height: 1;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-right: 20px;
+    position: relative;
+}
+
+.nav-link {
+    color: var(--fg);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--a);
+    background: rgba(0, 229, 255, 0.1);
+}
+
+/* Dropdown */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    z-index: 1;
+    padding: 10px;
+    margin-top: 10px;
+}
+.dropdown-content a {
+    color: var(--fg);
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    border-radius: 4px;
+    transition: background-color var(--transition-speed);
+}
+.dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--a);
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* --- 4. BUTTON STYLES (Standardized from Homepage) --- */
+
+button, .btn-action {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-future {
+    background: linear-gradient(90deg, var(--a), var(--b));
+    color: var(--bg);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+.btn-future:hover {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 30px rgba(124, 58, 237, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--a);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+/* Specific Action Buttons */
+.btn-action {
+    padding: 8px 15px;
+    margin-right: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.btn-approve {
+    background: linear-gradient(45deg, #10B981, #06D6A0); /* Tailwind Green */
+    color: var(--bg);
+    box-shadow: 0 0 8px #10B981;
+}
+.btn-approve:hover { box-shadow: 0 0 15px #10B981; }
+
+.btn-reject {
+    background: linear-gradient(45deg, #EF4444, #F93B88); /* Tailwind Red/Pink */
+    color: var(--fg);
+    box-shadow: 0 0 8px #EF4444;
+}
+.btn-reject:hover { box-shadow: 0 0 15px #EF4444; }
+
+.btn-escalate {
+    background: linear-gradient(45deg, var(--b), #9333EA); /* Purple */
+    color: var(--fg);
+    box-shadow: 0 0 8px var(--b);
+}
+.btn-escalate:hover { box-shadow: 0 0 15px var(--b); }
+
+.btn-manual-verify {
+    background: linear-gradient(45deg, #F59E0B, #FFC107); /* Amber/Yellow */
+    color: var(--bg);
+    box-shadow: 0 0 8px #F59E0B;
+}
+.btn-manual-verify:hover { box-shadow: 0 0 15px #F59E0B; }
+
+/* --- 5. DASHBOARD LAYOUT & PANELS --- */
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* Main content and right panel */
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.main-content {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.statbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.stat {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-content, .right-panel {
+    padding: 20px;
+    height: fit-content; /* Ensure panels don't take up full height unnecessarily */
+}
+
+/* Stat Bar (Glass) */
+.statbar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.stat .value {
+    font-size: 2rem;
+    font-family: "Orbitron", sans-serif;
+    color: var(--a);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+.stat .label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* --- 6. TABLE STYLING --- */
+
+.table-wrapper {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.request-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px; /* Ensure table is readable on smaller main-content areas */
+}
+.request-table th {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--a);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.request-table td {
+    padding: 10px;
+    font-size: 0.9rem;
+}
+.request-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+.action-cell button {
+    margin-right: 5px;
+}
+
+/* Make action buttons inside the request table smaller and more compact */
+.request-table td .btn-action,
+.request-table td button.btn-action {
+    padding: 6px 8px; /* reduced padding */
+    font-size: 0.75rem; /* slightly smaller text */
+    margin-right: 6px; /* less spacing between buttons */
+    min-width: 34px;
+    height: 30px;
+    line-height: 1;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon-only buttons in table: hide any label, force square icon look */
+.request-table td .btn-action i {
+    font-size: 1rem;
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+}
+.request-table td .btn-action {
+    padding: 6px;
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: none; /* avoid uppercase */
+}
+
+/* File cell clickable icon styling */
+td.file-cell {
+    cursor: pointer;
+    text-align: center;
+}
+
+td.file-cell i {
+    color: var(--a);
+    font-size: 1rem;
+}
+
+/* Modal styles for file preview */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+}
+.modal-content {
+    position: relative;
+    z-index: 3001;
+    width: 90%;
+    max-width: 1100px;
+    margin: 20px;
+    padding: 12px;
+    border-radius: 10px;
+}
+.modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    color: var(--fg);
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+.modal-body {
+    margin-top: 30px;
+}
+
+/* Ensure iframe fills modal body */
+.modal-body iframe {
+    width: 100%;
+    height: 75vh;
+    border-radius: 6px;
+    border: none;
+}
+
+/* When modal visible, quickly show via display block (JS toggles) */
+.modal[style] { /* leave JS-controlled display alone */ }
+
+/* --- 7. SELECTED REQUEST PANEL --- */
+.selected-request {
+    margin-top: 2rem;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border-left: 5px solid var(--a);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.selected-request p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+.selected-request p i {
+    color: var(--a);
+    margin-right: 8px;
+}
+
+.detail-value {
+    color: var(--fg);
+    font-weight: 500;
+}
+.detail-value.status-verified { color: #10B981; }
+.detail-value.status-pending { color: #F59E0B; }
+
+/* --- 8. RIGHT PANEL (Verification Tools) --- */
+
+.right-panel {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.right-panel h3 {
+    color: var(--b);
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.tool-item {
+    margin-bottom: 1.5rem;
+}
+
+/* Progress Bar Styling */
+.progress-item h4 {
+    color: var(--fg);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+.neon-progress {
+    width: 100%;
+    height: 10px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+}
+.neon-progress::-webkit-progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+.neon-progress::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--b), var(--a));
+    border-radius: 5px;
+    box-shadow: 0 0 5px var(--a);
+}
+.neon-progress::-moz-progress-bar {
+    background: linear-gradient(90deg, var(--b), var(--a));
+    border-radius: 5px;
+    box-shadow: 0 0 5px var(--a);
+}
+.progress-label {
+    display: block;
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--a);
+    margin-top: 5px;
+}
+
+/* --- 9. FOOTER --- */
+.footer {
+    padding: 15px 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.footer .noise {
+    opacity: 0.1;
+    height: 100%;
+}
+
+
+/* --- 10. SCROLL ANIMATION CSS (From Homepage) --- */
+
+.fade-in, .slide-in-left, .slide-in-right, .scale-in, .slide-in-up {
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease-out, transform var(--transition-speed) ease-out;
+}
+
+.fade-in.visible { opacity: 1; }
+
+.slide-in-left { transform: translateX(-50px); }
+.slide-in-left.visible { opacity: 1; transform: translateX(0); }
+
+.slide-in-right { transform: translateX(50px); }
+.slide-in-right.visible { opacity: 1; transform: translateX(0); }
+
+.slide-in-up { transform: translateY(20px); }
+.slide-in-up.visible { opacity: 1; transform: translateY(0); }
+
+.scale-in { transform: scale(0.95); }
+.scale-in.visible { opacity: 1; transform: scale(1); }
+
+/* Utility Classes */
+.w-full { width: 100%; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+
+/* --- 11. THEMED NOTIFICATION BOX (Replaces alert()) --- */
+.notification-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 250px;
+    padding: 15px;
+    background: rgba(4, 255, 143, 0.9); /* Greenish-Aqua for success/notification */
+    color: var(--bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    border-left: 5px solid var(--b);
+}
+.notification-box.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+
+/* --- 12. RESPONSIVENESS (Mobile/Tablet Layout) --- */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "main"
+            "right";
+        padding: 0 1rem;
+    }
+    .main-content { grid-area: main; }
+    .right-panel { grid-area: right; }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "main"
+            "right";
+        padding: 0 1rem;
+    }
+    nav { padding: 10px 15px; }
+    nav ul { display: none; } /* Hide main nav links */
+    .auth-buttons button { padding: 8px 12px; }
+    .statbar { grid-template-columns: 1fr; }
+    .details-grid { grid-template-columns: 1fr; }
+    .action-row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .btn-action {
+        width: 48%; /* Adjust button width */
+        margin: 5px 1%;
+    }
+}
+
+/* Compact static action buttons in the selected request panel */
+.selected-request .action-row .btn-action,
+.action-row .btn-action {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    height: 32px;
+    min-width: 36px;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+/* Hide the textual label inside compact action buttons but keep accessible name via aria-label/title */
+.selected-request .action-row .btn-action .btn-label,
+.action-row .btn-action .btn-label {
+    display: none;
+}
+
+/* Make the icon slightly larger to compensate for label removal */
+.selected-request .action-row .btn-action i,
+.action-row .btn-action i {
+    font-size: 1.1rem;
+    margin-right: 0; /* no space since label is hidden */
+}
+
+/* On very small screens, tighten spacing further */
+@media (max-width: 480px) {
+    .selected-request .action-row .btn-action,
+    .action-row .btn-action {
+        padding: 5px 6px;
+        height: 28px;
+        min-width: 30px;
+        font-size: 0.7rem;
+    }
+}

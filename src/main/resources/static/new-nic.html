@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for New NIC - Online NIC Issuing Service</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <link rel="stylesheet" href="css/new-nic.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<section class="form-section">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+    <div class="form-inner">
+        <div class="eyebrow fade-in">APPLICATION PROCESS</div>
+        <h1 class="display fade-in">Apply for New NIC</h1>
+        <p class="sub fade-in">Please fill out the form below with accurate information. All fields are required unless indicated otherwise.</p>
+
+        <!-- Need Help Button -->
+        <div class="top-actions fade-in">
+            <button id="helpBtn" class="btn-ghost" onclick="window.location.href='assistance.html'">
+                <span>Need Help?</span>
+            </button>
+        </div>
+
+        <form id="nicForm" class="application-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nameWithInitials">Name with Initials</label>
+                    <input type="text" id="nameWithInitials" name="nameWithInitials" required placeholder="e.g., A.B. Perera">
+                </div>
+
+                <!-- Updated Gender Selection with Horizontal Radio Buttons -->
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="radio-group horizontal">
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="male" required>
+                            <span class="radio-custom"></span>
+                            Male
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="female">
+                            <span class="radio-custom"></span>
+                            Female
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gender" value="other">
+                            <span class="radio-custom"></span>
+                            Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="18" required placeholder="Must be 18 or older">
+                </div>
+
+                <div class="form-group">
+                    <label for="civilStatus">Civil Status</label>
+                    <select id="civilStatus" name="civilStatus" required>
+                        <option value="">Select Civil Status</option>
+                        <option value="single">Single</option>
+                        <option value="married">Married</option>
+                        <option value="divorced">Divorced</option>
+                        <option value="widowed">Widowed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="profession">Profession</label>
+                    <input type="text" id="profession" name="profession" required placeholder="Your occupation">
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Birthdate</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">Full Address</label>
+                    <textarea id="address" name="address" required placeholder="Your complete address" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="tel" id="contactNumber" name="contactNumber" required placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="birthCertificate">Birth Certificate (PDF only)</label>
+                    <input type="file" id="birthCertificate" name="birthCertificate" accept=".pdf" required>
+                    <div class="file-info">Maximum file size: 5MB</div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="photo">Passport Size Photo (JPEG or PNG)</label>
+                    <input type="file" id="photo" name="photo" accept=".jpeg,.jpg,.png" required>
+                    <div class="file-info">Maximum file size: 2MB</div>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="btn-future">Submit Application</button>
+                <button type="reset" class="btn-ghost">Clear Form</button>
+            </div>
+        </form>
+
+        <div class="payment-section">
+            <h2 class="display">Payment</h2>
+            <p class="sub">After submitting your application, please proceed to make the payment.</p>
+            <a href="paymentGateway.html">
+                <button id="paymentBtn" class="btn-future" disabled>Proceed to Payment</button>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script src="js/new-nic.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>

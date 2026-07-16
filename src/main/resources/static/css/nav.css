@@ -1,0 +1,172 @@
+nav.glass {
+    background: rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav.glass ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+nav.glass ul li {
+    margin-right: 20px;
+    position: relative;
+}
+
+nav.glass ul li a {
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    display: block;
+}
+
+nav.glass ul li a:hover {
+    color: var(--a);
+}
+
+nav.glass .dropdown {
+    position: relative;
+}
+
+nav.glass .dropbtn {
+    cursor: pointer;
+}
+
+nav.glass .dropdown-content {
+    display: none;
+    position: absolute;
+    /* Black opaque background for the dropdown */
+    background: rgba(0,0,0,1);
+    /* light translucent border to separate from nav */
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: none;
+    border-radius: 8px;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,.2);
+    z-index: 1000;
+    top: 100%;
+    right: 0;
+    transform: translateY(40px);
+    padding: 5px 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+}
+
+nav.glass .dropdown:hover .dropdown-content {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+nav.glass .dropdown-content a {
+    color: #fff; /* white text on black background */
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+nav.glass .dropdown-content a:hover {
+    /* Light translucent overlay on hover to indicate selection */
+    background: rgba(255,255,255,0.04);
+    color: #fff; /* keep text white on hover */
+}
+
+/* Ensure auth area anchors (e.g., Hello, User) look like nav links */
+nav.glass .auth-buttons a,
+nav.glass .auth-buttons .dropbtn,
+nav.glass .auth-buttons .user-dropbtn {
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    display: inline-block;
+}
+
+nav.glass .auth-buttons a:hover {
+    color: var(--a);
+}
+
+nav.glass .auth-buttons button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+nav.glass .auth-buttons .btn-ghost,
+nav.glass .auth-buttons .btn-future {
+    font-weight: 700;
+}
+
+/* Responsive tweaks for navigation */
+@media (max-width: 700px) {
+    nav.glass .dropdown-content {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        /* Use a solid black background on mobile too */
+        background: rgba(0,0,0,1);
+    }
+
+    nav.glass .dropdown:hover .dropdown-content {
+        display: none; /* Disable hover on mobile */
+    }
+
+    nav.glass .dropdown {
+        width: 100%;
+    }
+
+    nav.glass .dropbtn {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+    }
+
+    nav.glass .dropdown-content a {
+        padding: 10px;
+        border-bottom: 1px solid rgba(255,255,255,.18);
+    }
+
+    nav.glass .dropdown-content a:last-child {
+        border-bottom: none;
+    }
+
+    nav.glass .auth-buttons {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    nav.glass .auth-buttons button {
+        margin: 5px 0;
+        width: 100%;
+    }
+
+    nav.glass {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav.glass ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    nav.glass ul li {
+        margin-right: 0;
+        width: 100%;
+    }
+}

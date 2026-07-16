@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - NIC Services</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Space+Grotesk&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name">John Doe</div>
+            <div class="user-id">NIC: 901234567V</div>
+        </div>
+
+        <nav>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="applications.html"><i class="fas fa-id-card"></i> My NIC Applications</a></li>
+                <li><a href="profile.html"><i class="fas fa-user-edit"></i> Profile Settings</a></li>
+                <li><a href="documents.html"><i class="fas fa-file-upload"></i> Document Center</a></li>
+                <li><a href="payments.html"><i class="fas fa-credit-card"></i> Payment History</a></li>
+                <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle"></i> Help & Support</a></li>
+                <li><a href="login.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1 class="page-title">Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn-ghost notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="btn-future new-application-btn">
+                    <i class="fas fa-plus"></i> New Application
+                </button>
+            </div>
+        </header>
+
+        <!-- Application Status -->
+        <section class="dashboard-card status-card">
+            <div class="card-header">
+                <h2 class="card-title">Current Application Status</h2>
+                <div class="card-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+            </div>
+
+            <div class="status-timeline">
+                <div class="status-step completed">
+                    <div class="status-dot"><i class="fas fa-check"></i></div>
+                    <div class="status-label">Submitted</div>
+                </div>
+                <div class="status-step completed">
+                    <div class="status-dot"><i class="fas fa-check"></i></div>
+                    <div class="status-label">Under Review</div>
+                </div>
+                <div class="status-step active">
+                    <div class="status-dot"><i class="fas fa-spinner"></i></div>
+                    <div class="status-label">Processing</div>
+                </div>
+                <div class="status-step">
+                    <div class="status-dot"><i class="fas fa-clock"></i></div>
+                    <div class="status-label">Ready for Pickup</div>
+                </div>
+                <div class="status-step">
+                    <div class="status-dot"><i class="fas fa-flag"></i></div>
+                    <div class="status-label">Completed</div>
+                </div>
+            </div>
+
+            <div class="status-details">
+                <p>Application ID: <strong>NIC2024-00123</strong></p>
+                <p>Submitted: <strong>15 November 2024</strong></p>
+                <p>Estimated completion: <strong>15 December 2024</strong></p>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Quick Stats -->
+            <div class="dashboard-card stats-card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Stats</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Total Applications</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">1</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dashboard-card activity-card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Activity</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                </div>
+                <div class="activity-content">
+                    <ul class="activity-list">
+                        <li class="activity-item">
+                            <div class="activity-icon completed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="activity-details">
+                                <div class="activity-title">Application Submitted</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon completed">
+                                <i class="fas fa-file-upload"></i>
+                            </div>
+                            <div class="activity-details">
+                                <div class="activity-title">Documents Verified</div>
+                                <div class="activity-time">1 week ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="activity-details">
+                                <div class="activity-title">Payment Processing</div>
+                                <div class="activity-time">3 weeks ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card actions-card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <a href="new-application.html" class="action-btn">
+                        <i class="fas fa-plus action-icon"></i>
+                        <span>New Application</span>
+                    </a>
+                    <a href="documents.html" class="action-btn">
+                        <i class="fas fa-upload action-icon"></i>
+                        <span>Upload Docs</span>
+                    </a>
+                    <a href="payments.html" class="action-btn">
+                        <i class="fas fa-download action-icon"></i>
+                        <span>Download Receipt</span>
+                    </a>
+                    <a href="appointments.html" class="action-btn">
+                        <i class="fas fa-calendar action-icon"></i>
+                        <span>Book Appointment</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <section class="dashboard-card notifications-card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Notifications</h2>
+                <div class="card-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+            <div class="notifications-content">
+                <ul class="notification-list">
+                    <li class="notification-item">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Application Update</div>
+                            <div class="notification-desc">Your NIC application is currently being processed.</div>
+                            <div class="notification-time">Today, 10:30 AM</div>
+                        </div>
+                    </li>
+                    <li class="notification-item">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Document Required</div>
+                            <div class="notification-desc">Please upload your birth certificate.</div>
+                            <div class="notification-time">Yesterday, 2:15 PM</div>
+                        </div>
+                    </li>
+                    <li class="notification-item">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Payment Received</div>
+                            <div class="notification-desc">Your payment has been processed successfully.</div>
+                            <div class="notification-time">3 days ago</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="js/dashboard.js"></script>
+<script src="js/nav.js"></script>
+</body>
+</html>

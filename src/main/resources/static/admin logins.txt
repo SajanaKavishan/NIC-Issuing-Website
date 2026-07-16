@@ -1,0 +1,19 @@
+Main admin 
+
+admin@gmail.com
+1234
+
+finance admin
+finance@gmail.com : 1234
+
+delivery admin
+delivery@gmail.com : 1234
+
+PRO admin
+pro@gmail.com : 1234
+
+recovery admin
+recovery@gmail.com : 1234
+
+assistant admin
+assistant@gmail.com : 1234

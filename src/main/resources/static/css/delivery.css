@@ -1,0 +1,521 @@
+/* =============== Theme Variables (From Home Page) =============== */
+:root{
+    --bg:#070818;
+    --fg:#E6F0FF;
+    --muted:#9DB2CE;
+    --a:#00E5FF; /* Primary Action / Success */
+    --b:#7C3AED; /* Accent 1 (Purple) */
+    --c:#FF1F6A; /* Accent 2 (Pink) */
+    --glass-bg: rgba(255,255,255,.06);
+    --glass-br: rgba(255,255,255,.18);
+    --radius:16px;
+    --font-display: "Orbitron", sans-serif;
+    --font-body: "Space Grotesk", system-ui, sans-serif;
+    --page-pad: 1rem; /* new: consistent page padding from viewport edges */
+}
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Global Styling */
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-family: var(--font-body), system-ui, sans-serif; /* added generic fallbacks */
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    padding: var(--page-pad); /* ensure a consistent gap from viewport edges */
+}
+a { color: inherit; text-decoration: none; }
+.container { width: min(100% - calc(var(--page-pad) * 2), 1400px); margin-inline: auto; }
+.font-orbitron { font-family: var(--font-display), sans-serif; }
+
+/* --- Background and Animation Setup (Reused from home.css) --- */
+.neo-dashboard-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.aurora {
+    position: absolute;
+    inset: -25vmax;
+    background:
+            radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0%, rgba(124,58,237,.35) 35%, transparent 55%),
+            radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0%, rgba(0,229,255,.28) 30%, transparent 60%),
+            radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0%, rgba(255,31,106,.26) 25%, transparent 55%);
+    filter: blur(60px) saturate(120%);
+    animation: aurora-rotate 24s linear infinite;
+}
+
+@keyframes aurora-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.06); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .18;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+    mix-blend-mode: soft-light;
+}
+
+.orbits {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+/* Dot styles are omitted for brevity but should be in the main CSS */
+
+
+/* --- Utility Styles (Reused) --- */
+.glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-br);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 40px rgba(0,0,0,.4);
+}
+
+.display-sm {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    color: var(--fg);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-display), sans-serif;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #fff, var(--a));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.sub-text {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+/* Future Button */
+.btn-future {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .75rem 1.25rem;
+    border-radius: 12px;
+    color: #001016;
+    background: linear-gradient(180deg, #7df2ff, var(--a));
+    box-shadow: 0 0 0 0 rgba(0,229,255,.6), 0 5px 20px rgba(0,229,255,.25);
+    font-weight: 700;
+    border: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-future:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 30px rgba(0,229,255,.35);
+    transform: translateY(-1px);
+}
+
+/* Ghost Button */
+.btn-ghost, .btn-ghost-small {
+    padding: .75rem 1.25rem;
+    border-radius: 12px;
+    color: var(--fg);
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--glass-br);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.btn-ghost-small {
+    padding: .5rem 1rem;
+    font-size: 0.9rem;
+}
+.btn-ghost:hover, .btn-ghost-small:hover {
+    background: rgba(255,255,255,.1);
+}
+
+.btn-view, .btn-edit, .btn-delete {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    background: var(--b);
+    color: var(--fg);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-view:hover, .btn-edit:hover, .btn-delete:hover {
+    background: #9b6af7;
+}
+
+/* --- Header --- */
+.admin-header {
+    background: rgba(7, 8, 24, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--a);
+}
+.logo-icon {
+    font-family: var(--font-display), sans-serif;
+    padding: 5px 10px;
+    border: 2px solid var(--a);
+    border-radius: 8px;
+}
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--c);
+    color: var(--fg);
+    display: grid;
+    place-content: center;
+    font-weight: 600;
+}
+
+/* --- Main Layout and Sidebar --- */
+.admin-main {
+    display: flex;
+    flex-grow: 1;
+    padding-top: 20px;
+    z-index: 5; /* Ensure content is above background effects */
+    padding-inline: calc(var(--page-pad) / 2); /* small horizontal inner offset so content doesn't touch container edges */
+}
+.admin-sidebar {
+    width: 250px;
+    min-width: 250px;
+    padding: 1.5rem 1rem;
+    margin-right: 20px;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+.nav-section {
+    margin-bottom: 2rem;
+}
+.nav-title {
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding: 0 10px;
+    letter-spacing: 1px;
+    font-family: var(--font-display), sans-serif;
+}
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    color: var(--fg);
+    transition: background 0.2s, color 0.2s;
+}
+.nav-item svg {
+    fill: currentColor;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+}
+.nav-item:hover {
+    background: rgba(255,255,255,.05);
+}
+.nav-item.active {
+    background: var(--a);
+    color: var(--bg);
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,229,255,.2);
+}
+.nav-item.active:hover {
+    background: var(--a);
+}
+
+.admin-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 50px;
+}
+.content-header {
+    padding: 2rem;
+}
+
+
+/* --- Filter Controls --- */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+.filter-group {
+    flex: 1 1 200px;
+    padding: 1rem;
+}
+.filter-group label {
+    display: block;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+.filter-group select, .filter-group input {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--glass-br);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: var(--font-body), system-ui, sans-serif; /* added fallback */
+    appearance: none; /* Hide default dropdown arrow */
+}
+.search-group {
+    flex: 2 1 300px;
+}
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* --- Table Styles --- */
+.table-wrapper {
+    overflow-x: auto;
+    padding: 0.5rem; /* small padding so the table isn't flush with the card */
+}
+#deliveredTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+#deliveredTable th, #deliveredTable td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    white-space: nowrap;
+}
+#deliveredTable thead th {
+    color: var(--a);
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+#deliveredTable tbody tr:hover {
+    background: rgba(255,255,255,.03);
+}
+#deliveredTable tbody tr td {
+    border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.status {
+    padding: 0.3rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.status.delivered {
+    background: rgba(0,229,255,.15);
+    color: var(--a);
+}
+
+/* --- Modal --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding-top: 60px;
+}
+.modal-content {
+    margin: 5% auto;
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+    padding-inline: calc(var(--page-pad) / 2); /* keep modal content away from screen edges on narrow viewports */
+}
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--glass-br);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.close-btn {
+    color: var(--muted);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-btn:hover, .close-btn:focus {
+    color: var(--c);
+}
+.modal-body {
+    padding: 1.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+.detail-group {
+    display: flex;
+    flex-direction: column;
+}
+.detail-group.full-width {
+    grid-column: 1 / -1;
+}
+.detail-group label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    font-family: var(--font-display), sans-serif;
+}
+.detail-group span {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    word-break: break-all;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--glass-br);
+}
+
+/* --- Scroll/Load Animations --- */
+.fade-in { opacity: 0; transition: opacity 0.8s ease 0.2s; }
+.slide-in-left { opacity: 0; transform: translateX(-20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.slide-in-right { opacity: 0; transform: translateX(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.scale-in { opacity: 0; transform: scale(0.98); transition: opacity 0.8s ease, transform 0.8s ease; }
+
+.visible { opacity: 1; transform: none; }
+
+
+/* =============== Responsive =============== */
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        width: 70px;
+        min-width: 70px;
+        padding: 1rem 0.5rem;
+    }
+    .nav-text, .nav-title {
+        display: none;
+    }
+    .nav-item {
+        justify-content: center;
+    }
+    .nav-item svg {
+        margin-right: 0;
+    }
+    .admin-main {
+        padding-top: 10px;
+    }
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-group {
+        flex: auto;
+    }
+    .filter-actions {
+        justify-content: stretch;
+    }
+    .filter-actions button {
+        flex: 1;
+    }
+    #deliveredTable th, #deliveredTable td {
+        padding: 0.75rem 1rem;
+    }
+}
+@media (max-width: 600px) {
+    .admin-main {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .admin-sidebar {
+        width: 100%;
+        min-width: 100%;
+        margin-right: 0;
+        position: static;
+        top: auto;
+        padding: 0.5rem;
+        display: flex;
+        justify-content: center;
+        overflow-x: auto;
+    }
+    .nav-section {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    .admin-sidebar .nav-title { display: none; }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .user-menu {
+        gap: 1rem;
+    }
+    .modal-content {
+        margin: 10% auto;
+    }
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive tweak: slightly reduce page padding on very small screens */
+@media (max-width: 420px) {
+    :root { --page-pad: 0.5rem; }
+    .container { padding-inline: calc(var(--page-pad) / 2); }
+    .admin-main { padding-inline: calc(var(--page-pad) / 2); }
+}

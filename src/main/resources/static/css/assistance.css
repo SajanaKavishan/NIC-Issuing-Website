@@ -1,0 +1,184 @@
+:root {
+    --bg: #070818;
+    --fg: #E6F0FF;
+    --muted: #9DB2CE;
+    --a: #00E5FF;
+    --b: #7C3AED;
+    --c: #FF1F6A;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+h1 {
+    color: var(--a);
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    line-height: 1.05;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #fff, #d9e8ff 60%, #a8e7ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.06);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: "Space Grotesk", sans-serif;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--a);
+    box-shadow: 0 0 0 2px rgba(0,229,255,.2);
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 1.1rem;
+    border-radius: 14px;
+    color: #001016;
+    background: linear-gradient(180deg, #7df2ff, #00bfe3);
+    box-shadow: 0 0 0 0 rgba(0,229,255,.6), 0 10px 30px rgba(0,229,255,.25);
+    font-weight: 700;
+    border: 0;
+    cursor: pointer;
+    transition: filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 40px rgba(0,229,255,.35);
+}
+
+#backBtn {
+    background: rgba(255,255,255,.06);
+    color: var(--fg);
+    border: 1px solid rgba(255,255,255,.18);
+    margin-top: 1rem;
+}
+
+#backBtn:hover {
+    background: rgba(255,255,255,.1);
+}
+
+#message {
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.glass {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+}
+
+.aurora {
+    position: fixed;
+    inset: -25vmax;
+    z-index: -1;
+    background:
+            radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0 35%, transparent 55%),
+            radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0 30%, transparent 60%),
+            radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0 25%, transparent 55%);
+    filter: blur(60px) saturate(120%);
+    animation: aurora-rotate 24s linear infinite;
+}
+
+@keyframes aurora-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.06); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 10px;
+    }
+    .glass {
+        padding: 1.5rem;
+    }
+    button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora { animation: none; }
+}
+
+/* Existing styles... */
+.conversation-list {
+    margin-top: 20px;
+}
+
+.conversation-list h2 {
+    color: #E6F0FF;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.conversation-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.conversation-list li {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    border: 1px solid rgb(0, 0, 0);
+    color: #000000;
+}
+
+.conversation-list li strong {
+    font-weight: bold;
+    color: #000000;
+}
+
+#message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}

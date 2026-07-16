@@ -1,0 +1,274 @@
+/* Importing home.css styles (variables, aurora, noise, glass, etc.) */
+/* In a real project, you would import a core stylesheet, but for this context, we'll redefine the necessary variables and classes. */
+:root {
+    --bg: #070818;
+    --fg: #E6F0FF;
+    --muted: #9DB2CE;
+    --a: #00E5FF; /* Primary action/success color */
+    --b: #7C3AED;
+    --c: #FF1F6A;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* --- Reused Utility Classes from Home Page --- */
+
+.glass {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.btn-ghost {
+    display: inline-flex;
+    padding: .8rem 1.1rem;
+    border-radius: 14px;
+    color: var(--fg);
+    text-decoration: none;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.btn-ghost:hover {
+    background: rgba(255,255,255,.1);
+}
+
+.btn-future {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .8rem 1.1rem;
+    border-radius: 14px;
+    color: #001016;
+    background: linear-gradient(180deg, #7df2ff, var(--a)); /* Using --a for consistency */
+    box-shadow: 0 0 0 0 rgba(0,229,255,.6), 0 10px 30px rgba(0,229,255,.25);
+    font-weight: 700;
+    border: 0;
+    text-decoration: none;
+    transform: translateZ(0);
+    cursor: pointer;
+}
+
+.btn-future:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 40px rgba(0,229,255,.35);
+}
+
+.display {
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    letter-spacing: .5px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+    margin: .25rem 0 .75rem;
+    background: linear-gradient(90deg, #fff, #d9e8ff 60%, var(--a));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 8px 40px rgba(124,58,237,.25);
+}
+
+.sub {
+    color: var(--muted);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cta-row {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0 0;
+}
+
+/* --- Background and Animation Setup (from home.css) --- */
+
+.neo-confirmation {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg);
+    padding: 2rem 0;
+    isolation: isolate;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.aurora {
+    position: absolute;
+    inset: -25vmax;
+    z-index: 1;
+    background:
+            radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0 35%, transparent 55%),
+            radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0 30%, transparent 60%),
+            radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0 25%, transparent 55%);
+    filter: blur(60px) saturate(120%);
+    animation: aurora-rotate 24s linear infinite;
+}
+
+@keyframes aurora-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.06); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.noise {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: .18;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+    mix-blend-mode: soft-light;
+}
+
+.orbits {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+/* Dot styles are omitted for brevity but should be in the main CSS */
+
+/* --- Confirmation Specific Styles --- */
+
+.confirmation-container {
+    position: relative;
+    z-index: 5;
+    width: 90%;
+    max-width: 900px;
+    padding: 2rem 0;
+}
+
+.confirmation-card {
+    padding: 3rem 2rem;
+    margin: 0 auto;
+}
+
+.header-text {
+    margin-bottom: 2rem;
+}
+
+/* Success Icon Animation */
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.success-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.circle-path {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke: var(--a);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.check-mark {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke-width: 2;
+    stroke: var(--a);
+    fill: none;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Details Grid */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    text-align: left;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    border-top: 1px dashed rgba(255,255,255,.1);
+    border-bottom: 1px dashed rgba(255,255,255,.1);
+}
+
+.detail-item .label {
+    display: block;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.detail-item strong {
+    font-size: 1.2rem;
+    color: var(--fg);
+    word-break: break-all;
+}
+
+/* Next Steps */
+.next-steps {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(124,58,237,.1); /* Using --b accent for a slight highlight */
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.next-steps h2 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--a);
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+.next-steps-info {
+    color: var(--fg);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Media Queries (Responsive) */
+@media (max-width: 768px) {
+    .confirmation-card {
+        padding: 2rem 1rem;
+    }
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+    .cta-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .btn-future, .btn-ghost {
+        width: 100%;
+        justify-content: center;
+    }
+}

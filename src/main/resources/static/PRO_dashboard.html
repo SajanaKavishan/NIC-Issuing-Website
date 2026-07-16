@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRO Dashboard - Complaint Management</title>
+
+    <!-- Google Fonts: Orbitron & Space Grotesk (Neo Theme) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Space+Grotesk:wght@400;600&display=swap">
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="/css/PRO_dashboard.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <!-- nav.css removed to prevent nav override on this page -->
+</head>
+<body>
+
+<!-- Background Effects Section (From Homepage) -->
+<section class="neo-dashboard-bg">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+</section>
+
+<!-- Main Layout -->
+<div class="admin-main container">
+
+    <!-- Content Header -->
+    <div class="card glass content-header scale-in">
+        <h1 class="display-sm font-orbitron">Public Relations Dashboard</h1>
+        <p class="sub-text">Monitor, manage, and respond to all user complaints and feedback.</p>
+    </div>
+
+    <!-- Overview cards -->
+    <div class="grid scale-in">
+        <div class="card glass"><h3 id="totalComplaints">0</h3><p>Total Submissions</p></div>
+        <div class="card glass"><h3 id="pendingComplaints">0</h3><p>Pending Review</p></div>
+        <div class="card glass"><h3 id="resolvedComplaints">0</h3><p>Resolved</p></div>
+        <div class="card glass"><h3 id="reviewedFeedback">0</h3><p>Reviewed Feedback</p></div>
+    </div>
+
+    <!-- Complaint/Feedback Table -->
+    <div class="panel slide-in-right">
+        <h2 class="display-sm font-orbitron">Recent Submissions</h2>
+
+        <!-- Filter/Search Bar -->
+        <div class="toolbar">
+            <div>
+                <label for="searchFilter">Search by ID or Name</label>
+                <input type="text" id="searchFilter" class="input" placeholder="C001, John Doe...">
+            </div>
+            <div>
+                <label for="typeFilter">Type</label>
+                <select id="typeFilter" class="input">
+                    <option value="all">All Types</option>
+                    <option value="Complaint">Complaint</option>
+                    <option value="Feedback">Feedback</option>
+                </select>
+            </div>
+            <div>
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter" class="input">
+                    <option value="all">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Reviewed">Reviewed</option>
+                </select>
+            </div>
+            <button class="btn-future" onclick="renderTable()">Apply Filters</button>
+            <button class="btn-ghost" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div class="card glass table-wrap">
+            <table id="complaintsTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Table rows are inserted here by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Reports & Notifications Section -->
+    <div class="row fade-in">
+        <!-- Reports -->
+        <div class="card glass">
+            <h2 class="display-sm font-orbitron">Reports & Exports</h2>
+            <p class="sub-text" style="margin-top:-10px;">Generate and export operational reports.</p>
+            <div class="report-actions" style="margin-top: 1rem;">
+                <button class="btn-future" onclick="generate('weekly')">Weekly Summary</button>
+                <button class="btn-future" onclick="generate('monthly')">Monthly Stats</button>
+                <button class="btn-ghost" onclick="exportFile('pdf')">Export PDF</button>
+                <button class="btn-ghost" onclick="exportFile('excel')">Export Excel (CSV)</button>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card glass">
+            <h2 class="display-sm font-orbitron">System Notifications</h2>
+            <p class="sub-text" style="margin-top:-10px;">Recent activity and system updates.</p>
+            <div id="notifications">
+                <p>• Database connection secure. (2025-09-27)</p>
+                <p>• New complaint received: C007 (Pending)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Viewing/Responding to Submission -->
+<div id="responseModal" class="modal">
+    <div class="modal-content glass scale-in">
+        <div class="modal-header">
+            <h3 id="modalTitle" class="font-orbitron">Submission Details: <span id="modalId"></span></h3>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h4>Details</h4>
+            <p><strong>Name:</strong> <span id="modalName"></span><input id="modalNameInput" class="input" type="text" style="display:none;" /></p>
+            <p><strong>Date:</strong> <span id="modalDate"></span></p>
+            <p><strong>Type:</strong> <span id="modalType"></span>
+                <select id="modalTypeSelect" class="input" style="display:none;">
+                    <option value="Feedback">Feedback</option>
+                    <option value="Complaint">Complaint</option>
+                </select>
+            </p>
+            <p><strong>Current Status:</strong> <span id="modalStatus"></span></p>
+            <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+
+            <h4 style="margin-top: 1.5rem;">Respond & Update Status</h4>
+            <label for="updateStatus">New Status</label>
+            <select id="updateStatus" class="input">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Reviewed">Reviewed</option>
+            </select>
+
+            <label for="responseText" style="margin-top: 1rem;">Response Message</label>
+            <textarea id="responseText" placeholder="Type your official response here..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-ghost" onclick="closeModal()">Close</button>
+            <button class="btn-future" id="saveUpdateBtn" onclick="saveUpdate()" style="display:none;">Save</button>
+            <button class="btn-future" onclick="saveChanges()">Save & Respond</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/PRO_dashboard.js"></script>
+<script src="/js/nav.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Complaints - Online NIC Issuing Service</title>
+    <link rel="stylesheet" href="css/feedback.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+      <!-- Hero Section -->
+    <section class="neo-hero">
+        <div class="hero-inner fade-in">
+            <span class="eyebrow">Your Voice Matters</span>
+            <h1 class="display">Feedback & Complaints</h1>
+            <p class="sub">Help us improve our National Identity Card services by sharing your feedback or reporting issues securely.</p>
+            <div class="cta-row">
+                <a href="#form" class="btn-future">Submit Feedback</a>
+            </div>
+        </div>
+        <div class="aurora"></div>
+        <div class="noise"></div>
+        <div class="orbits">
+            <div class="dot d1"></div>
+            <div class="dot d2"></div>
+            <div class="dot d3"></div>
+        </div>
+    </section>
+
+    <!-- Why Feedback Section -->
+    <section class="features-section">
+        <div class="features-inner">
+            <span class="eyebrow slide-in-left">Why Share Feedback?</span>
+            <h2 class="display slide-in-left">Improving Together</h2>
+            <p class="sub slide-in-left">Your input drives enhancements to our services for all Sri Lankans.</p>
+            <div class="features-grid">
+                <div class="feature-card glass scale-in">
+                    <h3>Quick Response</h3>
+                    <p>We aim to address submissions within 48 hours.</p>
+                </div>
+                <div class="feature-card glass scale-in">
+                    <h3>Secure Handling</h3>
+                    <p>Your data is protected with top-tier encryption.</p>
+                </div>
+                <div class="feature-card glass scale-in">
+                    <h3>Real Impact</h3>
+                    <p>User feedback directly shapes our improvements.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Form Section -->
+    <section class="contact-section" id="form">
+        <div class="contact-inner">
+            <span class="eyebrow">Tell Us More</span>
+            <h2 class="display">Submit Feedback</h2>
+            <p class="sub">Use the form below to share feedback or file a complaint. All fields are required unless marked optional.</p>
+            <form class="contact-form fade-in" id="feedback-form">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <select name="type" required>
+                    <option value="">Select Type</option>
+                    <option value="feedback">Feedback</option>
+                    <option value="complain">Complaint</option>
+                </select>
+                <input type="text" name="subject" placeholder="Subject" required>
+                <textarea name="message" placeholder="Your Message" required></textarea>
+                <button class="btn-future" type="submit">Submit</button>
+            </form>
+        </div>
+        <div class="aurora"></div>
+        <div class="noise"></div>
+    </section>
+    <script src="js/feedback.js"></script>
+    <script src="js/nav.js"></script>
+</body>
+</html>

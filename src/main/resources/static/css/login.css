@@ -1,0 +1,150 @@
+/* =============== Theme =============== */
+:root{
+  --bg:#070818; --fg:#E6F0FF; --muted:#9DB2CE;
+  --a:#00E5FF; --b:#7C3AED; --c:#FF1F6A;
+  --glass-bg: rgba(255,255,255,.06);
+  --glass-br: rgba(255,255,255,.18);
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: "Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color:var(--fg); background:var(--bg); line-height:1.6;
+}
+a{color:inherit; text-decoration:none}
+.container{width:min(100% - 2rem, 980px); margin-inline:auto}
+
+/* =============== Aurora Glass Hero =============== */
+.neo-hero{
+  position:relative; overflow:hidden; color:var(--fg);
+  background: radial-gradient(1200px circle at 20% 10%, #0b1229 0 35%, transparent 40%),
+              linear-gradient(180deg, #070818 0%, #050611 100%);
+  padding: clamp(5rem, 12vh, 10rem) 0 4rem; isolation:isolate;
+}
+.hero-inner{position:relative; z-index:2; text-align:center; max-width:980px; margin:0 auto; padding:0 1rem}
+.eyebrow{display:inline-block; letter-spacing:.18em; font-size:.8rem; color:rgba(255,255,255,.7); text-transform:uppercase; margin-bottom:.5rem}
+.display{
+  font-family:"Orbitron", sans-serif; font-weight:700; letter-spacing:.5px;
+  font-size:clamp(2.2rem, 6vw, 4rem); line-height:1.05; margin:.25rem 0 .5rem;
+  background: linear-gradient(90deg,#fff, #d9e8ff 60%, #a8e7ff);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 8px 40px rgba(124,58,237,.25);
+}
+.sub{max-width:720px; margin:0 auto 1.5rem; color:var(--muted)}
+
+/* Aurora blobs */
+.aurora{
+  position:absolute; inset:-25vmax; z-index:1;
+  background:
+    radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0 35%, transparent 55%),
+    radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0 30%, transparent 60%),
+    radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0 25%, transparent 55%);
+  filter:blur(60px) saturate(120%);
+  animation:aurora-rotate 24s linear infinite;
+  /* Cursor parallax pivot */
+  transform-origin: calc(var(--mx, .5) * 100%) calc(var(--my, .5) * 100%);
+}
+@keyframes aurora-rotate{
+  0%{transform:rotate(0deg) scale(1)}
+  50%{transform:rotate(180deg) scale(1.06)}
+  100%{transform:rotate(360deg) scale(1)}
+}
+
+/* Noise / scanlines */
+.noise{position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.18;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+  mix-blend-mode:soft-light;
+}
+
+/* Orbiting dots */
+.orbits{position:absolute; inset:0; z-index:1; pointer-events:none}
+.dot{position:absolute; top:50%; left:50%; width:6px; height:6px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #fff, #7df2ff);
+  box-shadow:0 0 18px rgba(0,229,255,.7)
+}
+.d1{animation:orbit1 16s linear infinite}
+.d2{animation:orbit2 22s linear infinite}
+.d3{animation:orbit3 28s linear infinite}
+@keyframes orbit1{from{transform:rotate(0deg) translateX(180px)} to{transform:rotate(360deg) translateX(180px)}}
+@keyframes orbit2{from{transform:rotate(0deg) translateX(-240px)} to{transform:rotate(360deg) translateX(-240px)}}
+@keyframes orbit3{from{transform:rotate(0deg) translateX(120px)} to{transform:rotate(360deg) translateX(120px)}}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .aurora,.orbits .dot{animation:none}
+}
+
+/* =============== Glass card =============== */
+.glass{
+  background:var(--glass-bg); border:1px solid var(--glass-br);
+  backdrop-filter:blur(14px) saturate(140%); border-radius:var(--radius);
+  box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* =============== Login card & form =============== */
+.login-hero{padding-bottom:6rem}
+.auth-card{
+  max-width:520px; margin:1.5rem auto 0; padding:1.25rem;
+}
+form{display:grid; gap:1rem}
+.field{display:grid; gap:.35rem; text-align:left}
+.field span{font-weight:600; font-size:.95rem}
+.input-wrap{position:relative; display:flex; align-items:center}
+
+input{
+  width:100%; padding:.72rem .9rem; border-radius:12px; color:var(--fg);
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.16);
+  transition:border-color .2s, box-shadow .2s, background .2s; font:inherit;
+}
+input::placeholder{color:#9db2ce99}
+input:focus-visible{
+  outline:none; border-color:#7df2ff;
+  box-shadow:0 0 0 3px rgba(0,229,255,.18), 0 6px 22px rgba(0,229,255,.12);
+  background:rgba(255,255,255,.06);
+}
+
+.icon-btn{
+  position:absolute; right:.35rem; top:50%; transform:translateY(-50%);
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px; background:transparent; color:#b2c9e5;
+  border:1px solid rgba(255,255,255,.14); cursor:pointer;
+}
+.icon-btn:hover{color:#fff; border-color:rgba(255,255,255,.3); background:rgba(255,255,255,.06)}
+
+.check{display:flex; align-items:center; gap:.6rem; margin-top:.25rem; color:#cfe2ff}
+.check input{width:18px; height:18px}
+
+.btn-future{
+  display:inline-flex; justify-content:center; align-items:center; gap:.5rem; padding:.9rem 1.2rem;
+  border-radius:14px; color:#001016; background:linear-gradient(180deg, #7df2ff, #00bfe3);
+  box-shadow:0 0 0 0 rgba(0,229,255,.6), 0 10px 30px rgba(0,229,255,.25);
+  font-weight:700; border:0; text-decoration:none; transform:translateZ(0); cursor:pointer;
+}
+.btn-future:hover{filter:brightness(1.05); box-shadow:0 0 40px rgba(0,229,255,.35)}
+.btn-future:disabled{opacity:.55; cursor:not-allowed; filter:none; box-shadow:none}
+
+.btn-ghost{
+  display:inline-flex; justify-content:center; align-items:center; gap:.5rem; padding:.85rem 1.1rem;
+  border-radius:14px; color:var(--fg); text-decoration:none; cursor:pointer;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(10px);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+.alt{margin:.5rem 0 0; color:#cfe2ff}
+.link{color:#a8e7ff; text-decoration:underline dotted}
+.link:hover{text-decoration:underline}
+
+.oauth{margin-top:1rem}
+.oauth .divider{position:relative; text-align:center; margin:1rem 0}
+.oauth .divider::before{
+  content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(255,255,255,.15)
+}
+.oauth .divider span{position:relative; background:transparent; padding:0 .5rem; color:#bcd2ef}
+.oauth-btn .dot-ico{width:.65rem; height:.65rem; border-radius:50%; background:radial-gradient(circle at 30% 30%, #fff, #7df2ff); box-shadow:0 0 10px rgba(0,229,255,.5)}
+
+/* Minor tweaks for small screens */
+@media (max-width:480px){
+  .auth-card{padding:1rem}
+}

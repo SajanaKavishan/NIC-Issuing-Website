@@ -1,0 +1,121 @@
+:root {
+    --bg: #070818;
+    --fg: #E6F0FF;
+    --muted: #9DB2CE;
+    --a: #00E5FF;
+    --b: #7C3AED;
+    --c: #FF1F6A;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(1200px circle at 20% 10%, #0b1229 0 35%, transparent 40%),
+                linear-gradient(180deg, #070818 0%, #050611 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+#preloader.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader {
+    width: fit-content;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 20px;
+    color: var(--fg);
+    text-shadow: 
+        0 0 0 var(--a), 
+        0 0 0 var(--b), 
+        0 0 0 var(--c);
+    animation: l32 0.5s infinite cubic-bezier(0.5,-2000,0.5,2000);
+}
+
+.loader:before {
+    content: "Loading...";
+}
+
+@keyframes l32 {
+    25%, 100% {
+        text-shadow: 
+            0.03px -0.01px 0.01px var(--a), 
+            0.02px  0.02px 0     var(--b), 
+           -0.02px  0.02px 0     var(--c);
+    }
+}
+
+/* Aurora background */
+.aurora {
+    position: absolute;
+    inset: -25vmax;
+    z-index: 0;
+    background:
+        radial-gradient(40% 40% at 20% 20%, rgba(124,58,237,.35) 0 35%, transparent 55%),
+        radial-gradient(35% 35% at 80% 30%, rgba(0,229,255,.28) 0 30%, transparent 60%),
+        radial-gradient(30% 30% at 50% 80%, rgba(255,31,106,.26) 0 25%, transparent 55%);
+    filter: blur(60px) saturate(120%);
+    animation: aurora-rotate 24s linear infinite;
+}
+
+@keyframes aurora-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.06); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Subtle noise/scanlines */
+.noise {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: .18;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 2px);
+    mix-blend-mode: soft-light;
+}
+
+/* Orbiting dots */
+.orbits {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #7df2ff);
+    box-shadow: 0 0 18px rgba(0,229,255,.7);
+}
+
+.d1 { animation: orbit1 16s linear infinite; }
+.d2 { animation: orbit2 22s linear infinite; }
+.d3 { animation: orbit3 28s linear infinite; }
+
+@keyframes orbit1 { from { transform: rotate(0deg) translateX(180px); } to { transform: rotate(360deg) translateX(180px); } }
+@keyframes orbit2 { from { transform: rotate(0deg) translateX(-240px); } to { transform: rotate(360deg) translateX(-240px); } }
+@keyframes orbit3 { from { transform: rotate(0deg) translateX(120px); } to { transform: rotate(360deg) translateX(120px); } }

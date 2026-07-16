@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Assistant Daily Logs</title>
+  <!-- Google Fonts: Orbitron & Space Grotesk -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Space+Grotesk:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/css/delivery.css">
+<!--  <link rel="stylesheet" href="/css/nav.css">-->
+  <style>
+    .log-page { padding: 2rem; }
+    .log-card { max-width: 1000px; margin: 0 auto; }
+    .logs-table { width: 100%; border-collapse: collapse; }
+    .logs-table th, .logs-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .form-row { display:flex; gap:.5rem; align-items:center; }
+    .form-row input[type="date"] { padding:.5rem; }
+    .form-row input[type="text"] { flex:1; padding:.5rem; }
+    .toolbar { display:flex; gap:.5rem; margin-bottom:1rem; }
+    .muted { color: var(--muted); font-size: .9rem; }
+    .small { font-size: .9rem; padding:.4rem .6rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+  <section class="neo-dashboard-bg">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+      <div class="dot d1"></div>
+      <div class="dot d2"></div>
+      <div class="dot d3"></div>
+    </div>
+  </section>
+
+  <div class="container log-page">
+    <div class="log-card glass">
+      <div class="content-header" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+        <div style="flex:1;min-width:0;">
+          <h2 id="assistantLogsTitle" class="display-sm" aria-describedby="assistantLogsDesc" role="heading" aria-level="2" aria-label="Assistant Daily Logs">Assistant Daily Logs</h2>
+          <p id="assistantLogsDesc" class="sub-text" role="note" aria-label="Short description of the assistant logs page">Short notes by assistants. Admins can review and edit older entries.</p>
+        </div>
+        <div style="flex:0 0 auto;">
+          <a id="returnToDelivery" href="/assistant-dashboard.html" class="btn-ghost" role="button" aria-label="Return to Delivery">Return to Assistant Dashboard</a>
+        </div>
+      </div>
+
+      <div style="padding: 1.25rem;">
+        <div class="toolbar">
+          <button id="newBtn" class="btn-future">New Log</button>
+<!--          <div class="muted">Tip: Click a row's Edit button to change or remove it.</div>-->
+        </div>
+
+        <div id="formArea" style="display:none; margin-bottom:1rem;">
+          <form id="logForm">
+            <input type="hidden" id="logId" />
+            <div class="form-row">
+              <label for="logDate" class="sr-only">Log date</label>
+              <input type="date" id="logDate" required aria-required="true" />
+              <label for="logDesc" class="sr-only">Description</label>
+              <input type="text" id="logDesc" placeholder="Short description" maxlength="300" required aria-required="true" />
+              <button type="submit" class="btn-future small">Save</button>
+              <button type="button" id="cancelBtn" class="btn-ghost-small small">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="table-wrapper glass">
+          <table class="logs-table" id="logsTable">
+            <thead>
+              <tr>
+                <th style="width:120px">Date</th>
+                <th>Description</th>
+                <th style="width:150px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody">
+              <tr><td colspan="3" class="muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/assistant-log.js"></script>
+<!--  <script src="js/nav.js"></script>-->
+</body>
+</html>
+

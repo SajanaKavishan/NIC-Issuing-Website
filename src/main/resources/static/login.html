@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log in — MySite</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Page styles -->
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+  <section class="neo-hero login-hero" aria-label="Log in">
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="orbits" aria-hidden="true">
+      <span class="dot d1"></span>
+      <span class="dot d2"></span>
+      <span class="dot d3"></span>
+    </div>
+
+    <div class="container hero-inner">
+      <span class="eyebrow">WELCOME BACK</span>
+      <h1 class="display">Sign in to continue</h1>
+      <p class="sub">Effortless, secure sign-in with a modern touch.</p>
+
+      <!-- Glass Login Card -->
+      <div class="auth-card glass">
+        <form id="login-form" novalidate>
+          <label class="field">
+            <span>Email</span>
+            <input id="loginEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+          </label>
+
+          <label class="field with-action">
+            <span>Password</span>
+            <div class="input-wrap">
+              <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
+              <button class="icon-btn" type="button" aria-label="Show password" data-toggle="loginPassword">
+                <!-- eye icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </div>
+          </label>
+
+          <label class="check">
+            <input id="remember" name="remember" type="checkbox" />
+            <span>Remember me</span>
+          </label>
+
+          <button class="btn-future" type="submit" id="loginSubmit" disabled>Sign in</button>
+
+          <p class="alt">
+            <a class="link" href="./reset.html">Forgot your password?</a>
+          </p>
+          <p class="alt">
+            Don’t have an account?
+            <a class="link" href="./signup.html">Create one</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page script -->
+  <script src="js/login.js"></script>
+</body>
+</html>

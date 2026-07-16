@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivered NICs - Admin Dashboard</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Space+Grotesk:wght@400;600&display=swap">
+    <link rel="stylesheet" href="css/delivery.css">
+<!--<link rel="stylesheet" href="css/nav.css">-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+
+<section class="neo-dashboard-bg">
+    <div class="aurora"></div>
+    <div class="noise"></div>
+    <div class="orbits">
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+    </div>
+</section>
+
+<!-- Main Layout -->
+<div class="admin-main container">
+
+
+    <main class="admin-content">
+        <div class="card glass content-header scale-in">
+            <h1 class="display-sm font-orbitron">Delivered NICs Log</h1>
+            <p class="sub-text">View and manage all successfully delivered National Identity Cards.</p>
+        </div>
+
+        <div class="filter-controls scale-in">
+            <div class="card glass filter-group">
+                <label for="dateRange">Date Range</label>
+                <select id="dateRange">
+                    <option value="all" selected>All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                </select>
+            </div>
+            <div class="card glass filter-group">
+                <label for="deliveryMethod">Delivery Method</label>
+                <select id="deliveryMethod">
+                    <option value="all">All Methods</option>
+                    <option value="postal">Postal Service</option>
+                    <option value="courier">Private Courier</option>
+                    <option value="pickup">Office Pickup</option>
+                </select>
+            </div>
+            <div class="card glass filter-group search-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" placeholder="NIC / Recipient Name">
+            </div>
+            <div class="filter-actions">
+                <button id="applyFilters" class="btn-future">Apply Filters</button>
+                <button id="resetFilters" class="btn-ghost">Reset</button>
+                <button id="generateReport" class="btn-future">Generate Weekly Report</button>
+                <button id="generateMonthlyReport" class="btn-future">Generate Monthly Report</button>
+                <a id="deliveryLogsBtn" href="/delivery-log.html" class="btn-future" role="button" aria-label="Open Delivery Logs" style="text-decoration:none;display:inline-flex;align-items:center;margin-left:8px;">Delivery Logs</a>
+                <!-- Logout button: clears client storage and redirects to login page -->
+                <button id="logoutBtn" class="btn-ghost" style="margin-left:8px;">Logout</button>
+            </div>
+        </div>
+
+        <div class="card glass table-wrapper slide-in-right">
+            <table id="deliveredTable">
+                <thead>
+                <tr>
+                    <th>NIC Number</th>
+                    <th>Recipient</th>
+                    <th>Delivery Date</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+<!--                <tr>-->
+<!--                    <td>200012345678</td>-->
+<!--                    <td>Ayesha K. Silva</td>-->
+<!--                    <td>2024-09-25</td>-->
+<!--                    <td>Postal Service</td>-->
+<!--                    <td><span class="status delivered">Delivered</span></td>-->
+<!--                    <td><button class="btn-edit" data-nic="200012345678">Edit</button></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>199587654321</td>-->
+<!--                    <td>Chamara B. Fonseka</td>-->
+<!--                    <td>2024-09-24</td>-->
+<!--                    <td>Private Courier</td>-->
+<!--                    <td><span class="status delivered">Delivered</span></td>-->
+<!--                    <td><button class="btn-edit" data-nic="199587654321">Edit</button></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>198811223344</td>-->
+<!--                    <td>Priya C. De Soyza</td>-->
+<!--                    <td>2024-09-20</td>-->
+<!--                    <td>Office Pickup</td>-->
+<!--                    <td><span class="status delivered">Delivered</span></td>-->
+<!--                    <td><button class="btn-edit" data-nic="198811223344">Edit</button></td>-->
+<!--                </tr>-->
+                </tbody>
+            </table>
+            <div class="no-results" style="display: none;">No delivered NICs match your current filter criteria.</div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal for Viewing Details -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content glass scale-in">
+        <div class="modal-header">
+            <h3 class="font-orbitron">Delivery Details: <span id="modalNicNumber"></span></h3>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="detail-grid">
+                <div class="detail-group">
+                    <label>NIC Number:</label>
+                    <span id="modalNic"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Application ID:</label>
+                    <span id="modalAppId"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Recipient:</label>
+                    <span id="modalRecipient"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Delivery Date:</label>
+                    <span id="modalDeliveryDate"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Delivery Method:</label>
+                    <span id="modalDeliveryMethod"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Contact Number:</label>
+                    <span id="modalContact"></span>
+                </div>
+                <div class="detail-group full-width">
+                    <label>Delivery Address:</label>
+                    <span id="modalAddress"></span>
+                </div>
+                <div class="detail-group full-width">
+                    <label>Delivery Notes:</label>
+                    <span id="modalNotes"></span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-ghost" id="closeModal">Close</button>
+            <button class="btn-future" id="printDetails">Print Details</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal for Editing Details -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeEditModal">&times;</span>
+        <h2>Edit Delivery Method & Status</h2>
+        <form id="editForm">
+            <label>NIC Number: <input type="text" id="editNic" name="nic" readonly></label><br>
+            <label>Method:
+                <select id="editMethod" name="method">
+                    <option value="Postal Service">Postal Service</option>
+                    <option value="Private Courier">Private Courier</option>
+                    <option value="Office Pickup">Office Pickup</option>
+                    <option value="Other">Other</option>
+                </select>
+            </label><br>
+            <label>Status:
+                <select id="editStatus" name="status">
+                    <option value="Delivered">Delivered</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Returned">Returned</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </label><br>
+            <div class="modal-actions">
+                <button type="button" id="saveEditBtn" class="btn-future">Save</button>
+                <button type="button" id="cancelEditBtn" class="btn-ghost">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Script: Corrected path -->
+<script src="js/delivery.js"></script>
+<!-- Inline logout handler -->
+<script>
+    (function(){
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn){
+            logoutBtn.addEventListener('click', function(){
+                try{
+                    // Clear client-side storage (tokens, session flags, etc.)
+                    if (window.localStorage) localStorage.clear();
+                    if (window.sessionStorage) sessionStorage.clear();
+                }catch(e){
+                    // ignore storage errors
+                    console.warn('Error clearing storage during logout', e);
+                }
+                // Redirect to the login page. Adjust path if your login URL is different.
+                window.location.href = '/login.html';
+            });
+        }
+    })();
+</script>
+</body>
+</html>
+
