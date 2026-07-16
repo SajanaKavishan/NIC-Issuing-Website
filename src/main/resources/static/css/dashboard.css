@@ -286,6 +286,127 @@ body {
     font-size: 0.9rem;
 }
 
+/* My Application Status */
+.my-status-card {
+    margin-bottom: 2rem;
+}
+
+.my-status-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.summary-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.summary-count {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--fg);
+}
+
+.summary-label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.summary-pill.in-progress {
+    border-color: rgba(0,229,255,.25);
+}
+
+.summary-pill.approved {
+    border-color: rgba(52,211,153,.25);
+}
+
+.summary-pill.pending {
+    border-color: rgba(251,191,36,.25);
+}
+
+.application-status-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.application-status-item {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.2fr) minmax(120px, 0.7fr) minmax(140px, 0.8fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+}
+
+.application-title {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.application-ref,
+.application-date,
+.application-next-step {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.application-date strong,
+.application-next-step strong {
+    display: block;
+    color: var(--fg);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.application-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 104px;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0;
+}
+
+.application-status-badge.processing {
+    color: var(--a);
+    background: rgba(0,229,255,.12);
+    border: 1px solid rgba(0,229,255,.25);
+}
+
+.application-status-badge.approved {
+    color: var(--success);
+    background: rgba(52,211,153,.12);
+    border: 1px solid rgba(52,211,153,.25);
+}
+
+.application-status-badge.pending {
+    color: var(--warning);
+    background: rgba(251,191,36,.12);
+    border: 1px solid rgba(251,191,36,.25);
+}
+
+.application-status-empty {
+    color: var(--muted);
+    padding: 1rem;
+    background: rgba(255,255,255,.05);
+    border-radius: 10px;
+}
+
 /* Stats Card */
 .stats-content {
     display: grid;
@@ -579,6 +700,15 @@ body {
     .status-dot {
         margin-right: 1rem;
         margin-bottom: 0;
+    }
+
+    .my-status-summary,
+    .application-status-item {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-label {
+        text-align: left;
     }
 
     .stats-content {

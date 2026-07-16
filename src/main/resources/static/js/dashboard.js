@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Status timeline animation
     animateStatusTimeline();
 
+    // My Application Status section
+    renderMyApplicationStatus();
+
     // Card hover effects
     setupCardInteractions();
 
@@ -88,6 +91,114 @@ function animateStatusTimeline() {
             step.style.transform = 'translateY(0)';
         }, index * 200);
     });
+}
+
+function renderMyApplicationStatus() {
+    const list = document.getElementById('applicationStatusList');
+    if (!list) return;
+
+    const applications = getCitizenApplications();
+
+    if (!applications.length) {
+        list.innerHTML = '<div class="application-status-empty">No applications found yet.</div>';
+        updateApplicationStatusCounts(applications);
+        return;
+    }
+
+    list.innerHTML = applications.map(app => `
+        <article class="application-status-item">
+            <div>
+                <div class="application-title">${escapeHtml(app.type)}</div>
+                <div class="application-ref">Reference: ${escapeHtml(app.reference)}</div>
+            </div>
+            <div class="application-date">
+                <strong>Submitted</strong>
+                ${escapeHtml(app.submitted)}
+            </div>
+            <div class="application-next-step">
+                <strong>Next Step</strong>
+                ${escapeHtml(app.nextStep)}
+            </div>
+            <span class="application-status-badge ${getApplicationStatusClass(app.status)}">
+                ${escapeHtml(formatApplicationStatus(app.status))}
+            </span>
+        </article>
+    `).join('');
+
+    updateApplicationStatusCounts(applications);
+}
+
+function getCitizenApplications() {
+    try {
+        const savedApplications = JSON.parse(localStorage.getItem('citizenApplications') || '[]');
+        if (Array.isArray(savedApplications) && savedApplications.length) {
+            return savedApplications;
+        }
+    } catch (_) {}
+
+    return [
+        {
+            type: 'New NIC Application',
+            reference: 'NIC2024-00123',
+            status: 'PROCESSING',
+            submitted: '15 November 2024',
+            nextStep: 'Officer review'
+        },
+        {
+            type: 'NIC Renewal',
+            reference: 'REN2024-00058',
+            status: 'PENDING',
+            submitted: '20 November 2024',
+            nextStep: 'Document verification'
+        },
+        {
+            type: 'Lost NIC Request',
+            reference: 'LST2024-00017',
+            status: 'APPROVED',
+            submitted: '02 November 2024',
+            nextStep: 'Ready for delivery'
+        }
+    ];
+}
+
+function updateApplicationStatusCounts(applications) {
+    const inProgressCount = applications.filter(app => ['PROCESSING', 'IN_REVIEW', 'UNDER_REVIEW'].includes(normalizeApplicationStatus(app.status))).length;
+    const approvedCount = applications.filter(app => normalizeApplicationStatus(app.status) === 'APPROVED').length;
+    const pendingCount = applications.filter(app => normalizeApplicationStatus(app.status) === 'PENDING').length;
+
+    setText('inProgressCount', inProgressCount);
+    setText('approvedCount', approvedCount);
+    setText('pendingCount', pendingCount);
+}
+
+function normalizeApplicationStatus(status) {
+    return String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+}
+
+function getApplicationStatusClass(status) {
+    const normalized = normalizeApplicationStatus(status);
+    if (normalized === 'APPROVED' || normalized === 'COMPLETED') return 'approved';
+    if (normalized === 'PENDING') return 'pending';
+    return 'processing';
+}
+
+function formatApplicationStatus(status) {
+    return normalizeApplicationStatus(status).replace(/_/g, ' ');
+}
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
 }
 
 function setupCardInteractions() {

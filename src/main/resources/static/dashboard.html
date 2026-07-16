@@ -89,6 +89,35 @@
             </div>
         </section>
 
+        <!-- My Application Status -->
+        <section class="dashboard-card my-status-card">
+            <div class="card-header">
+                <h2 class="card-title">My Application Status</h2>
+                <div class="card-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+            </div>
+
+            <div class="my-status-summary" aria-label="Application status summary">
+                <div class="summary-pill in-progress">
+                    <span class="summary-count" id="inProgressCount">0</span>
+                    <span class="summary-label">In Progress</span>
+                </div>
+                <div class="summary-pill approved">
+                    <span class="summary-count" id="approvedCount">0</span>
+                    <span class="summary-label">Approved</span>
+                </div>
+                <div class="summary-pill pending">
+                    <span class="summary-count" id="pendingCount">0</span>
+                    <span class="summary-label">Pending</span>
+                </div>
+            </div>
+
+            <div class="application-status-list" id="applicationStatusList">
+                <div class="application-status-empty">Loading application status...</div>
+            </div>
+        </section>
+
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
             <!-- Quick Stats -->
