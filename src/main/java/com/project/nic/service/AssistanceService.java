@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AssistanceService {
@@ -34,6 +35,10 @@ public class AssistanceService {
 
     public List<AssistanceRequest> getAllRequests() {
         return repo.findAll();
+    }
+
+    public Optional<AssistanceRequest> findById(Long id) {
+        return repo.findById(id);
     }
 
     public void replyToRequest(Long id, String replyMessage) {

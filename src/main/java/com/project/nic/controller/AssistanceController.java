@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/assistance")
@@ -24,8 +25,26 @@ public class AssistanceController {
         return authSessionService.hasAnyRole(token, "ADMIN", "ASSISTANT");
     }
 
+    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
+        return authSessionService.findByToken(token);
+    }
+
+    private boolean ownsRequest(AuthSessionService.SessionUser sessionUser, AssistanceRequest request) {
+        if (request.getUserId() != null && request.getUserId().equals(sessionUser.userId())) {
+            return true;
+        }
+        return request.getEmail() != null && request.getEmail().equalsIgnoreCase(sessionUser.email());
+    }
+
     @PostMapping("/request")
-    public ResponseEntity<String> createRequest(@RequestBody AssistanceRequest request) {
+    public ResponseEntity<String> createRequest(
+            @RequestBody AssistanceRequest request,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        getLoggedInUser(token).ifPresent(sessionUser -> {
+            request.setUserId(sessionUser.userId());
+            request.setEmail(sessionUser.email());
+        });
         AssistanceRequest saved = assistanceService.createRequest(request);
         return ResponseEntity.ok("Request submitted successfully: id=" + (saved != null ? saved.getId() : "null"));
     }
@@ -68,7 +87,23 @@ public class AssistanceController {
     }
 
     @DeleteMapping("/request/{id}")
-    public ResponseEntity<String> deleteRequestByRequestPath(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRequestByRequestPath(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+
+        Optional<AssistanceRequest> request = assistanceService.findById(id);
+        if (request.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!ownsRequest(sessionUser.get(), request.get())) {
+            return ResponseEntity.status(403).body("You can only delete your own assistance requests");
+        }
+
         try {
             assistanceService.deleteRequest(id);
             return ResponseEntity.ok("Request deleted successfully");
@@ -78,7 +113,24 @@ public class AssistanceController {
     }
 
     @PutMapping("/request/{id}")
-    public ResponseEntity<?> updateRequest(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> updateRequest(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+
+        Optional<AssistanceRequest> request = assistanceService.findById(id);
+        if (request.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!ownsRequest(sessionUser.get(), request.get())) {
+            return ResponseEntity.status(403).body("You can only update your own assistance requests");
+        }
+
         String newQuery = body.getOrDefault("query", "").toString();
         try {
             AssistanceRequest updated = assistanceService.updateRequest(id, newQuery);

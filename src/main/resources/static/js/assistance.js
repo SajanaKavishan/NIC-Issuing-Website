@@ -5,9 +5,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const requestList = document.getElementById('requestList');
     const messageDiv = document.getElementById('message');
     const backBtn = document.getElementById('backBtn');
+    const authHeaders = () => {
+        let token = '';
+        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
+        return token ? { 'X-Auth-Token': token } : {};
+    };
 
     // Load or set email from local storage
     let email = localStorage.getItem('assistanceEmail') || '';
+    try {
+        email = localStorage.getItem('loggedInEmail') || email;
+    } catch (_) {}
     if (email) {
         emailInput.value = email;
         storedEmailInput.value = email;
@@ -20,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (emailValue && query) {
             try {
-                await axios.post('http://localhost:8080/api/assistance/request', { userId: 1, email: emailValue, query }); // Replace 1 with dynamic userId if available
+                await axios.post('http://localhost:8080/api/assistance/request', { email: emailValue, query }, { headers: authHeaders() });
                 localStorage.setItem('assistanceEmail', emailValue); // Remember email
                 showMessage('Request submitted successfully!', 'green');
                 form.reset();
@@ -216,8 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
             try {
-                // Call backend to update request (assume PUT endpoint)
-                await axios.put(`http://localhost:8080/api/assistance/request/${encodeURIComponent(request.id)}`, { query: newQuery });
+                await axios.put(
+                    `http://localhost:8080/api/assistance/request/${encodeURIComponent(request.id)}`,
+                    { query: newQuery },
+                    { headers: authHeaders() }
+                );
                 request.query = newQuery; // update local copy
                 showMessage('Request updated.', 'green');
                 exitEditMode(li, request);
@@ -281,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Delete this request permanently?')) return;
 
         try {
-            await axios.delete(`http://localhost:8080/api/assistance/request/${encodeURIComponent(id)}`);
+            await axios.delete(`http://localhost:8080/api/assistance/request/${encodeURIComponent(id)}`, { headers: authHeaders() });
             if (listItemElement && listItemElement.remove) listItemElement.remove();
             showMessage(`Request ${id} deleted.`, 'green');
         } catch (error) {
