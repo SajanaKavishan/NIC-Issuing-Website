@@ -53,8 +53,16 @@ public class NewNicFormController {
             return ResponseEntity.status(403).body("Login required");
         }
 
-        String birthCertPath = FileUploadUtil.saveFile("uploads", birthCertificate);
-        String photoPath = FileUploadUtil.saveFile("uploads", photo);
+        String birthCertPath;
+        String photoPath;
+        try {
+            FileUploadUtil.validateDocument(birthCertificate);
+            FileUploadUtil.validateImage(photo);
+            birthCertPath = FileUploadUtil.saveDocument("uploads", birthCertificate);
+            photoPath = FileUploadUtil.saveImage("uploads", photo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         NewNicForm form = new NewNicForm();
         form.setNameWithInitials(nameWithInitials);

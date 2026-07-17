@@ -61,8 +61,16 @@ public class LostNicController {
             return ResponseEntity.status(403).body("Login required");
         }
 
-        String birthCertPath = FileUploadUtil.saveFile("uploads", birthCertificate);
-        String policeReportPath = FileUploadUtil.saveFile("uploads", policeReport);
+        String birthCertPath;
+        String policeReportPath;
+        try {
+            FileUploadUtil.validateDocument(birthCertificate);
+            FileUploadUtil.validateDocument(policeReport);
+            birthCertPath = FileUploadUtil.saveDocument("uploads", birthCertificate);
+            policeReportPath = FileUploadUtil.saveDocument("uploads", policeReport);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         LostNic lostNic = new LostNic();
         lostNic.setNicNumber(nicNumber);
