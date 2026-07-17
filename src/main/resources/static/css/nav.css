@@ -119,6 +119,9 @@ nav.glass .auth-buttons .btn-future {
         border: none;
         /* Use a solid black background on mobile too */
         background: rgba(0,0,0,1);
+        opacity: 1;
+        transform: none;
+        transition: none;
     }
 
     nav.glass .dropdown:hover .dropdown-content {
@@ -148,10 +151,16 @@ nav.glass .auth-buttons .btn-future {
         width: 100%;
         display: flex;
         flex-direction: column;
+        gap: 8px;
     }
 
     nav.glass .auth-buttons button {
         margin: 5px 0;
+        width: 100%;
+    }
+
+    nav.glass .auth-buttons .user-menu,
+    nav.glass .auth-buttons .user-dropbtn {
         width: 100%;
     }
 

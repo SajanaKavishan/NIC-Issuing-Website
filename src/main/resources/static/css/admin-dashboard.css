@@ -919,6 +919,33 @@ body {
     .dashboard-section {
         padding: 0 1rem 1rem;
     }
+
+    .section-header,
+    .review-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .review-tabs {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .review-tab {
+        flex: 1 0 auto;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    .review-filters,
+    .review-search,
+    .review-select {
+        width: 100%;
+    }
+
+    .review-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

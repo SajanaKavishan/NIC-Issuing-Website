@@ -134,13 +134,36 @@ nav ul li a {
 @media (max-width: 768px) {
     nav {
         padding: 1rem;
-        flex-direction: row; /* Changed to row to keep navigation horizontal */
+        flex-direction: column;
+        align-items: stretch;
         gap: 1rem;
     }
 
+    .nav-brand {
+        font-size: 1.15rem;
+        min-width: 0;
+    }
+
     .nav-actions {
-        width: auto; /* Removed full width to prevent stacking */
-        justify-content: flex-start; /* Aligned to the start */
+        width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+
+    .nav-actions button {
+        flex: 1 1 150px;
+        justify-content: center;
+    }
+
+    .table-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box,
+    .filter-select {
+        width: 100%;
     }
 }
 
@@ -675,6 +698,7 @@ nav ul li a {
     
     .payments-table {
         font-size: 0.9rem;
+        min-width: 720px;
     }
     
     .payments-table th,
