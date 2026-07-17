@@ -143,6 +143,7 @@ PowerShell example:
 $env:DB_PASSWORD="your-sql-server-password"
 $env:DB_USERNAME="sa"
 $env:DB_URL="jdbc:sqlserver://localhost:1433;databaseName=nic_db;encrypt=true;trustServerCertificate=true"
+$env:AUTH_TOKEN_SECRET="replace-with-a-long-random-secret"
 .\mvnw.cmd spring-boot:run
 ```
 
