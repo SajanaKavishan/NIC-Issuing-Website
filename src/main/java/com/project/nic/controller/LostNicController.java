@@ -5,6 +5,7 @@ import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +40,9 @@ public class LostNicController {
     @Autowired
     private AuthSessionService authSessionService;
 
+    @Value("${app.upload.dir}")
+    private String uploadDir;
+
     private boolean canManageLostNic(String token) {
         return authSessionService.hasAnyRole(token, "ADMIN", "RECOVERY");
     }
@@ -66,8 +70,8 @@ public class LostNicController {
         try {
             FileUploadUtil.validateDocument(birthCertificate);
             FileUploadUtil.validateDocument(policeReport);
-            birthCertPath = FileUploadUtil.saveDocument("uploads", birthCertificate);
-            policeReportPath = FileUploadUtil.saveDocument("uploads", policeReport);
+            birthCertPath = FileUploadUtil.saveDocument(uploadDir, birthCertificate);
+            policeReportPath = FileUploadUtil.saveDocument(uploadDir, policeReport);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -210,13 +214,13 @@ public class LostNicController {
                 return ResponseEntity.notFound().build();
             }
 
-            // Securely resolve file inside the uploads directory
-            Path uploadsDir = Paths.get("uploads").toAbsolutePath().normalize();
+            // Securely resolve file inside the configured private upload directory.
+            Path uploadsDir = Paths.get(uploadDir).toAbsolutePath().normalize();
             String fileName = Paths.get(storedPath).getFileName().toString();
             Path filePath = uploadsDir.resolve(fileName).normalize();
 
             if (!filePath.startsWith(uploadsDir) || !Files.exists(filePath)) {
-                logger.warn("Requested file not found or outside uploads: {}", filePath);
+                logger.warn("Requested file not found or outside upload directory: {}", filePath);
                 return ResponseEntity.notFound().build();
             }
 

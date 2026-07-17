@@ -5,6 +5,7 @@ import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.NewNicFormService;
 import com.project.nic.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,9 @@ public class NewNicFormController {
 
     @Autowired
     private AuthSessionService authSessionService;
+
+    @Value("${app.upload.dir}")
+    private String uploadDir;
 
     private boolean canManageApplications(String token) {
         return authSessionService.hasAnyRole(token, "ADMIN", "PRO", "RECOVERY");
@@ -58,8 +62,8 @@ public class NewNicFormController {
         try {
             FileUploadUtil.validateDocument(birthCertificate);
             FileUploadUtil.validateImage(photo);
-            birthCertPath = FileUploadUtil.saveDocument("uploads", birthCertificate);
-            photoPath = FileUploadUtil.saveImage("uploads", photo);
+            birthCertPath = FileUploadUtil.saveDocument(uploadDir, birthCertificate);
+            photoPath = FileUploadUtil.saveImage(uploadDir, photo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
