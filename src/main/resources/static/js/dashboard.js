@@ -22,12 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const APPLICATION_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
 
 function initDashboard() {
-    console.log('Dashboard initialized');
-
-    // Simulate loading user data
-    setTimeout(() => {
-        loadUserData();
-    }, 1000);
+    loadUserData();
 }
 
 function setupNotifications() {
@@ -41,42 +36,12 @@ function setupNotifications() {
         });
     }
 
-    // Simulate notification updates
-    setInterval(() => {
-        updateNotificationBadge();
-    }, 30000); // Check every 30 seconds
+    const badge = document.querySelector('.notification-badge');
+    if (badge) badge.style.display = 'none';
 }
 
 function toggleNotifications() {
-    // In a real application, this would show a notifications dropdown/modal
-    const badge = document.querySelector('.notification-badge');
-    const count = parseInt(badge.textContent);
-
-    if (count > 0) {
-        badge.textContent = '0';
-        badge.style.display = 'none';
-
-        // Show confirmation message
-        showToast('Notifications marked as read', 'success');
-    } else {
-        showToast('No new notifications', 'info');
-    }
-}
-
-function updateNotificationBadge() {
-    // Simulate receiving new notifications
-    const badge = document.querySelector('.notification-badge');
-    if (Math.random() > 0.7) { // 30% chance of new notification
-        const currentCount = parseInt(badge.textContent);
-        badge.textContent = currentCount + 1;
-        badge.style.display = 'flex';
-
-        // Pulse animation for new notification
-        badge.style.animation = 'pulse 1s infinite';
-        setTimeout(() => {
-            badge.style.animation = '';
-        }, 3000);
-    }
+    showToast('No new notifications', 'info');
 }
 
 function animateStatusTimeline() {
@@ -95,11 +60,13 @@ function animateStatusTimeline() {
     });
 }
 
-function renderMyApplicationStatus() {
+async function renderMyApplicationStatus() {
     const list = document.getElementById('applicationStatusList');
     if (!list) return;
 
-    const applications = getCitizenApplications();
+    list.innerHTML = '<div class="application-status-empty">Loading application status...</div>';
+
+    const applications = await getCitizenApplications();
 
     if (!applications.length) {
         list.innerHTML = '<div class="application-status-empty">No applications found yet.</div>';
@@ -128,39 +95,63 @@ function renderMyApplicationStatus() {
     `).join('');
 
     updateApplicationStatusCounts(applications);
+    updateCurrentApplication(applications);
 }
 
-function getCitizenApplications() {
+async function getCitizenApplications() {
     try {
-        const savedApplications = JSON.parse(localStorage.getItem('citizenApplications') || '[]');
-        if (Array.isArray(savedApplications) && savedApplications.length) {
-            return savedApplications;
-        }
+        const res = await fetch('/api/applications/mine', { headers: authHeaders({ 'Accept': 'application/json' }) });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return [
+            ...normalizeApplicationList(data.newNic, 'New NIC Application', 'NEW', app => app.nameWithInitials || `Application ${app.id}`),
+            ...normalizeApplicationList(data.renewNic, 'NIC Renewal', 'REN', app => app.oldNicNumber || `Renewal ${app.id}`),
+            ...normalizeApplicationList(data.lostNic, 'Lost NIC Request', 'LST', app => app.nicNumber || `Lost NIC ${app.id}`)
+        ].sort((a, b) => new Date(b.submittedRaw || 0) - new Date(a.submittedRaw || 0));
     } catch (_) {}
 
-    return [
-        {
-            type: 'New NIC Application',
-            reference: 'NIC2024-00123',
-            status: 'PROCESSING',
-            submitted: '15 November 2024',
-            nextStep: 'Officer review'
-        },
-        {
-            type: 'NIC Renewal',
-            reference: 'REN2024-00058',
-            status: 'PENDING',
-            submitted: '20 November 2024',
-            nextStep: 'Document verification'
-        },
-        {
-            type: 'Lost NIC Request',
-            reference: 'LST2024-00017',
-            status: 'APPROVED',
-            submitted: '02 November 2024',
-            nextStep: 'Ready for delivery'
-        }
-    ];
+    return [];
+}
+
+function normalizeApplicationList(value, type, prefix, getTitle) {
+    const list = Array.isArray(value) ? value : [];
+    return list.map(app => {
+        const id = app.id || '';
+        const status = normalizeApplicationStatus(app.status);
+        const submittedRaw = app.submittedAt || app.createdAt || app.birthdate || app.lostDate || '';
+        return {
+            type,
+            reference: `${prefix}-${String(id).padStart(5, '0')}`,
+            status,
+            submitted: formatDate(submittedRaw),
+            submittedRaw,
+            nextStep: getNextStep(status),
+            title: getTitle(app)
+        };
+    });
+}
+
+function getNextStep(status) {
+    const normalized = normalizeApplicationStatus(status);
+    if (normalized === 'APPROVED') return 'Awaiting delivery or pickup';
+    if (normalized === 'DELIVERED') return 'Completed';
+    if (normalized === 'REJECTED') return 'Contact support for details';
+    if (normalized === 'PROCESSING') return 'Officer review';
+    return 'Document verification';
+}
+
+function formatDate(value) {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleDateString();
+}
+
+function updateCurrentApplication(applications) {
+    const current = applications.find(app => !['DELIVERED', 'REJECTED'].includes(normalizeApplicationStatus(app.status))) || applications[0];
+    setText('currentApplicationRef', current ? current.reference : 'No active application');
+    setText('currentApplicationDate', current ? current.submitted : '-');
+    setText('currentApplicationStatus', current ? formatApplicationStatus(current.status) : '-');
 }
 
 function updateApplicationStatusCounts(applications) {
@@ -221,10 +212,9 @@ function setupCardInteractions() {
         // Click functionality for cards
         card.addEventListener('click', function(e) {
             if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-                // Handle card click - in real app, this would navigate to detailed view
                 const cardTitle = this.querySelector('.card-title');
                 if (cardTitle) {
-                    console.log(`Navigating to ${cardTitle.textContent} details`);
+                    showToast(`${cardTitle.textContent} selected`, 'info');
                 }
             }
         });
@@ -273,21 +263,10 @@ function removeMobileMenuButton() {
 }
 
 function loadUserData() {
-    // Simulate API call to load user data
-    const userData = {
-        name: 'John Doe',
-        nic: '901234567V',
-        applications: 3,
-        pending: 1,
-        completed: 2
-    };
-
-    // Update UI with user data
-    document.querySelector('.user-name').textContent = userData.name;
-    document.querySelector('.user-id').textContent = `NIC: ${userData.nic}`;
-
-    // Show loading completion
-    showToast('Dashboard data loaded successfully', 'success');
+    const email = localStorage.getItem('loggedInEmail') || '';
+    const name = email ? email.split('@')[0] : 'User';
+    document.querySelector('.user-name').textContent = name;
+    document.querySelector('.user-id').textContent = email || 'Signed in';
 }
 
 function showToast(message, type = 'info') {

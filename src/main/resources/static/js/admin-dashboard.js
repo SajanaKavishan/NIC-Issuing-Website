@@ -69,23 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Search functionality
-    const searchInput = document.querySelector('.search-box input');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            // Implement search functionality here
-            console.log('Searching for:', this.value);
-        });
-    }
-
     // Chart animation
     animateChartBars();
-
-    // Simulate real-time data updates
-    setInterval(updateDashboardData, 10000);
-
-    // Initialize dashboard data
-    loadDashboardData();
 
     // Initialize Users management
     initUsersManagement();
@@ -423,56 +408,6 @@ function animateChartBars() {
     });
 }
 
-// Simulated data loading
-async function loadDashboardData() {
-    try {
-        // Simulate API call
-        const response = await simulateAPICall();
-        updateDashboardStats(response);
-    } catch (error) {
-        console.error('Error loading dashboard data:', error);
-    }
-}
-
-function simulateAPICall() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                totalApplications: 1247,
-                pendingApprovals: 89,
-                approvedToday: 956,
-                totalRevenue: 287500,
-                recentActivities: [
-                    { type: 'new', message: 'New user registration', time: '2 mins ago' },
-                    { type: 'approved', message: 'Application approved', time: '15 mins ago' },
-                    { type: 'warning', message: 'Payment issue detected', time: '1 hour ago' }
-                ]
-            });
-        }, 1000);
-    });
-}
-
-function updateDashboardStats(data) {
-    // Update statistics cards
-    const statCards = document.querySelectorAll('.stat-info h3');
-    if (statCards.length >= 4) {
-        statCards[0].textContent = data.totalApplications.toLocaleString();
-        statCards[1].textContent = data.pendingApprovals;
-        statCards[2].textContent = data.approvedToday;
-        statCards[3].textContent = `LKR ${data.totalRevenue.toLocaleString()}`;
-    }
-}
-
-function updateDashboardData() {
-    // Simulate real-time data updates
-    const randomIncrement = Math.floor(Math.random() * 10) + 1;
-    const pendingElement = document.querySelector('.stat-card:nth-child(2) h3');
-    if (pendingElement) {
-        const current = parseInt(pendingElement.textContent);
-        pendingElement.textContent = Math.max(0, current - randomIncrement);
-    }
-}
-
 // Users management logic
 function initUsersManagement() {
     const API_BASE = '/api/users';
@@ -482,11 +417,7 @@ function initUsersManagement() {
     const formTitle = document.getElementById('userFormTitle');
     const btnCancel = document.getElementById('btnCancelUser');
 
-    // If any of these core elements are missing, still expose edit/delete stubs so buttons in the table won't break
     if (!btnAdd || !form || !btnCancel) {
-        // Create safe no-op handlers so onclick references do not throw
-        window.__editUser = (id) => { console.warn('Edit user UI not available on this page.'); };
-        window.__deleteUser = async (id) => { alert('Delete not available on this page.'); };
         return; // Users section not on this page
     }
 

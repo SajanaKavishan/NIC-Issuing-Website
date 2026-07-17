@@ -211,14 +211,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 4. DASHBOARD MOCK FUNCTIONALITY ---
+    // Legacy selected-request panel actions are disabled; table actions call the backend.
 
-    // Simulate selecting a request in the top mock table
+    /*
+    // Legacy selected-request panel kept for reference only.
+    // Selecting a request in the old static table
     selectButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
 
-            // Find the request ID and name from the table row (for mock population)
+            // Find the request ID and name from the table row
             const row = this.closest('tr');
             const requestId = row.querySelector('.tag').textContent;
             const citizenName = row.querySelector('td:nth-child(2)').textContent;
@@ -226,9 +228,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show the selected request panel
             selectedRequest.style.display = 'block';
 
-            // Populate with mock data
+            // Populate details from the selected row
             selectedRequest.querySelector('.details-grid p:nth-child(1) .detail-value').textContent = citizenName;
-            selectedRequest.querySelector('.details-grid p:nth-child(2) .detail-value').textContent = requestId.replace('#', 'NIC-'); // Mock NIC gen
+            selectedRequest.querySelector('.details-grid p:nth-child(2) .detail-value').textContent = requestId.replace('#', 'NIC-');
 
             // Scroll the selected request section into view on smaller screens
             if (window.innerWidth < 1024) {
@@ -240,44 +242,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Approve button functionality (mock)
+    // Approve button functionality
     document.querySelector('.btn-approve').addEventListener('click', function() {
         showNotification('✅ Request Approved and Forwarded to Printing!');
-        console.log('Action: Approve');
+        showNotification('Use the table status controls to approve a request.');
     });
 
-    // Reject button functionality (mock)
+    // Reject button functionality
     document.querySelector('.btn-reject').addEventListener('click', function() {
         showNotification('❌ Request Rejected. Citizen Notified.');
-        console.log('Action: Reject');
+        showNotification('Use the table status controls to reject a request.');
     });
 
-    // Escalate button functionality (mock)
+    // Escalate button functionality
     document.querySelector('.btn-escalate').addEventListener('click', function() {
         showNotification('⚠️ Request Escalated to Authority!');
-        console.log('Action: Escalate');
+        showNotification('Escalation workflow is not configured yet.');
     });
 
-    // Manual Verify button functionality (mock)
+    // Manual Verify button functionality
     const manualVerifyButton = document.querySelector('.btn-manual-verify');
     if (manualVerifyButton) {
         manualVerifyButton.addEventListener('click', function() {
             showNotification('👤 Manual Verification Initiated!');
-            console.log('Action: Manual Verify');
+            showNotification('Manual verification workflow is not configured yet.');
         });
     }
 
-    // Verification tools (mock actions)
+    // Verification tools
     const toolButtons = document.querySelectorAll('.right-panel .tool-btn');
     if (toolButtons) {
         toolButtons.forEach(button => {
             button.addEventListener('click', function() {
                 showNotification(`Tool Activated: ${this.textContent}`);
-                console.log(`Tool Action: ${this.textContent}`);
+                showNotification('Verification tools are not configured yet.');
             });
         });
     }
 
+    */
     // Prevent default form submission on search input
     const searchInput = document.querySelector('.search-box input');
     if (searchInput) {

@@ -119,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await axios.post(`http://localhost:8080/api/assistance/reply/${id}`, responseText, {
                 headers: authHeaders({ 'Content-Type': 'text/plain' })
             });
-            // Assuming API updates status, but if not, simulate
             request.status = newStatus;
             request.reply = responseText || request.reply;
 

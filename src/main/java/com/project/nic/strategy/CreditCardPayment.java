@@ -6,9 +6,7 @@ import com.project.nic.service.PaymentStrategy;
 public class CreditCardPayment implements PaymentStrategy {
     @Override
     public boolean processPayment(Payment payment) {
-        // Simulate credit card payment processing logic
-        System.out.println("Processing credit card payment for amount: " + payment.getAmount());
-        // In a real system, integrate with a payment gateway like Stripe or Visa
+        // Integrate a payment gateway here when live card processing is configured.
         payment.setStatus("completed");
         return true;
     }

@@ -97,20 +97,7 @@ function updateOverview() {
  * Filters data based on user input and renders the table rows.
  */
 function renderTable() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const typeFilter = typeSelect.value;
-    const statusFilter = statusSelect.value;
-
-    const filteredItems = items.filter(item => {
-        const matchesSearch = item.id.toLowerCase().includes(searchTerm) ||
-            item.name.toLowerCase().includes(searchTerm);
-
-        const matchesType = typeFilter === 'all' || item.type === typeFilter;
-
-        const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-
-        return matchesSearch && matchesType && matchesStatus;
-    });
+    const filteredItems = getFilteredItems();
 
     tableBody.innerHTML = ''; // Clear existing rows
 
@@ -133,6 +120,20 @@ function renderTable() {
                 <button class="btn-ghost" onclick="deleteRecord('${item.id}')">Delete</button>
             </td>
         `;
+    });
+}
+
+function getFilteredItems() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const typeFilter = typeSelect.value;
+    const statusFilter = statusSelect.value;
+
+    return items.filter(item => {
+        const matchesSearch = item.id.toLowerCase().includes(searchTerm) ||
+            item.name.toLowerCase().includes(searchTerm);
+        const matchesType = typeFilter === 'all' || item.type === typeFilter;
+        const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+        return matchesSearch && matchesType && matchesStatus;
     });
 }
 
@@ -177,7 +178,7 @@ function closeModal() {
 }
 
 /**
- * Saves changes (status update and response message) to the mock data.
+ * Saves changes (status update and response message) to the backend.
  */
 async function saveChanges() {
     const id = document.getElementById('modalId').textContent;
@@ -204,21 +205,16 @@ async function saveChanges() {
             return;
         }
 
-        // Mock: Add notification
         const notifDiv = document.getElementById('notifications');
         const p = document.createElement('p');
 
         if (responseText) {
             p.textContent = `• Response sent for ${id} (Status: ${newStatus}) — ${new Date().toLocaleDateString()}`;
-            console.log(`PRO responded to ${id}: "${responseText}"`); // Replaced alert()
         } else {
             p.textContent = `• Status updated for ${id} to ${newStatus}.`;
         }
 
         notifDiv.insertBefore(p, notifDiv.firstChild); // Add new notification at the top
-
-        // Log action and provide confirmation (replaces alert())
-        console.log(`Changes saved successfully for Submission ID ${id}. New Status: ${newStatus}`);
 
         closeModal();
         updateOverview();
@@ -312,20 +308,31 @@ function logout(){
 }
 
 function generate(type){
-    console.log(`Generating ${type} report... (Functionality triggered)`);
+    exportFile('excel', type);
 }
 
-function exportFile(fmt){
+function exportFile(fmt, scope = 'current'){
+    const rows = getFilteredItems();
+    if (!rows.length) {
+        alert('No records available to export.');
+        return;
+    }
+
     if (fmt === 'pdf') {
-        console.log('Simulating PDF generation for current table data.');
+        window.print();
     } else if (fmt === 'excel') {
         let csv = 'ID,Name,Date,Type,Status,Description\n';
-        items.forEach(c => csv += `${c.id},${c.name},${c.date},${c.type},${c.status},"${c.description.replace(/"/g, '""')}"\n`);
+        rows.forEach(c => csv += `${c.id},${c.name},${c.date},${c.type},${c.status},"${String(c.description || '').replace(/"/g, '""')}"\n`);
 
-        // This part would trigger a download in a full browser environment
         const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
         const url = URL.createObjectURL(blob);
-        console.log(`Generated CSV data. Simulated download URL: ${url}`);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `pro-${scope}-report.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
     }
 }
 

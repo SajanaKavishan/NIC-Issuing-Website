@@ -1,6 +1,6 @@
 /**
  * Payment Confirmation Page Logic
- * 1. Read URL parameters (simulating data passed after submission).
+ * 1. Read URL parameters passed after submission.
  * 2. Populate the confirmation card with dynamic data.
  * 3. Adjust the "Next Steps" message based on the payment method.
  */
@@ -14,15 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
-    // --- Dynamic Data Retrieval (Mocking a real response) ---
-    // In a real application, this data would come directly from the successful payment/submission response.
-    // For this example, we read parameters from the URL (e.g., confirmation.html?ref=NIC-2025-98765&service=New+NIC&method=Card)
-
-    // Fallback values for demonstration
-    const applicationRefId = getUrlParameter('ref') || 'NIC-2025-' + Math.floor(Math.random() * 90000 + 10000);
-    const serviceType = getUrlParameter('service') || 'New NIC (First Time)';
-    const paymentMethod = getUrlParameter('method') || 'Card Payment';
-    const amountPaid = getUrlParameter('amount') || 'LKR 2,500.00';
+    const applicationRefId = getUrlParameter('ref') || '-';
+    const serviceType = getUrlParameter('service') || '-';
+    const paymentMethod = getUrlParameter('method') || '-';
+    const amountPaid = getUrlParameter('amount') || '-';
 
 
     // --- DOM Population ---
@@ -80,5 +75,3 @@ document.addEventListener('DOMContentLoaded', function() {
     animateOnLoad();
 });
 
-// To simulate navigation and passing data, you could use a structure like this on your submission page:
-// window.location.href = 'confirmation.html?ref=' + applicationRefId + '&service=' + serviceType + '&method=' + paymentMethod + '&amount=' + amount;

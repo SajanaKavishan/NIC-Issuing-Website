@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Print functionality for modal
     printBtn.addEventListener('click', function() {
-        console.log('Printing details triggered for NIC:', document.getElementById('modalNicNumber').textContent);
+        window.print();
     });
 
     // --- Edit Modal Logic ---
