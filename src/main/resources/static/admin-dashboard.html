@@ -32,8 +32,86 @@
             </div>
         </header>
 
-        <!-- User Management Section (only visible section) -->
-        <section id="users" class="dashboard-section active" style="padding:16px;">
+        <section id="application-review" class="dashboard-section active" style="padding:16px;">
+            <div class="section-header glass">
+                <div>
+                    <h2 class="display">NIC Application Review</h2>
+                    <p class="section-subtitle">Review New NIC and Renewal requests before approval.</p>
+                </div>
+                <div class="section-actions">
+                    <button id="btnRefreshApplications" class="btn-ghost" title="Refresh applications" aria-label="Refresh applications">
+                        <i class="fas fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="review-toolbar glass">
+                <div class="review-tabs" role="tablist" aria-label="Application type">
+                    <button class="review-tab active" type="button" data-review-type="new" role="tab" aria-selected="true">
+                        <i class="fas fa-id-card"></i> New NIC
+                    </button>
+                    <button class="review-tab" type="button" data-review-type="renew" role="tab" aria-selected="false">
+                        <i class="fas fa-arrows-rotate"></i> Renew NIC
+                    </button>
+                </div>
+                <div class="review-filters">
+                    <label class="sr-only" for="applicationStatusFilter">Status</label>
+                    <select id="applicationStatusFilter" class="review-select" aria-label="Filter by status">
+                        <option value="ALL">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                        <option value="DELIVERED">Delivered</option>
+                    </select>
+                    <label class="review-search">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input id="applicationSearchInput" type="search" placeholder="Search name, email, NIC, contact" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="review-summary-grid" aria-label="Application summary">
+                <div class="review-summary-card glass">
+                    <span>Total</span>
+                    <strong id="reviewTotalCount">0</strong>
+                </div>
+                <div class="review-summary-card glass">
+                    <span>Pending</span>
+                    <strong id="reviewPendingCount">0</strong>
+                </div>
+                <div class="review-summary-card glass">
+                    <span>Approved</span>
+                    <strong id="reviewApprovedCount">0</strong>
+                </div>
+                <div class="review-summary-card glass">
+                    <span>Rejected</span>
+                    <strong id="reviewRejectedCount">0</strong>
+                </div>
+            </div>
+
+            <div class="glass review-table-card">
+                <div class="table-wrapper">
+                    <table class="data-table review-table" id="applicationsTable" style="width:100%;">
+                        <thead>
+                        <tr>
+                            <th>Ref</th>
+                            <th>Applicant</th>
+                            <th>Contact</th>
+                            <th>Submitted By</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr><td colspan="6">Loading applications...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="users" class="dashboard-section" style="padding:16px;">
             <div class="section-header glass">
                 <h2 class="display">User Management</h2>
                 <div class="section-actions">
@@ -103,6 +181,33 @@
             </div>
         </section>
     </main>
+</div>
+
+<div id="applicationReviewModal" class="review-modal" aria-hidden="true">
+    <div class="review-modal-backdrop" data-close-review-modal></div>
+    <section class="review-modal-panel glass" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+        <header class="review-modal-header">
+            <div>
+                <p id="reviewModalType" class="modal-kicker">Application</p>
+                <h3 id="reviewModalTitle">Review Application</h3>
+            </div>
+            <button class="btn-ghost icon-btn" type="button" data-close-review-modal title="Close" aria-label="Close">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </header>
+        <div id="reviewModalBody" class="review-details-grid"></div>
+        <footer class="review-modal-actions">
+            <button class="btn-ghost" type="button" data-review-status="PROCESSING">
+                <i class="fas fa-spinner"></i> Processing
+            </button>
+            <button class="btn-ghost btn-danger" type="button" data-review-status="REJECTED">
+                <i class="fas fa-xmark-circle"></i> Reject
+            </button>
+            <button class="btn-future" type="button" data-review-status="APPROVED">
+                <i class="fas fa-check-circle"></i> Approve
+            </button>
+        </footer>
+    </section>
 </div>
 
 <script src="js/admin-dashboard.js"></script>
