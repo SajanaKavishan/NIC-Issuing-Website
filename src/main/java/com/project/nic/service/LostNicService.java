@@ -36,6 +36,13 @@ public class LostNicService {
         return repository.findById(id);
     }
 
+    public Optional<LostNic> findLatestByNicNumber(String nicNumber) {
+        if (nicNumber == null || nicNumber.isBlank()) {
+            return Optional.empty();
+        }
+        return repository.findFirstByNicNumberIgnoreCaseOrderByIdDesc(nicNumber.trim());
+    }
+
     public LostNic update(Long id, LostNic updates) {
         return repository.findById(id).map(existing -> {
             // Only update editable fields

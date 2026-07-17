@@ -2,8 +2,11 @@ package com.project.nic.service;
 
 import com.project.nic.model.Delivery;
 import com.project.nic.repository.DeliveryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,10 +16,20 @@ import java.util.stream.Collectors;
 
 @Service
 public class DeliveryService {
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryService.class);
     private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
 
     @Autowired
     private DeliveryRepository deliveryRepository;
+
+    @Autowired
+    private NewNicFormService newNicFormService;
+
+    @Autowired
+    private RenewNicService renewNicService;
+
+    @Autowired
+    private LostNicService lostNicService;
 
     public List<Delivery> getAllDeliveries(String dateRange, String deliveryMethod, String search) {
         // Fetch all deliveries and filter in-memory to keep logic simple and correct.
@@ -72,9 +85,12 @@ public class DeliveryService {
         return deliveryRepository.findById(nic);
     }
 
+    @Transactional
     public Delivery saveDelivery(Delivery delivery) {
         delivery.setStatus(normalizeStatus(delivery.getStatus()));
-        return deliveryRepository.save(delivery);
+        Delivery saved = deliveryRepository.save(delivery);
+        updateRelatedApplicationStatus(saved);
+        return saved;
     }
 
     public List<Delivery> getAll() {
@@ -104,5 +120,54 @@ public class DeliveryService {
         if ("IN_TRANSIT".equals(normalized)) return "PROCESSING";
         if ("RETURNED".equals(normalized) || "CANCELLED".equals(normalized)) return "REJECTED";
         return ALLOWED_STATUSES.contains(normalized) ? normalized : "PENDING";
+    }
+
+    private void updateRelatedApplicationStatus(Delivery delivery) {
+        String status = normalizeStatus(delivery.getStatus());
+
+        if (delivery.getAppId() != null) {
+            if (updateByApplicationId(delivery.getAppId(), status)) {
+                return;
+            }
+        }
+
+        String nic = delivery.getNic();
+        if (nic != null && !nic.isBlank()) {
+            Optional<com.project.nic.model.RenewNic> renewNic = renewNicService.findLatestByOldNicNumber(nic);
+            if (renewNic.isPresent()) {
+                Long id = renewNic.get().getId();
+                renewNicService.updateStatus(id, status);
+                logger.info("Updated Renew NIC application {} to {} from delivery {}", id, status, nic);
+                return;
+            }
+            Optional<com.project.nic.model.LostNic> lostNic = lostNicService.findLatestByNicNumber(nic);
+            if (lostNic.isPresent()) {
+                Long id = lostNic.get().getId();
+                lostNicService.updateStatus(id, status);
+                logger.info("Updated Lost NIC application {} to {} from delivery {}", id, status, nic);
+                return;
+            }
+        }
+
+        logger.warn("No related NIC application found for delivery nic='{}', appId='{}'", delivery.getNic(), delivery.getAppId());
+    }
+
+    private boolean updateByApplicationId(Long appId, String status) {
+        if (newNicFormService.findById(appId).isPresent()) {
+            newNicFormService.updateStatus(appId, status);
+            logger.info("Updated New NIC application {} to {} from delivery appId", appId, status);
+            return true;
+        }
+        if (renewNicService.findById(appId).isPresent()) {
+            renewNicService.updateStatus(appId, status);
+            logger.info("Updated Renew NIC application {} to {} from delivery appId", appId, status);
+            return true;
+        }
+        if (lostNicService.findById(appId).isPresent()) {
+            lostNicService.updateStatus(appId, status);
+            logger.info("Updated Lost NIC application {} to {} from delivery appId", appId, status);
+            return true;
+        }
+        return false;
     }
 }

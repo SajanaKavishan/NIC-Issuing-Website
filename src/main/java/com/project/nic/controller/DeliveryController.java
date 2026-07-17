@@ -87,8 +87,12 @@ public class DeliveryController {
         Delivery delivery = deliveryService.getDeliveryByNic(nic).orElseThrow();
         String method = update.getMethod() == null ? null : update.getMethod().trim();
         String status = update.getStatus() == null ? null : update.getStatus().trim();
-        delivery.setMethod(method);
-        delivery.setStatus(status);
+        if (method != null && !method.isBlank()) {
+            delivery.setMethod(method);
+        }
+        if (status != null && !status.isBlank()) {
+            delivery.setStatus(status);
+        }
         Delivery saved = deliveryService.saveDelivery(delivery);
         logger.info("Saved delivery for nic='{}' with method='{}', status='{}'", nic, saved.getMethod(), saved.getStatus());
         return ResponseEntity.ok(saved);

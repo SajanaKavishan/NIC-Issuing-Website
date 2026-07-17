@@ -35,6 +35,13 @@ public class RenewNicService {
         return repository.findById(id);
     }
 
+    public Optional<RenewNic> findLatestByOldNicNumber(String oldNicNumber) {
+        if (oldNicNumber == null || oldNicNumber.isBlank()) {
+            return Optional.empty();
+        }
+        return repository.findFirstByOldNicNumberIgnoreCaseOrderByIdDesc(oldNicNumber.trim());
+    }
+
     public RenewNic updateStatus(Long id, String status) {
         String normalizedStatus = normalizeStatus(status);
         return repository.findById(id).map(existing -> {
