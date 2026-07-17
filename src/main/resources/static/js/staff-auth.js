@@ -1,4 +1,6 @@
 (function() {
+    document.documentElement.style.visibility = 'hidden';
+
     const roleHome = {
         ADMIN: 'admin-dashboard.html',
         FINANCE: 'finance.html',
@@ -21,10 +23,39 @@
         return 'CITIZEN';
     }
 
+    function clearAuth() {
+        [
+            'authToken',
+            'userRole',
+            'loggedInEmail',
+            'isAdmin',
+            'isFinance',
+            'isDelivery',
+            'isPro',
+            'isRecovery',
+            'isAssistant'
+        ].forEach(key => localStorage.removeItem(key));
+    }
+
+    function storeRole(role) {
+        ['isAdmin', 'isFinance', 'isDelivery', 'isPro', 'isRecovery', 'isAssistant'].forEach(key => localStorage.removeItem(key));
+        localStorage.setItem('userRole', role);
+        if (role === 'ADMIN') localStorage.setItem('isAdmin', 'true');
+        if (role === 'FINANCE') localStorage.setItem('isFinance', 'true');
+        if (role === 'DELIVERY') localStorage.setItem('isDelivery', 'true');
+        if (role === 'PRO') localStorage.setItem('isPro', 'true');
+        if (role === 'RECOVERY') localStorage.setItem('isRecovery', 'true');
+        if (role === 'ASSISTANT') localStorage.setItem('isAssistant', 'true');
+    }
+
     function redirectTo(url) {
         if (!window.location.pathname.endsWith(url)) {
             window.location.replace(url);
         }
+    }
+
+    function allowPage() {
+        document.documentElement.style.visibility = '';
     }
 
     try {
@@ -45,7 +76,35 @@
 
         if (requiredRoles.length && !requiredRoles.includes(role)) {
             redirectTo(roleHome[role] || 'home.html');
+            return;
         }
+
+        fetch('/api/users/session', {
+            headers: { 'X-Auth-Token': token, 'Accept': 'application/json' },
+            cache: 'no-store'
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    throw new Error('Invalid session');
+                }
+                return response.json();
+            })
+            .then(user => {
+                const serverRole = (user && user.role ? user.role : 'CITIZEN').toUpperCase();
+                storeRole(serverRole);
+                if (user && user.email) {
+                    localStorage.setItem('loggedInEmail', user.email);
+                }
+                if (requiredRoles.length && !requiredRoles.includes(serverRole)) {
+                    redirectTo(roleHome[serverRole] || 'home.html');
+                    return;
+                }
+                allowPage();
+            })
+            .catch(() => {
+                clearAuth();
+                redirectTo(`login.html?redirect=${encodeURIComponent(currentPage)}`);
+            });
     } catch (_) {
         window.location.replace('login.html');
     }

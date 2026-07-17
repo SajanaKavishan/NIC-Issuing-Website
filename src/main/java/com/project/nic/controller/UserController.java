@@ -68,6 +68,21 @@ public class UserController {
         return ResponseEntity.ok(LoginResponse.success(token, UserDto.from(user)));
     }
 
+    @GetMapping("/session")
+    public ResponseEntity<?> session(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(401).body("Invalid or expired session");
+        }
+
+        Optional<User> userOpt = userService.findById(sessionUser.get().userId());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).body("Invalid or expired session");
+        }
+
+        return ResponseEntity.ok(UserDto.from(userOpt.get()));
+    }
+
     @GetMapping
     public ResponseEntity<?> getAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
         if (!authSessionService.hasRole(token, "ADMIN")) {
