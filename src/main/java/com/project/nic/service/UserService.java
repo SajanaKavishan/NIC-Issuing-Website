@@ -8,9 +8,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
+    public static final Set<String> ALLOWED_ROLES = Set.of(
+            "CITIZEN", "ADMIN", "FINANCE", "DELIVERY", "PRO", "RECOVERY", "ASSISTANT"
+    );
+
     @Autowired
     private UserRepository userRepository;
 
@@ -69,11 +74,22 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public String normalizeRole(String role) {
+        return role == null ? null : role.trim().toUpperCase();
+    }
+
+    public boolean isAllowedRole(String role) {
+        return ALLOWED_ROLES.contains(normalizeRole(role));
+    }
+
     private void normalizeUser(User user) {
         if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("CITIZEN");
         } else {
-            user.setRole(user.getRole().trim().toUpperCase());
+            user.setRole(normalizeRole(user.getRole()));
+        }
+        if (!isAllowedRole(user.getRole())) {
+            throw new IllegalArgumentException("Invalid role: " + user.getRole());
         }
         user.setEmail(normalizeEmail(user.getEmail()));
     }

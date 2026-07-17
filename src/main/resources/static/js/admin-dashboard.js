@@ -221,6 +221,7 @@ function initUsersManagement() {
         document.getElementById('ufFirst').value = user?.firstName || '';
         document.getElementById('ufLast').value = user?.lastName || '';
         document.getElementById('ufEmail').value = user?.email || '';
+        document.getElementById('ufRole').value = user?.role || '';
         document.getElementById('ufPassword').value = '';
         formTitle.textContent = user ? 'Edit User' : 'Add User';
         formWrap.style.display = 'block';
@@ -237,11 +238,16 @@ function initUsersManagement() {
             firstName: document.getElementById('ufFirst').value.trim(),
             lastName: document.getElementById('ufLast').value.trim(),
             email: document.getElementById('ufEmail').value.trim(),
+            role: document.getElementById('ufRole').value,
             password: document.getElementById('ufPassword').value
         };
 
-        if (!payload.firstName || !payload.lastName || !payload.email) {
+        if (!payload.firstName || !payload.lastName || !payload.email || !payload.role) {
             alert('Please fill all required fields');
+            return;
+        }
+        if (!id && !payload.password) {
+            alert('Password is required for new users');
             return;
         }
 
@@ -261,10 +267,10 @@ function initUsersManagement() {
                 text = await res.text();
                 if (!res.ok) throw new Error(text || `Status ${res.status}`);
             } else {
-                // Create via signup endpoint
-                res = await fetch(`${API_BASE}/signup`, {
+                // Create via admin endpoint, with role validation
+                res = await fetch(API_BASE, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
                     body: JSON.stringify(payload)
                 });
                 text = await res.text();
@@ -322,7 +328,7 @@ async function loadUsers() {
     };
     const tbody = document.querySelector('#usersTable tbody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
     try {
         const res = await fetch(API_BASE, { headers: authHeaders() });
         if (!res.ok) throw new Error(await res.text() || `Status ${res.status}`);
@@ -333,7 +339,7 @@ async function loadUsers() {
         renderUsers(list);
     } catch (e) {
         console.error('Load users error', e);
-        tbody.innerHTML = '<tr><td colspan="5">Failed to load users</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6">Failed to load users</td></tr>';
     }
 }
 
@@ -341,7 +347,7 @@ function renderUsers(users) {
     const tbody = document.querySelector('#usersTable tbody');
     if (!tbody) return;
     if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="5">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
         return;
     }
     tbody.innerHTML = users.map(u => {
@@ -351,6 +357,7 @@ function renderUsers(users) {
             <td>${safe(u.firstName)}</td>
             <td>${safe(u.lastName)}</td>
             <td>${safe(u.email)}</td>
+            <td>${safe(u.role)}</td>
             <td style="text-align:right;">
                 <button class="btn-ghost" onclick="__editUser(${Number(u.id)})"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn-ghost" onclick="__deleteUser(${u.id})"><i class="fas fa-trash"></i> Delete</button>

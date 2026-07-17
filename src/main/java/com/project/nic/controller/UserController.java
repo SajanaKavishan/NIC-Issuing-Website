@@ -30,6 +30,32 @@ public class UserController {
         return "User registered successfully";
     }
 
+    @PostMapping
+    public ResponseEntity<String> create(
+            @RequestBody User payload,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        if (!authSessionService.hasRole(token, "ADMIN")) {
+            return ResponseEntity.status(403).body("Admin access required");
+        }
+        if (payload.getRole() == null || payload.getRole().isBlank()) {
+            return ResponseEntity.badRequest().body("Role is required");
+        }
+        if (!userService.isAllowedRole(payload.getRole())) {
+            return ResponseEntity.badRequest().body("Invalid role: " + payload.getRole());
+        }
+        if (payload.getPassword() == null || payload.getPassword().isBlank()) {
+            return ResponseEntity.badRequest().body("Password is required");
+        }
+        if (userService.emailExists(payload.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already registered");
+        }
+
+        payload.setRole(userService.normalizeRole(payload.getRole()));
+        userService.saveUser(payload);
+        return ResponseEntity.ok("User created successfully");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody User loginUser) {
         Optional<User> userOpt = userService.authenticate(loginUser.getEmail(), loginUser.getPassword());
@@ -78,6 +104,15 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Email already registered");
             }
             u.setEmail(payload.getEmail());
+        }
+        if (payload.getRole() != null) {
+            if (payload.getRole().isBlank()) {
+                return ResponseEntity.badRequest().body("Role is required");
+            }
+            if (!userService.isAllowedRole(payload.getRole())) {
+                return ResponseEntity.badRequest().body("Invalid role: " + payload.getRole());
+            }
+            u.setRole(userService.normalizeRole(payload.getRole()));
         }
         if (payload.getPassword() != null && !payload.getPassword().isEmpty()) u.setPassword(payload.getPassword());
         userService.saveUser(u);
