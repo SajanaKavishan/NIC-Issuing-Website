@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class DeliveryService {
+    private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
+
     @Autowired
     private DeliveryRepository deliveryRepository;
 
@@ -70,6 +73,7 @@ public class DeliveryService {
     }
 
     public Delivery saveDelivery(Delivery delivery) {
+        delivery.setStatus(normalizeStatus(delivery.getStatus()));
         return deliveryRepository.save(delivery);
     }
 
@@ -93,5 +97,12 @@ public class DeliveryService {
         if (!deliveryRepository.existsById(nic)) return false;
         deliveryRepository.deleteById(nic);
         return true;
+    }
+
+    private String normalizeStatus(String status) {
+        String normalized = status == null ? "PENDING" : status.trim().toUpperCase().replaceAll("\\s+", "_");
+        if ("IN_TRANSIT".equals(normalized)) return "PROCESSING";
+        if ("RETURNED".equals(normalized) || "CANCELLED".equals(normalized)) return "REJECTED";
+        return ALLOWED_STATUSES.contains(normalized) ? normalized : "PENDING";
     }
 }

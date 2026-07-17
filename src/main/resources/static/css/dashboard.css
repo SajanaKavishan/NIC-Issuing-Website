@@ -400,6 +400,18 @@ body {
     border: 1px solid rgba(251,191,36,.25);
 }
 
+.application-status-badge.rejected {
+    color: #f87171;
+    background: rgba(248,113,113,.12);
+    border: 1px solid rgba(248,113,113,.25);
+}
+
+.application-status-badge.delivered {
+    color: #c4b5fd;
+    background: rgba(167,139,250,.12);
+    border: 1px solid rgba(167,139,250,.25);
+}
+
 .application-status-empty {
     color: var(--muted);
     padding: 1rem;

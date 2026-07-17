@@ -16,7 +16,7 @@ public class LostNic {
     private String birthCertificatePath;
     private String policeReportPath;
 
-    // New status field: PENDING / APPROVED / REJECTED
+    // New status field: PENDING / PROCESSING / APPROVED / REJECTED / DELIVERED
     private String status;
     private Long userId;
     private String userEmail;

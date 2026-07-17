@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Service
 public class RenewNicService {
-    private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "APPROVED", "REJECTED", "PROCESSING", "DELIVERED");
+    private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
 
     @Autowired
     private RenewNicRepository repository;
@@ -44,7 +44,7 @@ public class RenewNicService {
     }
 
     private String normalizeStatus(String status) {
-        String normalizedStatus = status == null ? "PENDING" : status.trim().toUpperCase();
+        String normalizedStatus = status == null ? "PENDING" : status.trim().toUpperCase().replaceAll("\\s+", "_");
         if (!ALLOWED_STATUSES.contains(normalizedStatus)) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }

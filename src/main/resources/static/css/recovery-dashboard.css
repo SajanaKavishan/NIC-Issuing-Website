@@ -466,6 +466,17 @@ td.file-cell i {
 .detail-value.status-verified { color: #10B981; }
 .detail-value.status-pending { color: #F59E0B; }
 
+.status-cell {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-cell.status-pending { color: #F59E0B; }
+.status-cell.status-processing { color: #00E5FF; }
+.status-cell.status-approved { color: #10B981; }
+.status-cell.status-rejected { color: #EF4444; }
+.status-cell.status-delivered { color: #A78BFA; }
+
 /* --- 8. RIGHT PANEL (Verification Tools) --- */
 
 .right-panel {

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateMonthlyBtn = document.getElementById('generateMonthlyReport');
     const tableBody = document.querySelector('#deliveredTable tbody');
     const noResultsDiv = document.querySelector('.no-results');
+    const DELIVERY_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
 
     function authHeaders(extra = {}) {
         let token = '';
@@ -62,13 +63,13 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach(item => {
             const row = tableBody.insertRow();
             // Render status using span with status class (reverted to previous behavior)
-            const statusText = item.status || 'Delivered';
+            const statusText = normalizeDeliveryStatus(item.status || 'DELIVERED');
             row.innerHTML = `
                 <td>${item.nic}</td>
                 <td>${item.recipient}</td>
                 <td>${formatDateForUI(item.deliveryDate)}</td>
                 <td>${item.method || ''}</td>
-                <td><span class="status delivered">${statusText}</span></td>
+                <td><span class="status ${statusText.toLowerCase()}">${statusText}</span></td>
                 <td>
                     <button class="btn-edit" data-nic="${item.nic}">Edit</button>
                     <button class="btn-delete" data-nic="${item.nic}">Delete</button>
@@ -407,31 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Map status similarly
                     const editStatusSelect = document.getElementById('editStatus');
-                    const statusRaw = (data.status || '').toLowerCase();
-                    if (statusRaw.includes('deliv')) {
-                        editStatusSelect.value = 'Delivered';
-                    } else if (statusRaw.includes('pending')) {
-                        editStatusSelect.value = 'Pending';
-                    } else if (statusRaw.includes('return')) {
-                        editStatusSelect.value = 'Returned';
-                    } else if (statusRaw.includes('transit') || statusRaw.includes('in transit')) {
-                        editStatusSelect.value = 'In Transit';
-                    } else if (statusRaw.includes('cancel')) {
-                        editStatusSelect.value = 'Cancelled';
-                    } else if (statusRaw.trim().length === 0) {
-                        editStatusSelect.value = 'Pending';
-                    } else {
-                        const opt = Array.from(editStatusSelect.options).find(o => o.value.toLowerCase() === data.status?.toLowerCase());
-                        if (opt) editStatusSelect.value = opt.value;
-                        else {
-                            const tmp = document.createElement('option');
-                            tmp.value = data.status || 'Pending';
-                            tmp.textContent = data.status || 'Pending';
-                            tmp.selected = true;
-                            tmp.setAttribute('data-temp', 'true');
-                            editStatusSelect.appendChild(tmp);
-                        }
-                    }
+                    editStatusSelect.value = normalizeDeliveryStatus(data.status);
 
                     editModal.style.display = 'block';
                 } catch (err) {
@@ -458,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nic = document.getElementById('editNic').value;
         const updatedData = {
             method: document.getElementById('editMethod').value,
-            status: document.getElementById('editStatus').value
+            status: normalizeDeliveryStatus(document.getElementById('editStatus').value)
         };
 
         // Disable button while saving and provide feedback
@@ -498,7 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
                          const statusCell = tr.cells[4];
                          if (methodCell) methodCell.textContent = saved.method || '';
                          if (statusCell) {
-                             statusCell.textContent = String(saved.status || 'Unknown');
+                             const savedStatus = normalizeDeliveryStatus(saved.status);
+                             statusCell.innerHTML = `<span class="status ${savedStatus.toLowerCase()}">${savedStatus}</span>`;
                          }
                      }
                  }
@@ -576,5 +554,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial data load
     loadAllDeliveries();
+
+    function normalizeDeliveryStatus(status) {
+        const normalized = String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+        if (DELIVERY_STATUSES.includes(normalized)) return normalized;
+        if (normalized === 'IN_TRANSIT') return 'PROCESSING';
+        if (normalized === 'RETURNED' || normalized === 'CANCELLED') return 'REJECTED';
+        return 'PENDING';
+    }
 
 });

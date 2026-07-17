@@ -81,12 +81,20 @@
                     <strong id="reviewPendingCount">0</strong>
                 </div>
                 <div class="review-summary-card glass">
+                    <span>Processing</span>
+                    <strong id="reviewProcessingCount">0</strong>
+                </div>
+                <div class="review-summary-card glass">
                     <span>Approved</span>
                     <strong id="reviewApprovedCount">0</strong>
                 </div>
                 <div class="review-summary-card glass">
                     <span>Rejected</span>
                     <strong id="reviewRejectedCount">0</strong>
+                </div>
+                <div class="review-summary-card glass">
+                    <span>Delivered</span>
+                    <strong id="reviewDeliveredCount">0</strong>
                 </div>
             </div>
 
@@ -205,6 +213,9 @@
             </button>
             <button class="btn-future" type="button" data-review-status="APPROVED">
                 <i class="fas fa-check-circle"></i> Approve
+            </button>
+            <button class="btn-ghost" type="button" data-review-status="DELIVERED">
+                <i class="fas fa-truck"></i> Delivered
             </button>
         </footer>
     </section>

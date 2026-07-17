@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupMobileMenu();
 });
 
+const APPLICATION_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
+
 function initDashboard() {
     console.log('Dashboard initialized');
 
@@ -162,7 +164,7 @@ function getCitizenApplications() {
 }
 
 function updateApplicationStatusCounts(applications) {
-    const inProgressCount = applications.filter(app => ['PROCESSING', 'IN_REVIEW', 'UNDER_REVIEW'].includes(normalizeApplicationStatus(app.status))).length;
+    const inProgressCount = applications.filter(app => normalizeApplicationStatus(app.status) === 'PROCESSING').length;
     const approvedCount = applications.filter(app => normalizeApplicationStatus(app.status) === 'APPROVED').length;
     const pendingCount = applications.filter(app => normalizeApplicationStatus(app.status) === 'PENDING').length;
 
@@ -172,12 +174,15 @@ function updateApplicationStatusCounts(applications) {
 }
 
 function normalizeApplicationStatus(status) {
-    return String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+    const normalized = String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+    return APPLICATION_STATUSES.includes(normalized) ? normalized : 'PENDING';
 }
 
 function getApplicationStatusClass(status) {
     const normalized = normalizeApplicationStatus(status);
-    if (normalized === 'APPROVED' || normalized === 'COMPLETED') return 'approved';
+    if (normalized === 'APPROVED') return 'approved';
+    if (normalized === 'REJECTED') return 'rejected';
+    if (normalized === 'DELIVERED') return 'delivered';
     if (normalized === 'PENDING') return 'pending';
     return 'processing';
 }

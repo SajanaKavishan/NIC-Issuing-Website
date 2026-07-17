@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("lostnic-table-body");
+    const NIC_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
 
     function authHeaders(extra = {}) {
         let token = '';
@@ -22,8 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Store id on row for reliable lookup later
                 row.dataset.id = request.id;
 
-                const statusText = (request.status || 'PENDING').toUpperCase();
-                const statusClass = statusText === 'APPROVED' ? 'status-approved' : (statusText === 'REJECTED' ? 'status-rejected' : 'status-pending');
+                const statusText = normalizeStatus(request.status);
+                const statusClass = getStatusClass(statusText);
 
                 // Build secure view URLs that use the new controller endpoint
                 const bcViewUrl = `/api/lost-nic/${request.id}/file?type=birthCertificate`;
@@ -261,21 +262,29 @@ document.addEventListener("DOMContentLoaded", () => {
     function setRowStatus(row, status) {
         const cell = row.querySelector('.status-cell');
         if (!cell) return;
-        const s = (status || 'PENDING').toUpperCase();
+        const s = normalizeStatus(status);
         cell.textContent = formatStatusLabel(s);
-        cell.classList.remove('status-approved','status-rejected','status-pending');
-        if (s === 'APPROVED') cell.classList.add('status-approved');
-        else if (s === 'REJECTED') cell.classList.add('status-rejected');
-        else cell.classList.add('status-pending');
+        cell.classList.remove('status-approved','status-rejected','status-pending','status-processing','status-delivered');
+        cell.classList.add(getStatusClass(s));
+    }
+
+    function normalizeStatus(status) {
+        const normalized = String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+        return NIC_STATUSES.includes(normalized) ? normalized : 'PENDING';
+    }
+
+    function getStatusClass(status) {
+        switch (normalizeStatus(status)) {
+            case 'APPROVED': return 'status-approved';
+            case 'REJECTED': return 'status-rejected';
+            case 'PROCESSING': return 'status-processing';
+            case 'DELIVERED': return 'status-delivered';
+            default: return 'status-pending';
+        }
     }
 
     function formatStatusLabel(status) {
-        if (!status) return 'Pending';
-        switch (status.toUpperCase()) {
-            case 'APPROVED': return 'Approved';
-            case 'REJECTED': return 'Rejected';
-            default: return 'Pending';
-        }
+        return normalizeStatus(status).replace(/_/g, ' ');
     }
 
     function setButtonsDisabled(row, disabled) {

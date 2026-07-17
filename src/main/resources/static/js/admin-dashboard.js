@@ -105,6 +105,8 @@ const reviewEndpoints = {
     renew: '/api/renew-nic'
 };
 
+const REVIEW_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
+
 function initApplicationReview() {
     const tabs = document.querySelectorAll('[data-review-type]');
     const refreshBtn = document.getElementById('btnRefreshApplications');
@@ -222,6 +224,9 @@ function renderReviewApplications() {
                 <button class="btn-future" type="button" onclick="updateReviewStatus(${Number(app.id)}, 'APPROVED')">
                     <i class="fas fa-check"></i>
                 </button>
+                <button class="btn-ghost" type="button" onclick="updateReviewStatus(${Number(app.id)}, 'DELIVERED')">
+                    <i class="fas fa-truck"></i>
+                </button>
             </td>
         </tr>`;
     }).join('');
@@ -237,8 +242,10 @@ function updateReviewSummary(applications) {
 
     setReviewText('reviewTotalCount', counts.total || 0);
     setReviewText('reviewPendingCount', counts.PENDING || 0);
+    setReviewText('reviewProcessingCount', counts.PROCESSING || 0);
     setReviewText('reviewApprovedCount', counts.APPROVED || 0);
     setReviewText('reviewRejectedCount', counts.REJECTED || 0);
+    setReviewText('reviewDeliveredCount', counts.DELIVERED || 0);
 }
 
 function setReviewText(id, value) {
@@ -363,7 +370,8 @@ function getReviewSearchText(app) {
 }
 
 function normalizeReviewStatus(status) {
-    return (status || 'PENDING').trim().toUpperCase();
+    const normalized = String(status || 'PENDING').trim().toUpperCase().replace(/\s+/g, '_');
+    return REVIEW_STATUSES.includes(normalized) ? normalized : 'PENDING';
 }
 
 function fileNameFromPath(path) {
