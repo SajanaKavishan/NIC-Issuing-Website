@@ -54,6 +54,75 @@
         }
     }
 
+    function showAccessMessage(message) {
+        let box = document.getElementById('staffAccessMessage');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'staffAccessMessage';
+            box.setAttribute('role', 'alert');
+            box.style.position = 'fixed';
+            box.style.left = '50%';
+            box.style.top = '24px';
+            box.style.transform = 'translateX(-50%)';
+            box.style.zIndex = '99999';
+            box.style.maxWidth = 'min(92vw, 520px)';
+            box.style.padding = '14px 18px';
+            box.style.borderRadius = '10px';
+            box.style.border = '1px solid rgba(255,255,255,.24)';
+            box.style.background = 'rgba(10, 18, 32, .94)';
+            box.style.color = '#fff';
+            box.style.boxShadow = '0 18px 42px rgba(0,0,0,.32)';
+            box.style.fontFamily = 'Arial, sans-serif';
+            box.style.fontSize = '14px';
+            box.style.lineHeight = '1.4';
+            box.style.textAlign = 'center';
+            document.body.appendChild(box);
+        }
+        box.textContent = message;
+    }
+
+    function handleForbidden(message) {
+        if (window.__staffForbiddenRedirecting) return;
+        window.__staffForbiddenRedirecting = true;
+
+        allowPage();
+        const role = getStoredRole();
+        const target = roleHome[role] || 'home.html';
+        showAccessMessage(message || 'You do not have permission to access this page or action. Redirecting...');
+
+        window.setTimeout(() => redirectTo(target), 1600);
+    }
+
+    const originalFetch = window.fetch ? window.fetch.bind(window) : null;
+    if (originalFetch) {
+        window.fetch = function() {
+            return originalFetch.apply(null, arguments).then(response => {
+                if (response && response.status === 403) {
+                    handleForbidden('Access denied. Your account role cannot perform this action. Redirecting...');
+                }
+                return response;
+            });
+        };
+    }
+
+    function installAxiosForbiddenHandler() {
+        if (!window.axios || window.axios.__staffForbiddenHandlerInstalled) return;
+        window.axios.__staffForbiddenHandlerInstalled = true;
+        window.axios.interceptors.response.use(
+            response => response,
+            error => {
+                if (error && error.response && error.response.status === 403) {
+                    handleForbidden('Access denied. Your account role cannot perform this action. Redirecting...');
+                }
+                return Promise.reject(error);
+            }
+        );
+    }
+
+    installAxiosForbiddenHandler();
+    document.addEventListener('DOMContentLoaded', installAxiosForbiddenHandler);
+    window.setTimeout(installAxiosForbiddenHandler, 500);
+
     function allowPage() {
         document.documentElement.style.visibility = '';
     }
@@ -75,7 +144,7 @@
         }
 
         if (requiredRoles.length && !requiredRoles.includes(role)) {
-            redirectTo(roleHome[role] || 'home.html');
+            handleForbidden('This staff page is not available for your role. Redirecting...');
             return;
         }
 
@@ -96,7 +165,7 @@
                     localStorage.setItem('loggedInEmail', user.email);
                 }
                 if (requiredRoles.length && !requiredRoles.includes(serverRole)) {
-                    redirectTo(roleHome[serverRole] || 'home.html');
+                    handleForbidden('This staff page is not available for your role. Redirecting...');
                     return;
                 }
                 allowPage();
