@@ -30,7 +30,7 @@
                 <li><a href="payments.html"><i class="fas fa-credit-card"></i> Payment History</a></li>
                 <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="help.html"><i class="fas fa-question-circle"></i> Help & Support</a></li>
-                <li><a href="login.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="login.html" class="logout-btn" onclick="event.preventDefault(); authLogout({ redirectTo: 'login.html' });"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </aside>
@@ -261,6 +261,7 @@
 </div>
 
 <script src="js/dashboard.js"></script>
+<script src="js/auth-headers.js"></script>
 <script src="js/nav.js"></script>
 </body>
 </html>

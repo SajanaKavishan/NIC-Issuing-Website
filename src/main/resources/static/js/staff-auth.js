@@ -23,20 +23,6 @@
         return 'CITIZEN';
     }
 
-    function clearAuth() {
-        [
-            'authToken',
-            'userRole',
-            'loggedInEmail',
-            'isAdmin',
-            'isFinance',
-            'isDelivery',
-            'isPro',
-            'isRecovery',
-            'isAssistant'
-        ].forEach(key => localStorage.removeItem(key));
-    }
-
     function storeRole(role) {
         ['isAdmin', 'isFinance', 'isDelivery', 'isPro', 'isRecovery', 'isAssistant'].forEach(key => localStorage.removeItem(key));
         localStorage.setItem('userRole', role);
@@ -171,7 +157,7 @@
                 allowPage();
             })
             .catch(() => {
-                clearAuth();
+                clearAuthState();
                 redirectTo(`login.html?redirect=${encodeURIComponent(currentPage)}`);
             });
     } catch (_) {

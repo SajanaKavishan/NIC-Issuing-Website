@@ -146,16 +146,7 @@ function initAuthInNav() {
         logout.textContent = 'Logout';
         logout.addEventListener('click', (e) => {
             e.preventDefault();
-            try {
-                ['loggedInEmail', 'authToken', 'userRole', 'isAdmin', 'isFinance', 'isDelivery', 'isPro', 'isRecovery', 'isAssistant']
-                    .forEach(key => localStorage.removeItem(key));
-            } catch (e) {}
-            // Simple refresh to re-render nav state
-            if (window.location.pathname.endsWith('login.html')) {
-                location.reload();
-            } else {
-                location.href = 'home.html';
-            }
+            authLogout({ redirectTo: 'home.html', reloadIfLogin: true });
         });
 
         menu.appendChild(dash);
@@ -209,12 +200,7 @@ function initAuthInNav() {
             logout.textContent = 'Logout';
             logout.addEventListener('click', (e) => {
                 e.preventDefault();
-                try {
-                    ['loggedInEmail', 'authToken', 'userRole', 'isAdmin', 'isFinance', 'isDelivery', 'isPro', 'isRecovery', 'isAssistant']
-                        .forEach(key => localStorage.removeItem(key));
-                } catch (e) {}
-                // Redirect to login after logout from admin
-                location.href = 'login.html';
+                authLogout({ redirectTo: 'login.html' });
             });
 
             menu.appendChild(dash);

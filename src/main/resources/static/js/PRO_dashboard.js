@@ -308,7 +308,7 @@ async function saveUpdate() {
 // --- Reporting and Export Functions (Replaced alert() calls) ---
 
 function logout(){
-    console.log("Logging out PRO user...");
+    authLogout({ redirectTo: 'login.html' });
 }
 
 function generate(type){

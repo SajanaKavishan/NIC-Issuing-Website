@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.textContent = `• User logged out — ${new Date().toLocaleDateString()}`;
         notificationsEl.insertBefore(p, notificationsEl.firstChild);
         setTimeout(() => {
-            window.location.href = 'login.html';
+            authLogout({ redirectTo: 'login.html' });
         }, 500);
     });
 
