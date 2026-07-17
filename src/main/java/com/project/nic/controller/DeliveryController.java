@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/delivery")
-@CrossOrigin(origins = "*")
 public class DeliveryController {
     private static final Logger logger = LoggerFactory.getLogger(DeliveryController.class);
 

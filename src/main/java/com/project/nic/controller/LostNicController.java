@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/lost-nic")
 public class LostNicController {

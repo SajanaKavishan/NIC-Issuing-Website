@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/assistant-logs")
-@CrossOrigin(origins = "*")
 public class AssistantLogController {
 
     @Autowired

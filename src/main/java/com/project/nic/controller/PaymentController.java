@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/payments")
-@CrossOrigin(origins = "http://localhost:8080") // Adjust port as needed
 public class PaymentController {
     
     @Autowired
