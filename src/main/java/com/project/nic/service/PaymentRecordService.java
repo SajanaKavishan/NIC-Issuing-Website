@@ -20,4 +20,8 @@ public class PaymentRecordService {
     public List<PaymentRecord> getAll() {
         return repository.findAll();
     }
+
+    public List<PaymentRecord> getByUserId(Long userId) {
+        return repository.findByUserId(String.valueOf(userId));
+    }
 }

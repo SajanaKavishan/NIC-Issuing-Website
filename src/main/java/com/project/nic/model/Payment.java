@@ -18,6 +18,7 @@ public class Payment {
     private String paymentMethod;
     private Double amount;
     private String status;
+    private Long userId;
 
     // New fields to store NIC and Email separately
     private String nic; // NIC from previous step
@@ -61,6 +62,9 @@ public class Payment {
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getNic() { return nic; }
     public void setNic(String nic) { this.nic = nic; }

@@ -970,7 +970,7 @@
 
 <script>
     // API Configuration - UPDATE THIS URL TO MATCH YOUR BACKEND
-    const API_BASE_URL = 'http://localhost:8080/api/payments';
+    const API_BASE_URL = '/api/payments/checkout';
 
     function authHeaders(extra = {}) {
         let token = '';
@@ -997,6 +997,7 @@
     let selectedNicType = 'new';
     let nicPrice = 2000;
     const processingFee = 100;
+    let latestPaymentResult = null;
 
     // Function to record payment in backend
     async function recordPayment(paymentData) {
@@ -1013,6 +1014,7 @@
 
             const result = await response.json();
             console.log('Payment recorded successfully:', result);
+            latestPaymentResult = result;
             return result;
         } catch (error) {
             console.error('Error recording payment:', error);
@@ -1095,6 +1097,19 @@
             updateProgress();
         });
     });
+
+    function applyInitialNicType() {
+        const params = new URLSearchParams(window.location.search);
+        const requestedType = (params.get('type') || params.get('service') || '').trim().toLowerCase();
+        if (!requestedType) return;
+        const option = document.querySelector(`.nic-option[data-type="${requestedType}"]`);
+        if (!option) return;
+        document.querySelectorAll('.nic-option').forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedNicType = option.dataset.type;
+        nicPrice = parseInt(option.dataset.price);
+        updateSummary();
+    }
 
     // Payment method tabs
     document.querySelectorAll('.payment-tab').forEach(tab => {
@@ -1287,7 +1302,7 @@
         document.getElementById('successModal').classList.remove('active');
         document.getElementById('checkoutSuccess').style.display = 'block';
         setTimeout(() => {
-            window.location.href = "confirmation.html";
+            window.location.href = buildConfirmationUrl();
         }, 3000);
     });
 
@@ -1295,11 +1310,34 @@
         document.getElementById('submissionModal').classList.remove('active');
         document.getElementById('checkoutSuccess').style.display = 'block';
         setTimeout(() => {
-            window.location.href = "confirmation.html";
+            window.location.href = buildConfirmationUrl();
         }, 3000);
     });
 
+    function buildConfirmationUrl() {
+        const params = new URLSearchParams({
+            ref: latestPaymentResult?.paymentId || '',
+            service: getServiceLabel(selectedNicType),
+            method: getPaymentMethodLabel(selectedPaymentMethod),
+            amount: String(nicPrice + processingFee)
+        });
+        return `confirmation.html?${params.toString()}`;
+    }
+
+    function getServiceLabel(type) {
+        if (type === 'renew') return 'Renew NIC';
+        if (type === 'lost') return 'Lost NIC';
+        return 'New NIC';
+    }
+
+    function getPaymentMethodLabel(method) {
+        if (method === 'online') return 'Online Banking';
+        if (method === 'deposit') return 'Bank Deposit';
+        return 'Card Payment';
+    }
+
     // Initialize
+    applyInitialNicType();
     updateProgress();
 
     // Auto-advance progress when email is filled

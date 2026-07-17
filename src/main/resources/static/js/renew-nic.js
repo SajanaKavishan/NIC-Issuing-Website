@@ -138,8 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Payment button functionality
     paymentBtn.addEventListener('click', function() {
         if (formSubmitted) {
-            alert('Redirecting to payment gateway...');
-            // In a real application, this would redirect to a payment page
+            window.location.href = 'paymentGateway.html?type=renew';
         } else {
             alert('Please submit your renewal request first before making a payment.');
         }

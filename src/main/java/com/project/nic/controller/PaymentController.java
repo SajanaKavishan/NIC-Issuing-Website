@@ -31,10 +31,23 @@ public class PaymentController {
     
     @GetMapping
     public ResponseEntity<?> getAllPayments(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!isLoggedIn(token)) {
+        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
+        if (!canManagePayments(token)) {
+            return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()));
+        }
         return ResponseEntity.ok(paymentService.getAllPayments());
+    }
+
+    @GetMapping("/mine")
+    public ResponseEntity<?> getMyPayments(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
+        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+        return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()));
     }
     
     @GetMapping("/{id}")
@@ -62,6 +75,18 @@ public class PaymentController {
             payment.setPaymentId("PAY-" + System.currentTimeMillis());
         }
         return ResponseEntity.ok(paymentService.createPayment(payment));
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> createCheckoutPayment(
+            @RequestBody Payment payment,
+            @RequestHeader(value = "X-Auth-Token", required = false) String token
+    ) {
+        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        if (sessionUser.isEmpty()) {
+            return ResponseEntity.status(403).body("Login required");
+        }
+        return ResponseEntity.ok(paymentService.createCitizenPayment(payment, sessionUser.get()));
     }
     
     @PutMapping("/{id}")
