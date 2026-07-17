@@ -72,8 +72,9 @@ async function fetchFeedbacks() {
             name: fb.name || '',
             date: fb.date || '', // If date is not present, fallback to empty
             type: fb.type ? (fb.type.toLowerCase() === 'complain' ? 'Complaint' : 'Feedback') : 'Feedback',
-            status: 'Pending', // Default status, can be updated if backend provides
-            description: fb.message || fb.subject || ''
+            status: fb.status || 'Pending',
+            description: fb.message || fb.subject || '',
+            reply: fb.reply || ''
         }));
         updateOverview();
         renderTable();
@@ -169,7 +170,7 @@ function openModal(id) {
 
     // Set initial status dropdown value
     document.getElementById('updateStatus').value = item.status;
-    document.getElementById('responseText').value = '';
+    document.getElementById('responseText').value = item.reply || '';
 
     modal.style.display = 'block';
 }
@@ -184,15 +185,30 @@ function closeModal() {
 /**
  * Saves changes (status update and response message) to the mock data.
  */
-function saveChanges() {
+async function saveChanges() {
     const id = document.getElementById('modalId').textContent;
+    const numericId = id.replace(/^F0*/, '');
     const item = items.find(c => c.id === id);
 
     if (item) {
         const newStatus = document.getElementById('updateStatus').value;
         const responseText = document.getElementById('responseText').value;
 
-        item.status = newStatus;
+        try {
+            const response = await fetch(`/api/feedback/${numericId}`, {
+                method: 'PUT',
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ status: newStatus, reply: responseText })
+            });
+            if (!response.ok) throw new Error('Failed to save response');
+            const updated = await response.json();
+            item.status = updated.status || newStatus;
+            item.reply = updated.reply || responseText;
+        } catch (err) {
+            alert('Error saving response.');
+            console.error(err);
+            return;
+        }
 
         // Mock: Add notification
         const notifDiv = document.getElementById('notifications');
@@ -230,6 +246,7 @@ function updateRecord(id) {
     document.getElementById('modalType').textContent = item.type;
     document.getElementById('modalStatus').textContent = item.status;
     document.getElementById('modalDescription').textContent = item.description;
+    document.getElementById('responseText').value = item.reply || '';
 
     // Enable editing fields (if needed, convert to input fields)
     document.getElementById('modalDescription').contentEditable = true;
@@ -269,18 +286,21 @@ async function saveUpdate() {
     const numericId = id.replace(/^F0*/, '');
     const description = document.getElementById('modalDescription').textContent;
     const status = document.getElementById('updateStatus').value;
+    const reply = document.getElementById('responseText').value;
     try {
         const response = await fetch(`/api/feedback/${numericId}`, {
             method: 'PUT',
             headers: authHeaders({ 'Content-Type': 'application/json' }),
-            body: JSON.stringify({ message: description, status })
+            body: JSON.stringify({ message: description, status, reply })
         });
         if (!response.ok) throw new Error('Failed to update record');
+        const updated = await response.json();
         // Update local item
         const item = items.find(c => c.id === id);
         if (item) {
-            item.description = description;
-            item.status = status;
+            item.description = updated.message || description;
+            item.status = updated.status || status;
+            item.reply = updated.reply || reply;
         }
         updateOverview();
         renderTable();

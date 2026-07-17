@@ -30,4 +30,9 @@ public class Feedback {
 
     @jakarta.persistence.Column(name = "massege")
     private String message;
+
+    private String status = "Pending";
+
+    @jakarta.persistence.Column(length = 1000)
+    private String reply;
 }

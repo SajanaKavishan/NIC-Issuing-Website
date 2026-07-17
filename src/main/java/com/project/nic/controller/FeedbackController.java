@@ -1,19 +1,17 @@
 package com.project.nic.controller;
 
 import com.project.nic.model.Feedback;
-import com.project.nic.repository.FeedbackRepository;
 import com.project.nic.service.AuthSessionService;
+import com.project.nic.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/feedback")
 public class FeedbackController {
     @Autowired
-    private FeedbackRepository feedbackRepository;
+    private FeedbackService feedbackService;
 
     @Autowired
     private AuthSessionService authSessionService;
@@ -24,11 +22,7 @@ public class FeedbackController {
 
     @PostMapping
     public Feedback submitFeedback(@RequestBody Feedback feedback) {
-        // Normalize type to expected values (convert 'complaint' to 'complain')
-        if (feedback.getType() != null && feedback.getType().equalsIgnoreCase("complaint")) {
-            feedback.setType("complain");
-        }
-        return feedbackRepository.save(feedback);
+        return feedbackService.saveFeedback(feedback);
     }
 
     @GetMapping
@@ -36,7 +30,7 @@ public class FeedbackController {
         if (!canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
-        return ResponseEntity.ok(feedbackRepository.findAll());
+        return ResponseEntity.ok(feedbackService.getAll());
     }
 
     @PutMapping("/{id}")
@@ -48,8 +42,11 @@ public class FeedbackController {
         if (!canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
-        feedback.setId(id);
-        return ResponseEntity.ok(feedbackRepository.save(feedback));
+        try {
+            return ResponseEntity.ok(feedbackService.updateFeedback(id, feedback));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -60,7 +57,7 @@ public class FeedbackController {
         if (!canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
-        feedbackRepository.deleteById(id);
+        feedbackService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
