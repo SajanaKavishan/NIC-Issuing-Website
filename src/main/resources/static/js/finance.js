@@ -1,12 +1,6 @@
 // Backend API base
 const API_BASE_URL = window.API_BASE_URL || '/api/payments';
 
-function authHeaders(extra = {}) {
-    let token = '';
-    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-    return token ? { ...extra, 'X-Auth-Token': token } : extra;
-}
-
 // Payments loaded from backend
 let payments = [];
 // Cached stats from backend

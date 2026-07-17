@@ -5,11 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const requestList = document.getElementById('requestList');
     const messageDiv = document.getElementById('message');
     const backBtn = document.getElementById('backBtn');
-    const authHeaders = () => {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { 'X-Auth-Token': token } : {};
-    };
 
     // Load or set email from local storage
     let email = localStorage.getItem('assistanceEmail') || '';

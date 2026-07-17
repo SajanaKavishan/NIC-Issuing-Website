@@ -968,15 +968,10 @@
     </div>
 </div>
 
+<script src="js/auth-headers.js"></script>
 <script>
     // API Configuration - UPDATE THIS URL TO MATCH YOUR BACKEND
     const API_BASE_URL = '/api/payments/checkout';
-
-    function authHeaders(extra = {}) {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { ...extra, 'X-Auth-Token': token } : extra;
-    }
 
     function createParticles() {
         const container = document.querySelector('.bg-particles');

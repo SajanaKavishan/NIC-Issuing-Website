@@ -17,12 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allRequests = []; // Store all requests for filtering
 
-    function authHeaders(extra = {}) {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { ...extra, 'X-Auth-Token': token } : extra;
-    }
-
     // Set initial date
     initDateEl.textContent = new Date().toLocaleDateString();
 

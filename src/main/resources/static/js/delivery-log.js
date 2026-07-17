@@ -9,12 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const logDesc = document.getElementById('logDesc');
   const cancelBtn = document.getElementById('cancelBtn');
 
-  function authHeaders(extra = {}) {
-    let token = '';
-    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-    return token ? { ...extra, 'X-Auth-Token': token } : extra;
-  }
-
   function isoDate(d) {
     if (!d) return '';
     const dt = new Date(d);

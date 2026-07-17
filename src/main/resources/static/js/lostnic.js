@@ -2,12 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("lostnic-table-body");
     const NIC_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
 
-    function authHeaders(extra = {}) {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { ...extra, 'X-Auth-Token': token } : extra;
-    }
-
     // Fetch data from the backend
     fetch("/api/lost-nic/requests", { headers: authHeaders() })
         .then(response => {

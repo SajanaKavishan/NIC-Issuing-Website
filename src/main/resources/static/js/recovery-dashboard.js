@@ -32,12 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationBox = document.getElementById('notification-box');
     const lostNicTableBody = document.getElementById('lostnic-table-body');
 
-    function authHeaders(extra = {}) {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { ...extra, 'X-Auth-Token': token } : extra;
-    }
-
     // Function to check if element is in viewport
     function isInViewport(element) {
         const rect = element.getBoundingClientRect();

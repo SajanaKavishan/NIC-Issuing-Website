@@ -11,12 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const noResultsDiv = document.querySelector('.no-results');
     const DELIVERY_STATUSES = ['PENDING', 'PROCESSING', 'APPROVED', 'REJECTED', 'DELIVERED'];
 
-    function authHeaders(extra = {}) {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { ...extra, 'X-Auth-Token': token } : extra;
-    }
-
     // --- Modal Elements ---
     const modal = document.getElementById('detailsModal');
     const closeModalBtn = document.getElementById('closeModal');

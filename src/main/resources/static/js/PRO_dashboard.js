@@ -52,12 +52,6 @@ const searchInput = document.getElementById('searchFilter');
 const typeSelect = document.getElementById('typeFilter');
 const statusSelect = document.getElementById('statusFilter');
 
-function authHeaders(extra = {}) {
-    let token = '';
-    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-    return token ? { ...extra, 'X-Auth-Token': token } : extra;
-}
-
 /**
  * Fetch feedbacks from backend and update items array
  */

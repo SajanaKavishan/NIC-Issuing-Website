@@ -153,9 +153,7 @@ function initApplicationReview() {
 }
 
 function reviewAuthHeaders(extraHeaders = {}) {
-    let token = '';
-    try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-    return token ? { ...extraHeaders, 'X-Auth-Token': token } : extraHeaders;
+    return authHeaders(extraHeaders);
 }
 
 async function loadReviewApplications() {
@@ -478,11 +476,6 @@ function updateDashboardData() {
 // Users management logic
 function initUsersManagement() {
     const API_BASE = '/api/users';
-    const authHeaders = () => {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { 'X-Auth-Token': token } : {};
-    };
     const btnAdd = document.getElementById('btnAddUser');
     const formWrap = document.getElementById('userFormContainer');
     const form = document.getElementById('userForm');
@@ -622,11 +615,6 @@ function initUsersManagement() {
 
 async function loadUsers() {
     const API_BASE = '/api/users';
-    const authHeaders = () => {
-        let token = '';
-        try { token = localStorage.getItem('authToken') || ''; } catch (_) {}
-        return token ? { 'X-Auth-Token': token } : {};
-    };
     const tbody = document.querySelector('#usersTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
