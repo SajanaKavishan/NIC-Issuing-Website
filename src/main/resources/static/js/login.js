@@ -60,7 +60,7 @@ form.addEventListener('submit', (e) => {
     const old = submitBtn.textContent;
     submitBtn.textContent = 'Signing in...';
 
-    fetch('http://localhost:8080/api/users/login', {
+    fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.value, password: pw.value })

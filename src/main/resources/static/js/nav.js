@@ -226,7 +226,7 @@ function initAuthInNav() {
         return;
     }
 
-    fetch(`http://localhost:8080/api/users/by-email?email=${encodeURIComponent(email)}`)
+    fetch(`/api/users/by-email?email=${encodeURIComponent(email)}`)
         .then(r => r.ok ? r.json() : null)
         .then(profile => {
             if (profile && (profile.firstName || profile.email)) {

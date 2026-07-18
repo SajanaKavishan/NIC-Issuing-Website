@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pendingRequests.innerHTML = '';
         completedRequests.innerHTML = '';
         try {
-            const response = await axios.get('http://localhost:8080/api/assistance/all', {
+            const response = await axios.get('/api/assistance/all', {
                 headers: authHeaders()
             });
             allRequests = response.data;
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Save changes?')) return;
 
         try {
-            await axios.post(`http://localhost:8080/api/assistance/reply/${id}`, responseText, {
+            await axios.post(`/api/assistance/reply/${id}`, responseText, {
                 headers: authHeaders({ 'Content-Type': 'text/plain' })
             });
             request.status = newStatus;
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteRequest = async (id, liElement) => {
         if (!confirm('Are you sure you want to delete this request?')) return;
         try {
-            await axios.delete(`http://localhost:8080/api/assistance/${id}`, {
+            await axios.delete(`/api/assistance/${id}`, {
                 headers: authHeaders()
             });
             const p = document.createElement('p');

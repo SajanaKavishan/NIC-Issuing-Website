@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (emailValue && query) {
             try {
-                await axios.post('http://localhost:8080/api/assistance/request', { email: emailValue, query }, { headers: authHeaders() });
+                await axios.post('/api/assistance/request', { email: emailValue, query }, { headers: authHeaders() });
                 localStorage.setItem('assistanceEmail', emailValue); // Remember email
                 showMessage('Request submitted successfully!', 'green');
                 form.reset();
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 requestList.innerHTML = '<li>Please enter an email to load your history.</li>';
                 return;
             }
-            const response = await axios.get(`http://localhost:8080/api/assistance/requestsByEmail?email=${encodeURIComponent(emailValue)}`);
+            const response = await axios.get(`/api/assistance/requestsByEmail?email=${encodeURIComponent(emailValue)}`);
             const requests = response.data;
             requestList.innerHTML = ''; // Clear existing list
             if (Array.isArray(requests) && requests.length > 0) {
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.textContent = 'Saving...';
             try {
                 await axios.put(
-                    `http://localhost:8080/api/assistance/request/${encodeURIComponent(request.id)}`,
+                    `/api/assistance/request/${encodeURIComponent(request.id)}`,
                     { query: newQuery },
                     { headers: authHeaders() }
                 );
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Delete this request permanently?')) return;
 
         try {
-            await axios.delete(`http://localhost:8080/api/assistance/request/${encodeURIComponent(id)}`, { headers: authHeaders() });
+            await axios.delete(`/api/assistance/request/${encodeURIComponent(id)}`, { headers: authHeaders() });
             if (listItemElement && listItemElement.remove) listItemElement.remove();
             showMessage(`Request ${id} deleted.`, 'green');
         } catch (error) {

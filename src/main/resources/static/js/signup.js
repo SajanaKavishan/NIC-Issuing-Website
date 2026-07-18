@@ -121,7 +121,7 @@ form.addEventListener('submit', (e) => {
         password: pw.value
     };
 
-    fetch('http://localhost:8080/api/users/signup', {
+    fetch('/api/users/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
