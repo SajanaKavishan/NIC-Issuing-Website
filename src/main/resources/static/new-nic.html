@@ -24,7 +24,7 @@
 
         <!-- Need Help Button -->
         <div class="top-actions fade-in">
-            <button id="helpBtn" class="btn-ghost" onclick="window.location.href='assistance.html'">
+            <button id="helpBtn" class="btn-ghost">
                 <span>Need Help?</span>
             </button>
         </div>
@@ -33,7 +33,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="nameWithInitials">Name with Initials</label>
-                    <input type="text" id="nameWithInitials" name="nameWithInitials" required placeholder="e.g., A.B. Perera">
+                    <input type="text" id="nameWithInitials" name="nameWithInitials" required placeholder="e.g., A.B. Perera" autocomplete="name">
                 </div>
 
                 <!-- Updated Gender Selection with Horizontal Radio Buttons -->
@@ -41,17 +41,17 @@
                     <label>Gender</label>
                     <div class="radio-group horizontal">
                         <label class="radio-option">
-                            <input type="radio" name="gender" value="male" required>
+                            <input type="radio" name="gender" value="male" required autocomplete="sex">
                             <span class="radio-custom"></span>
                             Male
                         </label>
                         <label class="radio-option">
-                            <input type="radio" name="gender" value="female">
+                            <input type="radio" name="gender" value="female" autocomplete="sex">
                             <span class="radio-custom"></span>
                             Female
                         </label>
                         <label class="radio-option">
-                            <input type="radio" name="gender" value="other">
+                            <input type="radio" name="gender" value="other" autocomplete="sex">
                             <span class="radio-custom"></span>
                             Other
                         </label>
@@ -60,7 +60,7 @@
 
                 <div class="form-group">
                     <label for="age">Age</label>
-                    <input type="number" id="age" name="age" min="18" required placeholder="Must be 18 or older">
+                    <input type="number" id="age" name="age" min="18" required placeholder="Must be 18 or older" autocomplete="off">
                 </div>
 
                 <div class="form-group">
@@ -76,22 +76,22 @@
 
                 <div class="form-group">
                     <label for="profession">Profession</label>
-                    <input type="text" id="profession" name="profession" required placeholder="Your occupation">
+                    <input type="text" id="profession" name="profession" required placeholder="Your occupation" autocomplete="organization-title">
                 </div>
 
                 <div class="form-group">
                     <label for="birthdate">Birthdate</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
+                    <input type="date" id="birthdate" name="birthdate" required autocomplete="bday">
                 </div>
 
                 <div class="form-group full-width">
                     <label for="address">Full Address</label>
-                    <textarea id="address" name="address" required placeholder="Your complete address" rows="3"></textarea>
+                    <textarea id="address" name="address" required placeholder="Your complete address" rows="3" autocomplete="street-address"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="contactNumber">Contact Number</label>
-                    <input type="tel" id="contactNumber" name="contactNumber" required placeholder="e.g., 0771234567" pattern="[0-9]{10}">
+                    <input type="tel" id="contactNumber" name="contactNumber" required placeholder="e.g., 0771234567" pattern="[0-9]{10}" autocomplete="tel">
                 </div>
 
                 <div class="form-group full-width">
