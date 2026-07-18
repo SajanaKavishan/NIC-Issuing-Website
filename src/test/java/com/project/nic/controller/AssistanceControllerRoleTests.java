@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +43,58 @@ class AssistanceControllerRoleTests {
     @BeforeEach
     void setUp() {
         assistanceRequestRepository.deleteAll();
+    }
+
+    @Test
+    void anonymousRequestSubmissionSavesProvidedEmailAndPendingStatus() throws Exception {
+        Map<String, Object> request = Map.of(
+                "email", "guest@example.com",
+                "query", "How do I check my NIC application status?",
+                "applicantId", 501L
+        );
+
+        mockMvc.perform(post("/api/assistance/request")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message", startsWith("Request submitted successfully: id=")));
+
+        assertThat(assistanceRequestRepository.findAll())
+                .singleElement()
+                .satisfies(saved -> {
+                    assertThat(saved.getUserId()).isNull();
+                    assertThat(saved.getEmail()).isEqualTo("guest@example.com");
+                    assertThat(saved.getQuery()).isEqualTo("How do I check my NIC application status?");
+                    assertThat(saved.getApplicantId()).isEqualTo(501L);
+                    assertThat(saved.getStatus()).isEqualTo("pending");
+                });
+    }
+
+    @Test
+    void loggedInRequestSubmissionUsesSessionUserOverPayloadIdentity() throws Exception {
+        Map<String, Object> request = Map.of(
+                "userId", 999L,
+                "email", "spoofed@example.com",
+                "query", "Please help me correct my assistance request."
+        );
+
+        mockMvc.perform(post("/api/assistance/request")
+                        .header("X-Auth-Token", tokenFor(101L, "owner@example.com", "CITIZEN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message", startsWith("Request submitted successfully: id=")));
+
+        assertThat(assistanceRequestRepository.findAll())
+                .singleElement()
+                .satisfies(saved -> {
+                    assertThat(saved.getUserId()).isEqualTo(101L);
+                    assertThat(saved.getEmail()).isEqualTo("owner@example.com");
+                    assertThat(saved.getQuery()).isEqualTo("Please help me correct my assistance request.");
+                    assertThat(saved.getStatus()).isEqualTo("pending");
+                });
     }
 
     @Test
@@ -103,6 +156,21 @@ class AssistanceControllerRoleTests {
         AssistanceRequest updated = assistanceRequestRepository.findById(request.getId()).orElseThrow();
         assertThat(updated.getStatus()).isEqualTo("resolved");
         assertThat(updated.getReply()).isEqualTo("Please visit the divisional office.");
+
+        AssistanceRequest adminRequest = assistanceRequestRepository.save(
+                assistanceRequest(102L, "second@example.com", "Need admin help")
+        );
+        mockMvc.perform(post("/api/assistance/reply/{id}", adminRequest.getId())
+                        .header("X-Auth-Token", tokenFor(1L, "admin@example.com", "ADMIN"))
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("Admin reply sent."))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Reply sent successfully"));
+
+        AssistanceRequest adminUpdated = assistanceRequestRepository.findById(adminRequest.getId()).orElseThrow();
+        assertThat(adminUpdated.getStatus()).isEqualTo("resolved");
+        assertThat(adminUpdated.getReply()).isEqualTo("Admin reply sent.");
     }
 
     @Test
