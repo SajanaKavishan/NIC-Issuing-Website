@@ -1,5 +1,7 @@
 package com.project.nic.exception;
 
+import com.project.nic.dto.ApiResponse;
+import com.project.nic.dto.ApiResponse.ApiFieldError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -18,7 +20,6 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -27,37 +28,37 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleBodyValidation(
+    public ResponseEntity<ApiResponse<Object>> handleBodyValidation(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-        List<ApiFieldError> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new ApiFieldError(error.getField(), validationMessage(error)))
+        List<ApiResponse.ApiFieldError> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new ApiResponse.ApiFieldError(error.getField(), validationMessage(error)))
                 .toList();
 
         return buildResponse(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodValidation(
+    public ResponseEntity<ApiResponse<Object>> handleMethodValidation(
             HandlerMethodValidationException ex,
             HttpServletRequest request
     ) {
-        List<ApiFieldError> errors = ex.getParameterValidationResults().stream()
+        List<ApiResponse.ApiFieldError> errors = ex.getParameterValidationResults().stream()
                 .flatMap(result -> result.getResolvableErrors().stream()
-                        .map(error -> new ApiFieldError(result.getMethodParameter().getParameterName(), error.getDefaultMessage())))
+                        .map(error -> new ApiResponse.ApiFieldError(result.getMethodParameter().getParameterName(), error.getDefaultMessage())))
                 .toList();
 
         return buildResponse(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+    public ResponseEntity<ApiResponse<Object>> handleConstraintViolation(
             ConstraintViolationException ex,
             HttpServletRequest request
     ) {
-        List<ApiFieldError> errors = ex.getConstraintViolations().stream()
-                .map(violation -> new ApiFieldError(
+        List<ApiResponse.ApiFieldError> errors = ex.getConstraintViolations().stream()
+                .map(violation -> new ApiResponse.ApiFieldError(
                         violation.getPropertyPath().toString(),
                         violation.getMessage()
                 ))
@@ -67,25 +68,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ApiErrorResponse> handleMissingParameter(
+    public ResponseEntity<ApiResponse<Object>> handleMissingParameter(
             MissingServletRequestParameterException ex,
             HttpServletRequest request
     ) {
-        List<ApiFieldError> errors = List.of(new ApiFieldError(ex.getParameterName(), "Required parameter is missing"));
+        List<ApiResponse.ApiFieldError> errors = List.of(new ApiResponse.ApiFieldError(ex.getParameterName(), "Required parameter is missing"));
         return buildResponse(HttpStatus.BAD_REQUEST, "Required request parameter is missing", request, errors);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+    public ResponseEntity<ApiResponse<Object>> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex,
             HttpServletRequest request
     ) {
-        List<ApiFieldError> errors = List.of(new ApiFieldError(ex.getName(), "Invalid value"));
+        List<ApiResponse.ApiFieldError> errors = List.of(new ApiResponse.ApiFieldError(ex.getName(), "Invalid value"));
         return buildResponse(HttpStatus.BAD_REQUEST, "Invalid request value", request, errors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleUnreadableMessage(
+    public ResponseEntity<ApiResponse<Object>> handleUnreadableMessage(
             HttpMessageNotReadableException ex,
             HttpServletRequest request
     ) {
@@ -93,7 +94,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+    public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
@@ -101,12 +102,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(NoSuchElementException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleNotFound(NoSuchElementException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, "Resource not found", request, List.of());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(
+    public ResponseEntity<ApiResponse<Object>> handleDataIntegrity(
             DataIntegrityViolationException ex,
             HttpServletRequest request
     ) {
@@ -114,12 +115,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MultipartException.class)
-    public ResponseEntity<ApiErrorResponse> handleMultipart(MultipartException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleMultipart(MultipartException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Invalid file upload request", request, List.of());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodNotSupported(
+    public ResponseEntity<ApiResponse<Object>> handleMethodNotSupported(
             HttpRequestMethodNotSupportedException ex,
             HttpServletRequest request
     ) {
@@ -127,7 +128,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleUnexpected(Exception ex, HttpServletRequest request) {
         logger.error("Unhandled exception for {} {}", request.getMethod(), request.getRequestURI(), ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request, List.of());
     }
@@ -136,33 +137,12 @@ public class GlobalExceptionHandler {
         return error.getDefaultMessage() == null ? "Invalid value" : error.getDefaultMessage();
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(
+    private ResponseEntity<ApiResponse<Object>> buildResponse(
             HttpStatus status,
             String message,
             HttpServletRequest request,
-            List<ApiFieldError> errors
+            List<ApiResponse.ApiFieldError> errors
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
-                request.getRequestURI(),
-                errors
-        );
-        return ResponseEntity.status(status).body(response);
-    }
-
-    public record ApiErrorResponse(
-            LocalDateTime timestamp,
-            int status,
-            String error,
-            String message,
-            String path,
-            List<ApiFieldError> errors
-    ) {
-    }
-
-    public record ApiFieldError(String field, String message) {
+        return ResponseEntity.status(status).body(ApiResponse.error(message, errors, request.getRequestURI()));
     }
 }
