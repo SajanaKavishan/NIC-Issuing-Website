@@ -115,7 +115,10 @@ class NicApplicationControllerTests {
                 .satisfies(saved -> {
                     assertThat(saved.getUserId()).isEqualTo(102L);
                     assertThat(saved.getUserEmail()).isEqualTo("renew@example.com");
+                    assertThat(saved.getName()).isEqualTo("A B Renew");
+                    assertThat(saved.getGender()).isEqualTo("female");
                     assertThat(saved.getOldNicNumber()).isEqualTo("200012345678");
+                    assertThat(saved.getAddress()).isEqualTo("456 Renewal Road");
                     assertThat(saved.getReason()).isEqualTo("Damaged");
                     assertThat(saved.getStatus()).isEqualTo("PENDING");
                     assertThat(saved.getBirthCertificatePath()).endsWith(".pdf");
@@ -140,8 +143,10 @@ class NicApplicationControllerTests {
                 .satisfies(saved -> {
                     assertThat(saved.getUserId()).isEqualTo(103L);
                     assertThat(saved.getUserEmail()).isEqualTo("lost@example.com");
+                    assertThat(saved.getFullName()).isEqualTo("A B Lost");
                     assertThat(saved.getNicNumber()).isEqualTo("991234567V");
                     assertThat(saved.getLostDate()).isEqualTo(LocalDate.of(2026, 1, 10));
+                    assertThat(saved.getAddress()).isEqualTo("789 Lost Lane");
                     assertThat(saved.getStatus()).isEqualTo("PENDING");
                     assertThat(saved.getBirthCertificatePath()).endsWith(".pdf");
                     assertThat(saved.getPoliceReportPath()).endsWith(".pdf");
@@ -261,8 +266,11 @@ class NicApplicationControllerTests {
         var request = multipart("/api/renew-nic/submit")
                 .file(pdfFile("birthCertificate"))
                 .file(jpgFile("photo"))
+                .param("name", "A B Renew")
+                .param("gender", "female")
                 .param("oldNicNumber", "200012345678")
                 .param("birthdate", "2000-01-02")
+                .param("address", "456 Renewal Road")
                 .param("reason", "Damaged")
                 .param("contactNumber", "0771234567");
         if (token != null) {
@@ -275,9 +283,11 @@ class NicApplicationControllerTests {
         var request = multipart("/api/lost-nic/submit")
                 .file(pdfFile("birthCertificate"))
                 .file(pdfFile("policeReport"))
+                .param("fullName", "A B Lost")
                 .param("nicNumber", "991234567V")
                 .param("lostDate", "2026-01-10")
-                .param("contactNumber", "0771234567");
+                .param("contactNumber", "0771234567")
+                .param("address", "789 Lost Lane");
         if (token != null) {
             request.header("X-Auth-Token", token);
         }
@@ -312,8 +322,11 @@ class NicApplicationControllerTests {
 
     private RenewNic renewNicApplication() {
         RenewNic form = new RenewNic();
+        form.setName("A B Renew");
+        form.setGender("female");
         form.setOldNicNumber("200012345678");
         form.setBirthdate(LocalDate.of(2000, 1, 2));
+        form.setAddress("456 Renewal Road");
         form.setReason("Damaged");
         form.setContactNumber("0771234567");
         form.setBirthCertificatePath("birth.pdf");
@@ -326,9 +339,11 @@ class NicApplicationControllerTests {
 
     private LostNic lostNicReport() {
         LostNic report = new LostNic();
+        report.setFullName("A B Lost");
         report.setNicNumber("991234567V");
         report.setLostDate(LocalDate.of(2026, 1, 10));
         report.setContactNumber("0771234567");
+        report.setAddress("789 Lost Lane");
         report.setBirthCertificatePath("birth.pdf");
         report.setPoliceReportPath("police.pdf");
         report.setUserId(103L);

@@ -109,7 +109,10 @@ public final class ApiDtos {
     public static class RenewNicDto {
         public Long id;
         public String oldNicNumber;
+        public String name;
+        public String gender;
         public LocalDate birthdate;
+        public String address;
         public String reason;
         public String otherReason;
         public String contactNumber;
@@ -123,7 +126,10 @@ public final class ApiDtos {
             RenewNicDto dto = new RenewNicDto();
             dto.id = renewNic.getId();
             dto.oldNicNumber = renewNic.getOldNicNumber();
+            dto.name = renewNic.getName();
+            dto.gender = renewNic.getGender();
             dto.birthdate = renewNic.getBirthdate();
+            dto.address = renewNic.getAddress();
             dto.reason = renewNic.getReason();
             dto.otherReason = renewNic.getOtherReason();
             dto.contactNumber = renewNic.getContactNumber();
@@ -138,9 +144,11 @@ public final class ApiDtos {
 
     public static class LostNicDto {
         public Long id;
+        public String fullName;
         public String nicNumber;
         public LocalDate lostDate;
         public String contactNumber;
+        public String address;
         public String birthCertificatePath;
         public String policeReportPath;
         public String status;
@@ -150,9 +158,11 @@ public final class ApiDtos {
         public static LostNicDto from(LostNic lostNic) {
             LostNicDto dto = new LostNicDto();
             dto.id = lostNic.getId();
+            dto.fullName = lostNic.getFullName();
             dto.nicNumber = lostNic.getNicNumber();
             dto.lostDate = lostNic.getLostDate();
             dto.contactNumber = lostNic.getContactNumber();
+            dto.address = lostNic.getAddress();
             dto.birthCertificatePath = fileNameOnly(lostNic.getBirthCertificatePath());
             dto.policeReportPath = fileNameOnly(lostNic.getPoliceReportPath());
             dto.status = lostNic.getStatus();
@@ -163,18 +173,24 @@ public final class ApiDtos {
     }
 
     public static class LostNicUpdateRequest {
+        @Size(max = 150)
+        public String fullName;
         @Size(max = 30)
         public String nicNumber;
         @PastOrPresent
         public LocalDate lostDate;
         @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$")
         public String contactNumber;
+        @Size(max = 500)
+        public String address;
 
         public LostNic toEntity() {
             LostNic lostNic = new LostNic();
+            lostNic.setFullName(fullName);
             lostNic.setNicNumber(nicNumber);
             lostNic.setLostDate(lostDate);
             lostNic.setContactNumber(contactNumber);
+            lostNic.setAddress(address);
             return lostNic;
         }
     }

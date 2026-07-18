@@ -12,7 +12,10 @@ public class RenewNic {
     private Long id;
 
     private String oldNicNumber;
+    private String name;
+    private String gender;
     private LocalDate birthdate;
+    private String address;
     private String reason;
     private String otherReason;
     private String contactNumber;
@@ -41,12 +44,36 @@ public class RenewNic {
         this.oldNicNumber = oldNicNumber;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public LocalDate getBirthdate() {
         return birthdate;
     }
 
     public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getReason() {

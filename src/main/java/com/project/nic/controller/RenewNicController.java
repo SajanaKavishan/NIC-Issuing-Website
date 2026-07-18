@@ -43,8 +43,11 @@ public class RenewNicController {
 
     @PostMapping("/submit")
     public ResponseEntity<?> submitRenewNic(
+        @NotBlank @RequestParam String name,
+        @NotBlank @RequestParam String gender,
         @NotBlank @RequestParam String oldNicNumber,
         @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String birthdate,
+        @NotBlank @RequestParam String address,
         @NotBlank @RequestParam String reason,
         @RequestParam(required = false) String otherReason,
         @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$") @RequestParam String contactNumber,
@@ -69,8 +72,11 @@ public class RenewNicController {
         }
 
         RenewNic renewNic = new RenewNic();
+        renewNic.setName(name);
+        renewNic.setGender(gender);
         renewNic.setOldNicNumber(oldNicNumber);
         renewNic.setBirthdate(LocalDate.parse(birthdate));
+        renewNic.setAddress(address);
         renewNic.setReason(reason);
         renewNic.setOtherReason(otherReason);
         renewNic.setContactNumber(contactNumber);

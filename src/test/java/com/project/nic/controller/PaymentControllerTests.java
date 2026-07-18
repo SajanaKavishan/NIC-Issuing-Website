@@ -218,8 +218,11 @@ class PaymentControllerTests {
 
     private RenewNic renewNicApplication(Long userId, String email) {
         RenewNic form = new RenewNic();
+        form.setName("A B Renew");
+        form.setGender("female");
         form.setOldNicNumber("200012345678");
         form.setBirthdate(LocalDate.of(2000, 1, 2));
+        form.setAddress("456 Renewal Road");
         form.setReason("Damaged");
         form.setContactNumber("0771234567");
         form.setBirthCertificatePath("birth.pdf");

@@ -10,9 +10,11 @@ public class LostNic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String fullName;
     private String nicNumber;
     private LocalDate lostDate;
     private String contactNumber;
+    private String address;
     private String birthCertificatePath;
     private String policeReportPath;
 
@@ -32,6 +34,14 @@ public class LostNic {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getNicNumber() {
@@ -56,6 +66,14 @@ public class LostNic {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getBirthCertificatePath() {

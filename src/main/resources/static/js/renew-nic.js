@@ -1,8 +1,11 @@
 // Form validation and functionality for NIC renewal
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('renewNicForm');
+    const nameInput = document.getElementById('name');
+    const genderInputs = document.querySelectorAll('input[name="gender"]');
     const oldNicNumberInput = document.getElementById('oldNicNumber');
     const birthdateInput = document.getElementById('birthdate');
+    const addressInput = document.getElementById('address');
     const birthCertificateInput = document.getElementById('birthCertificate');
     const photoInput = document.getElementById('photo');
     const reasonSelect = document.getElementById('reason');
@@ -97,10 +100,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        let genderValue = '';
+        genderInputs.forEach(input => { if (input.checked) genderValue = input.value; });
+
         // Prepare multipart form data matching backend API
         const formData = new FormData();
+        formData.append('name', nameInput.value.trim());
+        formData.append('gender', genderValue);
         formData.append('oldNicNumber', oldNicNumberInput.value.trim());
         formData.append('birthdate', birthdateInput.value);
+        formData.append('address', addressInput.value.trim());
         formData.append('reason', reasonSelect.value);
         if (otherReasonInput.value && reasonSelect.value === 'other') {
             formData.append('otherReason', otherReasonInput.value.trim());

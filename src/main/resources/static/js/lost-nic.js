@@ -1,8 +1,10 @@
 // Form validation and functionality for Lost NIC report
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('lostNicForm');
+    const fullNameInput = document.getElementById('fullName');
     const nicNumberInput = document.getElementById('nicNumber');
     const lostDateInput = document.getElementById('lostDate');
+    const addressInput = document.getElementById('address');
     const birthCertificateInput = document.getElementById('birthCertificate');
     const policeReportInput = document.getElementById('policeReport');
     const paymentBtn = document.getElementById('paymentBtn');
@@ -79,9 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Prepare multipart form data matching backend API
         const formData = new FormData();
+        formData.append('fullName', fullNameInput.value.trim());
         formData.append('nicNumber', nicNumberInput.value.trim());
         formData.append('lostDate', lostDateInput.value);
         formData.append('contactNumber', contactNumberInput.value.trim());
+        formData.append('address', addressInput.value.trim());
         if (birthCertificateInput.files[0]) {
             formData.append('birthCertificate', birthCertificateInput.files[0]);
         }

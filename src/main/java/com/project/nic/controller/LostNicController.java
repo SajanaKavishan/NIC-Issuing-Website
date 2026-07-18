@@ -58,9 +58,11 @@ public class LostNicController {
 
     @PostMapping("/submit")
     public ResponseEntity<?> submitLostNic(
+        @NotBlank @RequestParam String fullName,
         @NotBlank @RequestParam String nicNumber,
         @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String lostDate,
         @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$") @RequestParam String contactNumber,
+        @NotBlank @RequestParam String address,
         @RequestParam("birthCertificate") MultipartFile birthCertificate,
         @RequestParam("policeReport") MultipartFile policeReport,
         @RequestHeader(value = "X-Auth-Token", required = false) String token
@@ -82,9 +84,11 @@ public class LostNicController {
         }
 
         LostNic lostNic = new LostNic();
+        lostNic.setFullName(fullName);
         lostNic.setNicNumber(nicNumber);
         lostNic.setLostDate(LocalDate.parse(lostDate));
         lostNic.setContactNumber(contactNumber);
+        lostNic.setAddress(address);
         lostNic.setBirthCertificatePath(birthCertPath);
         lostNic.setPoliceReportPath(policeReportPath);
         lostNic.setUserId(sessionUser.get().userId());

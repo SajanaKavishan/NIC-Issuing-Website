@@ -55,9 +55,11 @@ public class LostNicService {
     public LostNic update(Long id, LostNic updates) {
         return repository.findById(id).map(existing -> {
             // Only update editable fields
+            if (updates.getFullName() != null) existing.setFullName(updates.getFullName());
             if (updates.getNicNumber() != null) existing.setNicNumber(updates.getNicNumber());
             if (updates.getLostDate() != null) existing.setLostDate(updates.getLostDate());
             if (updates.getContactNumber() != null) existing.setContactNumber(updates.getContactNumber());
+            if (updates.getAddress() != null) existing.setAddress(updates.getAddress());
             // File paths are not updated here via JSON edits
             return repository.save(existing);
         }).orElseThrow(() -> new IllegalArgumentException("LostNic with id " + id + " not found"));
