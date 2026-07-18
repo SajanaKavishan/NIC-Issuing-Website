@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.LogDto;
 import com.project.nic.model.AssistantLog;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistantLogService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assistant-logs")
@@ -30,7 +32,7 @@ public class AssistantLogController {
         if (!canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
-        return ResponseEntity.ok(assistantLogService.getAll());
+        return ResponseEntity.ok(assistantLogService.getAll().stream().map(LogDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
@@ -42,28 +44,28 @@ public class AssistantLogController {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
-        return opt.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return opt.<ResponseEntity<?>>map(log -> ResponseEntity.ok(LogDto.from(log))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<?> create(
-            @RequestBody AssistantLog log,
+            @RequestBody LogDto log,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
-        if (log.getDate() == null) {
+        if (log.date == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        AssistantLog saved = assistantLogService.save(log);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        AssistantLog saved = assistantLogService.save(log.toAssistantLog());
+        return ResponseEntity.status(HttpStatus.CREATED).body(LogDto.from(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestBody AssistantLog update,
+            @RequestBody LogDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageAssistance(token)) {
@@ -72,10 +74,10 @@ public class AssistantLogController {
         Optional<AssistantLog> opt = assistantLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         AssistantLog existing = opt.get();
-        if (update.getDate() != null) existing.setDate(update.getDate());
-        if (update.getDescription() != null) existing.setDescription(update.getDescription());
+        if (update.date != null) existing.setDate(update.date);
+        if (update.description != null) existing.setDescription(update.description);
         AssistantLog saved = assistantLogService.save(existing);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(LogDto.from(saved));
     }
 
     @DeleteMapping("/{id}")

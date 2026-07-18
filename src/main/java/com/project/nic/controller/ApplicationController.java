@@ -1,5 +1,8 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.LostNicDto;
+import com.project.nic.dto.ApiDtos.NewNicFormDto;
+import com.project.nic.dto.ApiDtos.RenewNicDto;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.service.NewNicFormService;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -40,9 +44,9 @@ public class ApplicationController {
 
         Long userId = sessionUser.get().userId();
         Map<String, Object> applications = new LinkedHashMap<>();
-        applications.put("newNic", newNicFormService.findByUserId(userId));
-        applications.put("renewNic", renewNicService.findByUserId(userId));
-        applications.put("lostNic", lostNicService.findByUserId(userId));
+        applications.put("newNic", newNicFormService.findByUserId(userId).stream().map(NewNicFormDto::from).collect(Collectors.toList()));
+        applications.put("renewNic", renewNicService.findByUserId(userId).stream().map(RenewNicDto::from).collect(Collectors.toList()));
+        applications.put("lostNic", lostNicService.findByUserId(userId).stream().map(LostNicDto::from).collect(Collectors.toList()));
 
         return ResponseEntity.ok(applications);
     }

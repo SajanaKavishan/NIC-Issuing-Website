@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.DeliveryDto;
 import com.project.nic.model.Delivery;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.DeliveryService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,7 @@ public class DeliveryController {
         }
         logger.info("GET /api/delivery/nics called with dateRange='{}', deliveryMethod='{}', search='{}',",
                 dateRange, deliveryMethod, search);
-        return ResponseEntity.ok(deliveryService.getAllDeliveries(dateRange, deliveryMethod, search));
+        return ResponseEntity.ok(deliveryService.getAllDeliveries(dateRange, deliveryMethod, search).stream().map(DeliveryDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/nics/all")
@@ -48,7 +50,7 @@ public class DeliveryController {
         if (!canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
-        return ResponseEntity.ok(deliveryService.getAll());
+        return ResponseEntity.ok(deliveryService.getAll().stream().map(DeliveryDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/nics/{nic}")
@@ -60,33 +62,33 @@ public class DeliveryController {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         Optional<Delivery> delivery = deliveryService.getDeliveryByNic(nic);
-        return delivery.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return delivery.<ResponseEntity<?>>map(item -> ResponseEntity.ok(DeliveryDto.from(item))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/nics")
     public ResponseEntity<?> createDelivery(
-            @RequestBody Delivery delivery,
+            @RequestBody DeliveryDto deliveryRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
-        return ResponseEntity.ok(deliveryService.saveDelivery(delivery));
+        return ResponseEntity.ok(DeliveryDto.from(deliveryService.saveDelivery(deliveryRequest.toEntity())));
     }
 
     @PutMapping("/nics/{nic}")
     public ResponseEntity<?> updateMethodAndStatus(
             @PathVariable String nic,
-            @RequestBody Delivery update,
+            @RequestBody DeliveryDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
-        logger.info("PUT /api/delivery/nics/{} called with payload method='{}', status='{}'", nic, update.getMethod(), update.getStatus());
+        logger.info("PUT /api/delivery/nics/{} called with payload method='{}', status='{}'", nic, update.method, update.status);
         Delivery delivery = deliveryService.getDeliveryByNic(nic).orElseThrow();
-        String method = update.getMethod() == null ? null : update.getMethod().trim();
-        String status = update.getStatus() == null ? null : update.getStatus().trim();
+        String method = update.method == null ? null : update.method.trim();
+        String status = update.status == null ? null : update.status.trim();
         if (method != null && !method.isBlank()) {
             delivery.setMethod(method);
         }
@@ -95,7 +97,7 @@ public class DeliveryController {
         }
         Delivery saved = deliveryService.saveDelivery(delivery);
         logger.info("Saved delivery for nic='{}' with method='{}', status='{}'", nic, saved.getMethod(), saved.getStatus());
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(DeliveryDto.from(saved));
     }
 
     @DeleteMapping("/nics/{nic}")
@@ -121,6 +123,6 @@ public class DeliveryController {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         LocalDate start = LocalDate.parse(startDate);
-        return ResponseEntity.ok(deliveryService.getWeeklyDeliveries(start));
+        return ResponseEntity.ok(deliveryService.getWeeklyDeliveries(start).stream().map(DeliveryDto::from).collect(Collectors.toList()));
     }
 }

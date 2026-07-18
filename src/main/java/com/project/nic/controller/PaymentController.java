@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.PaymentDto;
 import com.project.nic.model.Payment;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentService;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -36,9 +38,9 @@ public class PaymentController {
             return ResponseEntity.status(403).body("Login required");
         }
         if (!canManagePayments(token)) {
-            return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()));
+            return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()).stream().map(PaymentDto::from).collect(Collectors.toList()));
         }
-        return ResponseEntity.ok(paymentService.getAllPayments());
+        return ResponseEntity.ok(paymentService.getAllPayments().stream().map(PaymentDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/mine")
@@ -47,7 +49,7 @@ public class PaymentController {
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()));
+        return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()).stream().map(PaymentDto::from).collect(Collectors.toList()));
     }
     
     @GetMapping("/{id}")
@@ -59,47 +61,48 @@ public class PaymentController {
             return ResponseEntity.status(403).body("Finance access required");
         }
         Optional<Payment> payment = paymentService.getPaymentById(id);
-        return payment.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return payment.<ResponseEntity<?>>map(item -> ResponseEntity.ok(PaymentDto.from(item))).orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     @PostMapping
     public ResponseEntity<?> createPayment(
-            @RequestBody Payment payment,
+            @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
+        Payment payment = paymentRequest.toEntity();
         // Generate payment ID if not provided
         if (payment.getPaymentId() == null || payment.getPaymentId().isEmpty()) {
             payment.setPaymentId("PAY-" + System.currentTimeMillis());
         }
-        return ResponseEntity.ok(paymentService.createPayment(payment));
+        return ResponseEntity.ok(PaymentDto.from(paymentService.createPayment(payment)));
     }
 
     @PostMapping("/checkout")
     public ResponseEntity<?> createCheckoutPayment(
-            @RequestBody Payment payment,
+            @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        return ResponseEntity.ok(paymentService.createCitizenPayment(payment, sessionUser.get()));
+        return ResponseEntity.ok(PaymentDto.from(paymentService.createCitizenPayment(paymentRequest.toEntity(), sessionUser.get())));
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePayment(
             @PathVariable Long id,
-            @RequestBody Payment paymentDetails,
+            @RequestBody PaymentDto paymentDetails,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
-        Payment updatedPayment = paymentService.updatePayment(id, paymentDetails);
-        return updatedPayment != null ? ResponseEntity.ok(updatedPayment) : ResponseEntity.notFound().build();
+        Payment updatedPayment = paymentService.updatePayment(id, paymentDetails.toEntity());
+        return updatedPayment != null ? ResponseEntity.ok(PaymentDto.from(updatedPayment)) : ResponseEntity.notFound().build();
     }
     
     @DeleteMapping("/{id}")

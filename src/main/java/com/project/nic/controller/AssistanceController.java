@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.AssistanceRequestDto;
 import com.project.nic.model.AssistanceRequest;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistanceService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assistance")
@@ -38,9 +40,10 @@ public class AssistanceController {
 
     @PostMapping("/request")
     public ResponseEntity<String> createRequest(
-            @RequestBody AssistanceRequest request,
+            @RequestBody AssistanceRequestDto requestBody,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
+        AssistanceRequest request = requestBody.toEntity();
         getLoggedInUser(token).ifPresent(sessionUser -> {
             request.setUserId(sessionUser.userId());
             request.setEmail(sessionUser.email());
@@ -54,7 +57,7 @@ public class AssistanceController {
         if (!canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
-        return ResponseEntity.ok(assistanceService.getAllRequests());
+        return ResponseEntity.ok(assistanceService.getAllRequests().stream().map(AssistanceRequestDto::from).collect(Collectors.toList()));
     }
 
     @PostMapping("/reply/{id}")
@@ -134,21 +137,21 @@ public class AssistanceController {
         String newQuery = body.getOrDefault("query", "").toString();
         try {
             AssistanceRequest updated = assistanceService.updateRequest(id, newQuery);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(AssistanceRequestDto.from(updated));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/request/{userId}")
-    public ResponseEntity<AssistanceRequest> getRequestByUserId(@PathVariable Long userId) {
+    public ResponseEntity<AssistanceRequestDto> getRequestByUserId(@PathVariable Long userId) {
         AssistanceRequest request = assistanceService.getRequestByUserId(userId);
-        return request != null ? ResponseEntity.ok(request) : ResponseEntity.notFound().build();
+        return request != null ? ResponseEntity.ok(AssistanceRequestDto.from(request)) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/requestsByEmail")
-    public ResponseEntity<List<AssistanceRequest>> getRequestsByEmail(@RequestParam String email) {
+    public ResponseEntity<List<AssistanceRequestDto>> getRequestsByEmail(@RequestParam String email) {
         List<AssistanceRequest> requests = assistanceService.getRequestsByEmail(email);
-        return ResponseEntity.ok(requests);
+        return ResponseEntity.ok(requests.stream().map(AssistanceRequestDto::from).collect(Collectors.toList()));
     }
 }

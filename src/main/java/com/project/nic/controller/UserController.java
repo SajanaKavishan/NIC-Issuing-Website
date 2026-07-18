@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.UserRequest;
 import com.project.nic.model.User;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.UserService;
@@ -21,7 +22,8 @@ public class UserController {
     private AuthSessionService authSessionService;
 
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
+    public String signup(@RequestBody UserRequest request) {
+        User user = request.toEntity();
         if (userService.emailExists(user.getEmail())) {
             return "Email already registered";
         }
@@ -32,12 +34,13 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> create(
-            @RequestBody User payload,
+            @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authSessionService.hasRole(token, "ADMIN")) {
             return ResponseEntity.status(403).body("Admin access required");
         }
+        User payload = request.toEntity();
         if (payload.getRole() == null || payload.getRole().isBlank()) {
             return ResponseEntity.badRequest().body("Role is required");
         }
@@ -57,8 +60,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody User loginUser) {
-        Optional<User> userOpt = userService.authenticate(loginUser.getEmail(), loginUser.getPassword());
+    public ResponseEntity<LoginResponse> login(@RequestBody UserRequest loginRequest) {
+        Optional<User> userOpt = userService.authenticate(loginRequest.email, loginRequest.password);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body(LoginResponse.failure("Invalid credentials"));
         }
@@ -100,7 +103,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<String> update(
             @PathVariable Long id,
-            @RequestBody User payload,
+            @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authSessionService.hasRole(token, "ADMIN")) {
@@ -110,6 +113,7 @@ public class UserController {
         if (existing.isEmpty()) {
             return ResponseEntity.status(404).body("User not found");
         }
+        User payload = request.toEntity();
         User u = existing.get();
         if (payload.getFirstName() != null) u.setFirstName(payload.getFirstName());
         if (payload.getLastName() != null) u.setLastName(payload.getLastName());

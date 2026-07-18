@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.LogDto;
 import com.project.nic.model.DeliveryLog;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.DeliveryLogService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/delivery-logs")
@@ -30,7 +32,7 @@ public class DeliveryLogController {
         if (!canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
-        return ResponseEntity.ok(deliveryLogService.getAll());
+        return ResponseEntity.ok(deliveryLogService.getAll().stream().map(LogDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
@@ -42,28 +44,28 @@ public class DeliveryLogController {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         Optional<DeliveryLog> opt = deliveryLogService.getById(id);
-        return opt.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return opt.<ResponseEntity<?>>map(log -> ResponseEntity.ok(LogDto.from(log))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<?> create(
-            @RequestBody DeliveryLog log,
+            @RequestBody LogDto log,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
-        if (log.getDate() == null) {
+        if (log.date == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        DeliveryLog saved = deliveryLogService.save(log);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        DeliveryLog saved = deliveryLogService.save(log.toDeliveryLog());
+        return ResponseEntity.status(HttpStatus.CREATED).body(LogDto.from(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestBody DeliveryLog update,
+            @RequestBody LogDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageDelivery(token)) {
@@ -72,10 +74,10 @@ public class DeliveryLogController {
         Optional<DeliveryLog> opt = deliveryLogService.getById(id);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
         DeliveryLog existing = opt.get();
-        if (update.getDate() != null) existing.setDate(update.getDate());
-        if (update.getDescription() != null) existing.setDescription(update.getDescription());
+        if (update.date != null) existing.setDate(update.date);
+        if (update.description != null) existing.setDescription(update.description);
         DeliveryLog saved = deliveryLogService.save(existing);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(LogDto.from(saved));
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,7 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.LostNicDto;
+import com.project.nic.dto.ApiDtos.LostNicUpdateRequest;
 import com.project.nic.model.LostNic;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +98,7 @@ public class LostNicController {
         if (!canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(service.findAll().stream().map(LostNicDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/mine")
@@ -104,7 +107,7 @@ public class LostNicController {
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        return ResponseEntity.ok(service.findByUserId(sessionUser.get().userId()));
+        return ResponseEntity.ok(service.findByUserId(sessionUser.get().userId()).stream().map(LostNicDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
@@ -116,22 +119,22 @@ public class LostNicController {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         return service.findById(id)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(lostNic -> ResponseEntity.ok(LostNicDto.from(lostNic)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestBody LostNic updates,
+            @RequestBody LostNicUpdateRequest updates,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
-        logger.info("Received update request for ID: {} with data: {}", id, updates);
+        logger.info("Received update request for ID: {}", id);
         try {
-            return ResponseEntity.ok(service.update(id, updates));
+            return ResponseEntity.ok(LostNicDto.from(service.update(id, updates.toEntity())));
         } catch (Exception e) {
             logger.error("Error updating LostNic with ID: {}", id, e);
             throw e;
@@ -165,7 +168,7 @@ public class LostNicController {
         if (!canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(service.findAll().stream().map(LostNicDto::from).collect(Collectors.toList()));
     }
 
     // New endpoint to update only the status of a LostNic request
@@ -182,7 +185,7 @@ public class LostNicController {
         try {
             String status = payload.get("status");
             LostNic updated = service.updateStatus(id, status);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(LostNicDto.from(updated));
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid status update or not found: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());

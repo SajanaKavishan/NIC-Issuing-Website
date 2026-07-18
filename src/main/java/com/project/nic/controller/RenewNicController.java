@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.RenewNicDto;
 import com.project.nic.model.RenewNic;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.RenewNicService;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 
@@ -84,7 +86,7 @@ public class RenewNicController {
         if (!canManageApplications(token)) {
             return ResponseEntity.status(403).body("Application review access required");
         }
-        return ResponseEntity.ok(service.findAll());
+        return ResponseEntity.ok(service.findAll().stream().map(RenewNicDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/mine")
@@ -93,7 +95,7 @@ public class RenewNicController {
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        return ResponseEntity.ok(service.findByUserId(sessionUser.get().userId()));
+        return ResponseEntity.ok(service.findByUserId(sessionUser.get().userId()).stream().map(RenewNicDto::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
@@ -105,7 +107,7 @@ public class RenewNicController {
             return ResponseEntity.status(403).body("Application review access required");
         }
         return service.findById(id)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(renewNic -> ResponseEntity.ok(RenewNicDto.from(renewNic)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -119,7 +121,7 @@ public class RenewNicController {
             return ResponseEntity.status(403).body("Application review access required");
         }
         try {
-            return ResponseEntity.ok(service.updateStatus(id, payload.get("status")));
+            return ResponseEntity.ok(RenewNicDto.from(service.updateStatus(id, payload.get("status"))));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

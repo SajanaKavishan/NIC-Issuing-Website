@@ -1,11 +1,14 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.FeedbackDto;
 import com.project.nic.model.Feedback;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/feedback")
@@ -21,8 +24,8 @@ public class FeedbackController {
     }
 
     @PostMapping
-    public Feedback submitFeedback(@RequestBody Feedback feedback) {
-        return feedbackService.saveFeedback(feedback);
+    public FeedbackDto submitFeedback(@RequestBody FeedbackDto feedback) {
+        return FeedbackDto.from(feedbackService.saveFeedback(feedback.toEntity()));
     }
 
     @GetMapping
@@ -30,20 +33,20 @@ public class FeedbackController {
         if (!canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
-        return ResponseEntity.ok(feedbackService.getAll());
+        return ResponseEntity.ok(feedbackService.getAll().stream().map(FeedbackDto::from).collect(Collectors.toList()));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFeedback(
             @PathVariable Long id,
-            @RequestBody Feedback feedback,
+            @RequestBody FeedbackDto feedback,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
         try {
-            return ResponseEntity.ok(feedbackService.updateFeedback(id, feedback));
+            return ResponseEntity.ok(FeedbackDto.from(feedbackService.updateFeedback(id, feedback.toEntity())));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
