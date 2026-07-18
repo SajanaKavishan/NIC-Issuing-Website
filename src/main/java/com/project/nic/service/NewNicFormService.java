@@ -11,6 +11,8 @@ import java.util.Set;
 @Service
 public class NewNicFormService {
     private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
+    private static final Set<String> ACTIVE_STATUSES = Set.of("PENDING", "PROCESSING");
+    private static final String ACTIVE_APPLICATION_MESSAGE = "You already have an active NIC application being processed.";
 
     private final NewNicFormRepository repository;
     private final NotificationService notificationService;
@@ -22,6 +24,9 @@ public class NewNicFormService {
 
     public NewNicForm save(NewNicForm form) {
         boolean isNew = form.getId() == null;
+        if (isNew) {
+            ensureNoActiveApplication(form.getUserId());
+        }
         if (form.getStatus() == null || form.getStatus().isBlank()) {
             form.setStatus("PENDING");
         }
@@ -38,6 +43,12 @@ public class NewNicFormService {
 
     public List<NewNicForm> findByUserId(Long userId) {
         return repository.findByUserId(userId);
+    }
+
+    public void ensureNoActiveApplication(Long userId) {
+        if (userId != null && repository.existsByUserIdAndStatusIn(userId, ACTIVE_STATUSES)) {
+            throw new IllegalArgumentException(ACTIVE_APPLICATION_MESSAGE);
+        }
     }
 
     public Optional<NewNicForm> findById(Long id) {

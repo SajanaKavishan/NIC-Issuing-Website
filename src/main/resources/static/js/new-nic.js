@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contactNumberInput = document.getElementById('contactNumber');
     const birthCertificateInput = document.getElementById('birthCertificate');
     const photoInput = document.getElementById('photo');
+    const submitBtn = form.querySelector('button[type="submit"]');
     const paymentBtn = document.getElementById('paymentBtn');
     const helpBtn = document.getElementById('helpBtn');
     let formSubmitted = false;
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form submission
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         // Basic validation
@@ -87,6 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
             this.reportValidity();
             return;
         }
+
+        const originalSubmitText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        let submissionFailed = false;
 
         // Determine selected gender
         let genderValue = '';
@@ -110,26 +116,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Call backend
-        try {
-            const response = await fetch('/api/new-nic/submit', {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: formData
+        fetch('/api/new-nic/submit', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: formData
+        })
+            .then(async response => {
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(text || 'Submission failed');
+                }
+                return text;
+            })
+            .then(text => {
+                formSubmitted = true;
+                paymentBtn.disabled = false;
+                alert(text || 'New NIC application submitted successfully!');
+                document.querySelector('.payment-section').scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(err => {
+                submissionFailed = true;
+                console.error('New NIC submission error:', err);
+                alert('Failed to submit New NIC application. ' + (err.message || 'Please try again.'));
+            })
+            .finally(() => {
+                if (submissionFailed) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalSubmitText;
+                }
             });
-
-            const text = await response.text();
-            if (!response.ok) {
-                throw new Error(text || 'Submission failed');
-            }
-
-            formSubmitted = true;
-            paymentBtn.disabled = false;
-            alert(text || 'New NIC application submitted successfully!');
-            document.querySelector('.payment-section').scrollIntoView({ behavior: 'smooth' });
-        } catch (err) {
-            console.error('New NIC submission error:', err);
-            alert('Failed to submit New NIC application. ' + (err.message || 'Please try again.'));
-        }
     });
 
     // Payment button functionality

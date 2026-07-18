@@ -61,6 +61,12 @@ public class NewNicFormController {
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
+        Long userId = sessionUser.get().userId();
+        try {
+            service.ensureNoActiveApplication(userId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         String birthCertPath;
         String photoPath;
@@ -84,10 +90,14 @@ public class NewNicFormController {
         form.setContactNumber(contactNumber);
         form.setBirthCertificatePath(birthCertPath);
         form.setPhotoPath(photoPath);
-        form.setUserId(sessionUser.get().userId());
+        form.setUserId(userId);
         form.setUserEmail(sessionUser.get().email());
 
-        service.save(form);
+        try {
+            service.save(form);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok("New NIC application submitted successfully.");
     }
 

@@ -82,6 +82,22 @@ class NicApplicationControllerTests {
     }
 
     @Test
+    void newNicSubmitRejectsDuplicateActiveApplicationForUser() throws Exception {
+        NewNicForm existing = newNicApplication();
+        existing.setUserId(101L);
+        existing.setUserEmail("citizen@example.com");
+        existing.setStatus("PROCESSING");
+        newNicFormRepository.save(existing);
+
+        mockMvc.perform(newNicSubmitRequest(tokenFor(101L, "citizen@example.com", "CITIZEN")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("You already have an active NIC application being processed."));
+
+        assertThat(newNicFormRepository.findAll()).hasSize(1);
+    }
+
+    @Test
     void renewNicSubmitRequiresLoginAndSavesCitizenApplication() throws Exception {
         mockMvc.perform(renewNicSubmitRequest(null))
                 .andExpect(status().isForbidden())
