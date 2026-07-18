@@ -2,13 +2,12 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.DeliveryDto;
 import com.project.nic.model.Delivery;
-import com.project.nic.service.AuthSessionService;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,11 +24,7 @@ public class DeliveryController {
     private DeliveryService deliveryService;
 
     @Autowired
-    private AuthSessionService authSessionService;
-
-    private boolean canManageDelivery(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "DELIVERY");
-    }
+    private AuthAccessService authAccessService;
 
     @GetMapping("/nics")
     public ResponseEntity<?> getAllDeliveries(
@@ -37,7 +32,7 @@ public class DeliveryController {
             @RequestParam(required = false) String deliveryMethod,
             @RequestParam(required = false) String search,
             @RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         logger.info("GET /api/delivery/nics called with dateRange='{}', deliveryMethod='{}', search='{}',",
@@ -47,7 +42,7 @@ public class DeliveryController {
 
     @GetMapping("/nics/all")
     public ResponseEntity<?> getAllDeliveries(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         return ResponseEntity.ok(deliveryService.getAll().stream().map(DeliveryDto::from).collect(Collectors.toList()));
@@ -58,7 +53,7 @@ public class DeliveryController {
             @PathVariable String nic,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         Optional<Delivery> delivery = deliveryService.getDeliveryByNic(nic);
@@ -70,7 +65,7 @@ public class DeliveryController {
             @RequestBody DeliveryDto deliveryRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         return ResponseEntity.ok(DeliveryDto.from(deliveryService.saveDelivery(deliveryRequest.toEntity())));
@@ -82,7 +77,7 @@ public class DeliveryController {
             @RequestBody DeliveryDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         logger.info("PUT /api/delivery/nics/{} called with payload method='{}', status='{}'", nic, update.method, update.status);
@@ -105,7 +100,7 @@ public class DeliveryController {
             @PathVariable String nic,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         logger.info("DELETE /api/delivery/nics/{} called", nic);
@@ -119,7 +114,7 @@ public class DeliveryController {
             @RequestParam String startDate,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageDelivery(token)) {
+        if (!authAccessService.canManageDelivery(token)) {
             return ResponseEntity.status(403).body("Delivery access required");
         }
         LocalDate start = LocalDate.parse(startDate);

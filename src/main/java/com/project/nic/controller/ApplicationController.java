@@ -3,6 +3,7 @@ package com.project.nic.controller;
 import com.project.nic.dto.ApiDtos.LostNicDto;
 import com.project.nic.dto.ApiDtos.NewNicFormDto;
 import com.project.nic.dto.ApiDtos.RenewNicDto;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.service.NewNicFormService;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class ApplicationController {
 
     @Autowired
-    private AuthSessionService authSessionService;
+    private AuthAccessService authAccessService;
 
     @Autowired
     private NewNicFormService newNicFormService;
@@ -37,7 +38,7 @@ public class ApplicationController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyApplications(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }

@@ -2,14 +2,13 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.LogDto;
 import com.project.nic.model.AssistantLog;
-import com.project.nic.service.AuthSessionService;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AssistantLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,15 +20,11 @@ public class AssistantLogController {
     private AssistantLogService assistantLogService;
 
     @Autowired
-    private AuthSessionService authSessionService;
-
-    private boolean canManageAssistance(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "ASSISTANT");
-    }
+    private AuthAccessService authAccessService;
 
     @GetMapping
     public ResponseEntity<?> listAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         return ResponseEntity.ok(assistantLogService.getAll().stream().map(LogDto::from).collect(Collectors.toList()));
@@ -40,7 +35,7 @@ public class AssistantLogController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
@@ -52,7 +47,7 @@ public class AssistantLogController {
             @RequestBody LogDto log,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         if (log.date == null) {
@@ -68,7 +63,7 @@ public class AssistantLogController {
             @RequestBody LogDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         Optional<AssistantLog> opt = assistantLogService.getById(id);
@@ -85,7 +80,7 @@ public class AssistantLogController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         Optional<AssistantLog> opt = assistantLogService.getById(id);

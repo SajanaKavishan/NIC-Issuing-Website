@@ -2,6 +2,7 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.RenewNicDto;
 import com.project.nic.model.RenewNic;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.RenewNicService;
 import com.project.nic.util.FileUploadUtil;
@@ -12,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,18 +26,10 @@ public class RenewNicController {
     private RenewNicService service;
 
     @Autowired
-    private AuthSessionService authSessionService;
+    private AuthAccessService authAccessService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
-
-    private boolean canManageApplications(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "PRO", "RECOVERY");
-    }
-
-    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
-        return authSessionService.findByToken(token);
-    }
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitRenewNic(
@@ -50,7 +42,7 @@ public class RenewNicController {
         @RequestParam("photo") MultipartFile photo,
         @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) throws IOException {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -83,7 +75,7 @@ public class RenewNicController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllRenewNics(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageApplications(token)) {
+        if (!authAccessService.canManageApplications(token)) {
             return ResponseEntity.status(403).body("Application review access required");
         }
         return ResponseEntity.ok(service.findAll().stream().map(RenewNicDto::from).collect(Collectors.toList()));
@@ -91,7 +83,7 @@ public class RenewNicController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyApplications(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -103,7 +95,7 @@ public class RenewNicController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageApplications(token)) {
+        if (!authAccessService.canManageApplications(token)) {
             return ResponseEntity.status(403).body("Application review access required");
         }
         return service.findById(id)
@@ -117,7 +109,7 @@ public class RenewNicController {
             @RequestBody Map<String, String> payload,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageApplications(token)) {
+        if (!authAccessService.canManageApplications(token)) {
             return ResponseEntity.status(403).body("Application review access required");
         }
         try {

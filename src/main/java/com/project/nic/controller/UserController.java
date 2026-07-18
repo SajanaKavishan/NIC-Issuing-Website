@@ -2,6 +2,7 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.UserRequest;
 import com.project.nic.model.User;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class UserController {
     @Autowired
     private AuthSessionService authSessionService;
 
+    @Autowired
+    private AuthAccessService authAccessService;
+
     @PostMapping("/signup")
     public String signup(@RequestBody UserRequest request) {
         User user = request.toEntity();
@@ -37,7 +41,7 @@ public class UserController {
             @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!authSessionService.hasRole(token, "ADMIN")) {
+        if (!authAccessService.isAdmin(token)) {
             return ResponseEntity.status(403).body("Admin access required");
         }
         User payload = request.toEntity();
@@ -73,7 +77,7 @@ public class UserController {
 
     @GetMapping("/session")
     public ResponseEntity<?> session(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(401).body("Invalid or expired session");
         }
@@ -88,7 +92,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> getAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!authSessionService.hasRole(token, "ADMIN")) {
+        if (!authAccessService.isAdmin(token)) {
             return ResponseEntity.status(403).body("Admin access required");
         }
         return ResponseEntity.ok(userService.findAll().stream().map(UserDto::from).collect(Collectors.toList()));
@@ -106,7 +110,7 @@ public class UserController {
             @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!authSessionService.hasRole(token, "ADMIN")) {
+        if (!authAccessService.isAdmin(token)) {
             return ResponseEntity.status(403).body("Admin access required");
         }
         Optional<User> existing = userService.findById(id);
@@ -143,7 +147,7 @@ public class UserController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!authSessionService.hasRole(token, "ADMIN")) {
+        if (!authAccessService.isAdmin(token)) {
             return ResponseEntity.status(403).body("Admin access required");
         }
         Optional<User> existing = userService.findById(id);

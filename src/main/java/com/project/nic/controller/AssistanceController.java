@@ -2,6 +2,7 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.AssistanceRequestDto;
 import com.project.nic.model.AssistanceRequest;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +22,7 @@ public class AssistanceController {
     private AssistanceService assistanceService;
 
     @Autowired
-    private AuthSessionService authSessionService;
-
-    private boolean canManageAssistance(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "ASSISTANT");
-    }
-
-    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
-        return authSessionService.findByToken(token);
-    }
-
-    private boolean ownsRequest(AuthSessionService.SessionUser sessionUser, AssistanceRequest request) {
-        if (request.getUserId() != null && request.getUserId().equals(sessionUser.userId())) {
-            return true;
-        }
-        return request.getEmail() != null && request.getEmail().equalsIgnoreCase(sessionUser.email());
-    }
+    private AuthAccessService authAccessService;
 
     @PostMapping("/request")
     public ResponseEntity<String> createRequest(
@@ -44,7 +30,7 @@ public class AssistanceController {
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         AssistanceRequest request = requestBody.toEntity();
-        getLoggedInUser(token).ifPresent(sessionUser -> {
+        authAccessService.currentUser(token).ifPresent(sessionUser -> {
             request.setUserId(sessionUser.userId());
             request.setEmail(sessionUser.email());
         });
@@ -54,7 +40,7 @@ public class AssistanceController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllRequests(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         return ResponseEntity.ok(assistanceService.getAllRequests().stream().map(AssistanceRequestDto::from).collect(Collectors.toList()));
@@ -66,7 +52,7 @@ public class AssistanceController {
             @RequestBody String replyMessage,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         assistanceService.replyToRequest(id, replyMessage);
@@ -78,7 +64,7 @@ public class AssistanceController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageAssistance(token)) {
+        if (!authAccessService.canManageAssistance(token)) {
             return ResponseEntity.status(403).body("Assistant access required");
         }
         try {
@@ -94,7 +80,7 @@ public class AssistanceController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -103,7 +89,7 @@ public class AssistanceController {
         if (request.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        if (!ownsRequest(sessionUser.get(), request.get())) {
+        if (!authAccessService.ownsAssistanceRequest(sessionUser.get(), request.get())) {
             return ResponseEntity.status(403).body("You can only delete your own assistance requests");
         }
 
@@ -121,7 +107,7 @@ public class AssistanceController {
             @RequestBody Map<String, Object> body,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -130,7 +116,7 @@ public class AssistanceController {
         if (request.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        if (!ownsRequest(sessionUser.get(), request.get())) {
+        if (!authAccessService.ownsAssistanceRequest(sessionUser.get(), request.get())) {
             return ResponseEntity.status(403).body("You can only update your own assistance requests");
         }
 

@@ -1,8 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.FeedbackDto;
-import com.project.nic.model.Feedback;
-import com.project.nic.service.AuthSessionService;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +16,7 @@ public class FeedbackController {
     private FeedbackService feedbackService;
 
     @Autowired
-    private AuthSessionService authSessionService;
-
-    private boolean canManageFeedback(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "PRO");
-    }
+    private AuthAccessService authAccessService;
 
     @PostMapping
     public FeedbackDto submitFeedback(@RequestBody FeedbackDto feedback) {
@@ -30,7 +25,7 @@ public class FeedbackController {
 
     @GetMapping
     public ResponseEntity<?> getAllFeedbacks(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageFeedback(token)) {
+        if (!authAccessService.canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
         return ResponseEntity.ok(feedbackService.getAll().stream().map(FeedbackDto::from).collect(Collectors.toList()));
@@ -42,7 +37,7 @@ public class FeedbackController {
             @RequestBody FeedbackDto feedback,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageFeedback(token)) {
+        if (!authAccessService.canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
         try {
@@ -57,7 +52,7 @@ public class FeedbackController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageFeedback(token)) {
+        if (!authAccessService.canManageFeedback(token)) {
             return ResponseEntity.status(403).body("PRO access required");
         }
         feedbackService.deleteById(id);

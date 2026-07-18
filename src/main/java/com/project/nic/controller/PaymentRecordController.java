@@ -1,6 +1,7 @@
 package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.PaymentRecordDto;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,15 @@ public class PaymentRecordController {
     private PaymentRecordService paymentRecordService;
 
     @Autowired
-    private AuthSessionService authSessionService;
+    private AuthAccessService authAccessService;
 
     @GetMapping
     public ResponseEntity<?> getPaymentRecords(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        if (authSessionService.hasAnyRole(token, "ADMIN", "FINANCE")) {
+        if (authAccessService.canManagePayments(token)) {
             return ResponseEntity.ok(paymentRecordService.getAll().stream().map(PaymentRecordDto::from).collect(Collectors.toList()));
         }
         return ResponseEntity.ok(paymentRecordService.getByUserId(sessionUser.get().userId()).stream().map(PaymentRecordDto::from).collect(Collectors.toList()));
@@ -37,7 +38,7 @@ public class PaymentRecordController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyPaymentRecords(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }

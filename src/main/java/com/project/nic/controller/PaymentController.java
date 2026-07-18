@@ -2,13 +2,13 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.PaymentDto;
 import com.project.nic.model.Payment;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,23 +21,15 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @Autowired
-    private AuthSessionService authSessionService;
-
-    private boolean canManagePayments(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "FINANCE");
-    }
-
-    private boolean isLoggedIn(String token) {
-        return authSessionService.findByToken(token).isPresent();
-    }
+    private AuthAccessService authAccessService;
     
     @GetMapping
     public ResponseEntity<?> getAllPayments(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.ok(paymentService.getPaymentsByUserId(sessionUser.get().userId()).stream().map(PaymentDto::from).collect(Collectors.toList()));
         }
         return ResponseEntity.ok(paymentService.getAllPayments().stream().map(PaymentDto::from).collect(Collectors.toList()));
@@ -45,7 +37,7 @@ public class PaymentController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyPayments(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -57,7 +49,7 @@ public class PaymentController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
         Optional<Payment> payment = paymentService.getPaymentById(id);
@@ -69,7 +61,7 @@ public class PaymentController {
             @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
         Payment payment = paymentRequest.toEntity();
@@ -85,7 +77,7 @@ public class PaymentController {
             @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        Optional<AuthSessionService.SessionUser> sessionUser = authSessionService.findByToken(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -98,7 +90,7 @@ public class PaymentController {
             @RequestBody PaymentDto paymentDetails,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
         Payment updatedPayment = paymentService.updatePayment(id, paymentDetails.toEntity());
@@ -110,7 +102,7 @@ public class PaymentController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
         boolean deleted = paymentService.deletePayment(id);
@@ -119,7 +111,7 @@ public class PaymentController {
     
     @GetMapping("/stats")
     public ResponseEntity<?> getPaymentStatistics(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManagePayments(token)) {
+        if (!authAccessService.canManagePayments(token)) {
             return ResponseEntity.status(403).body("Finance access required");
         }
         Map<String, Object> stats = new HashMap<>();

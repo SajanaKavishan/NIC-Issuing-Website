@@ -3,6 +3,7 @@ package com.project.nic.controller;
 import com.project.nic.dto.ApiDtos.LostNicDto;
 import com.project.nic.dto.ApiDtos.LostNicUpdateRequest;
 import com.project.nic.model.LostNic;
+import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.util.FileUploadUtil;
@@ -13,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,18 +41,10 @@ public class LostNicController {
     private LostNicService service;
 
     @Autowired
-    private AuthSessionService authSessionService;
+    private AuthAccessService authAccessService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
-
-    private boolean canManageLostNic(String token) {
-        return authSessionService.hasAnyRole(token, "ADMIN", "RECOVERY");
-    }
-
-    private Optional<AuthSessionService.SessionUser> getLoggedInUser(String token) {
-        return authSessionService.findByToken(token);
-    }
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitLostNic(
@@ -63,7 +55,7 @@ public class LostNicController {
         @RequestParam("policeReport") MultipartFile policeReport,
         @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) throws IOException {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -95,7 +87,7 @@ public class LostNicController {
     // New endpoints for admin operations
     @GetMapping("/all")
     public ResponseEntity<?> getAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         return ResponseEntity.ok(service.findAll().stream().map(LostNicDto::from).collect(Collectors.toList()));
@@ -103,7 +95,7 @@ public class LostNicController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyApplications(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        Optional<AuthSessionService.SessionUser> sessionUser = getLoggedInUser(token);
+        Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
@@ -115,7 +107,7 @@ public class LostNicController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         return service.findById(id)
@@ -129,7 +121,7 @@ public class LostNicController {
             @RequestBody LostNicUpdateRequest updates,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         logger.info("Received update request for ID: {}", id);
@@ -146,7 +138,7 @@ public class LostNicController {
             @PathVariable Long id,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         logger.info("Received delete request for ID: {}", id);
@@ -165,7 +157,7 @@ public class LostNicController {
 
     @GetMapping("/requests")
     public ResponseEntity<?> getAllLostNicRequests(@RequestHeader(value = "X-Auth-Token", required = false) String token) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         return ResponseEntity.ok(service.findAll().stream().map(LostNicDto::from).collect(Collectors.toList()));
@@ -178,7 +170,7 @@ public class LostNicController {
             @RequestBody Map<String, String> payload,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         logger.info("Received status update for ID: {} with payload: {}", id, payload);
@@ -202,7 +194,7 @@ public class LostNicController {
             @RequestParam String type,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
-        if (!canManageLostNic(token)) {
+        if (!authAccessService.canManageLostNic(token)) {
             return ResponseEntity.status(403).body("Recovery access required");
         }
         try {
