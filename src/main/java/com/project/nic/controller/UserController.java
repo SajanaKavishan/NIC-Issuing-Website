@@ -5,8 +5,11 @@ import com.project.nic.model.User;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
+@Validated
 public class UserController {
 
     @Autowired
@@ -26,7 +30,7 @@ public class UserController {
     private AuthAccessService authAccessService;
 
     @PostMapping("/signup")
-    public String signup(@RequestBody UserRequest request) {
+    public String signup(@Valid @RequestBody UserRequest request) {
         User user = request.toEntity();
         if (userService.emailExists(user.getEmail())) {
             return "Email already registered";
@@ -38,7 +42,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> create(
-            @RequestBody UserRequest request,
+            @Valid @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.isAdmin(token)) {
@@ -64,7 +68,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody UserRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody UserRequest loginRequest) {
         Optional<User> userOpt = userService.authenticate(loginRequest.email, loginRequest.password);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body(LoginResponse.failure("Invalid credentials"));
@@ -99,7 +103,7 @@ public class UserController {
     }
 
     @GetMapping("/by-email")
-    public UserDto getByEmail(@RequestParam("email") String email) {
+    public UserDto getByEmail(@Email @RequestParam("email") String email) {
         Optional<User> userOpt = userService.findByEmail(email);
         return userOpt.map(UserDto::from).orElse(null);
     }
@@ -107,7 +111,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<String> update(
             @PathVariable Long id,
-            @RequestBody UserRequest request,
+            @Valid @RequestBody UserRequest request,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.isAdmin(token)) {

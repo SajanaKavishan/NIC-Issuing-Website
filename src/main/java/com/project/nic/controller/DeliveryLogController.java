@@ -4,6 +4,7 @@ import com.project.nic.dto.ApiDtos.LogDto;
 import com.project.nic.model.DeliveryLog;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.DeliveryLogService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class DeliveryLogController {
 
     @PostMapping
     public ResponseEntity<?> create(
-            @RequestBody LogDto log,
+            @Valid @RequestBody LogDto log,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageDelivery(token)) {
@@ -60,7 +61,7 @@ public class DeliveryLogController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestBody LogDto update,
+            @Valid @RequestBody LogDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageDelivery(token)) {

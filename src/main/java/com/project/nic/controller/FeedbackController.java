@@ -3,6 +3,7 @@ package com.project.nic.controller;
 import com.project.nic.dto.ApiDtos.FeedbackDto;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.FeedbackService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class FeedbackController {
     private AuthAccessService authAccessService;
 
     @PostMapping
-    public FeedbackDto submitFeedback(@RequestBody FeedbackDto feedback) {
+    public FeedbackDto submitFeedback(@Valid @RequestBody FeedbackDto feedback) {
         return FeedbackDto.from(feedbackService.saveFeedback(feedback.toEntity()));
     }
 
@@ -34,7 +35,7 @@ public class FeedbackController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFeedback(
             @PathVariable Long id,
-            @RequestBody FeedbackDto feedback,
+            @Valid @RequestBody FeedbackDto feedback,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageFeedback(token)) {

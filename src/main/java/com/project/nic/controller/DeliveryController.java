@@ -4,7 +4,10 @@ import com.project.nic.dto.ApiDtos.DeliveryDto;
 import com.project.nic.model.Delivery;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.DeliveryService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -17,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/delivery")
+@Validated
 public class DeliveryController {
     private static final Logger logger = LoggerFactory.getLogger(DeliveryController.class);
 
@@ -62,7 +66,7 @@ public class DeliveryController {
 
     @PostMapping("/nics")
     public ResponseEntity<?> createDelivery(
-            @RequestBody DeliveryDto deliveryRequest,
+            @Valid @RequestBody DeliveryDto deliveryRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageDelivery(token)) {
@@ -74,7 +78,7 @@ public class DeliveryController {
     @PutMapping("/nics/{nic}")
     public ResponseEntity<?> updateMethodAndStatus(
             @PathVariable String nic,
-            @RequestBody DeliveryDto update,
+            @Valid @RequestBody DeliveryDto update,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageDelivery(token)) {
@@ -111,7 +115,7 @@ public class DeliveryController {
 
     @GetMapping("/weekly-report")
     public ResponseEntity<?> getWeeklyReport(
-            @RequestParam String startDate,
+            @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String startDate,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageDelivery(token)) {

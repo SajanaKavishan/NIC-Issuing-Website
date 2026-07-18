@@ -5,6 +5,7 @@ import com.project.nic.model.Payment;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class PaymentController {
     
     @PostMapping
     public ResponseEntity<?> createPayment(
-            @RequestBody PaymentDto paymentRequest,
+            @Valid @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManagePayments(token)) {
@@ -74,7 +75,7 @@ public class PaymentController {
 
     @PostMapping("/checkout")
     public ResponseEntity<?> createCheckoutPayment(
-            @RequestBody PaymentDto paymentRequest,
+            @Valid @RequestBody PaymentDto paymentRequest,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
@@ -87,7 +88,7 @@ public class PaymentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePayment(
             @PathVariable Long id,
-            @RequestBody PaymentDto paymentDetails,
+            @Valid @RequestBody PaymentDto paymentDetails,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManagePayments(token)) {

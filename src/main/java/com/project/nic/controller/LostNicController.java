@@ -2,19 +2,23 @@ package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.LostNicDto;
 import com.project.nic.dto.ApiDtos.LostNicUpdateRequest;
+import com.project.nic.dto.ApiDtos.StatusUpdateRequest;
 import com.project.nic.model.LostNic;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.util.FileUploadUtil;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,6 +38,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/lost-nic")
+@Validated
 public class LostNicController {
     private static final Logger logger = LoggerFactory.getLogger(LostNicController.class);
 
@@ -48,9 +53,9 @@ public class LostNicController {
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitLostNic(
-        @RequestParam String nicNumber,
-        @RequestParam String lostDate,
-        @RequestParam String contactNumber,
+        @NotBlank @RequestParam String nicNumber,
+        @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String lostDate,
+        @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$") @RequestParam String contactNumber,
         @RequestParam("birthCertificate") MultipartFile birthCertificate,
         @RequestParam("policeReport") MultipartFile policeReport,
         @RequestHeader(value = "X-Auth-Token", required = false) String token
@@ -118,7 +123,7 @@ public class LostNicController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestBody LostNicUpdateRequest updates,
+            @Valid @RequestBody LostNicUpdateRequest updates,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageLostNic(token)) {
@@ -167,7 +172,7 @@ public class LostNicController {
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
-            @RequestBody Map<String, String> payload,
+            @Valid @RequestBody StatusUpdateRequest payload,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageLostNic(token)) {
@@ -175,8 +180,7 @@ public class LostNicController {
         }
         logger.info("Received status update for ID: {} with payload: {}", id, payload);
         try {
-            String status = payload.get("status");
-            LostNic updated = service.updateStatus(id, status);
+            LostNic updated = service.updateStatus(id, payload.status);
             return ResponseEntity.ok(LostNicDto.from(updated));
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid status update or not found: {}", e.getMessage());

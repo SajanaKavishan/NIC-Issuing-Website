@@ -11,6 +11,13 @@ import com.project.nic.model.Payment;
 import com.project.nic.model.PaymentRecord;
 import com.project.nic.model.RenewNic;
 import com.project.nic.model.User;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -28,10 +35,16 @@ public final class ApiDtos {
     }
 
     public static class UserRequest {
+        @Size(max = 100)
         public String firstName;
+        @Size(max = 100)
         public String lastName;
+        @Email
+        @Size(max = 255)
         public String email;
+        @Size(min = 6, max = 100)
         public String password;
+        @Pattern(regexp = "ADMIN|CITIZEN|PRO|RECOVERY|DELIVERY|FINANCE|ASSISTANT", flags = Pattern.Flag.CASE_INSENSITIVE)
         public String role;
 
         public User toEntity() {
@@ -138,8 +151,11 @@ public final class ApiDtos {
     }
 
     public static class LostNicUpdateRequest {
+        @Size(max = 30)
         public String nicNumber;
+        @PastOrPresent
         public LocalDate lostDate;
+        @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$")
         public String contactNumber;
 
         public LostNic toEntity() {
@@ -153,15 +169,25 @@ public final class ApiDtos {
 
     public static class PaymentDto {
         public Long id;
+        @Size(max = 80)
         public String paymentId;
         public LocalDateTime date;
+        @Pattern(regexp = "new|renew|lost|New NIC|Renew NIC|Lost NIC", flags = Pattern.Flag.CASE_INSENSITIVE)
         public String serviceType;
+        @Pattern(regexp = "card|deposit|online|credit card|bank deposit|online banking", flags = Pattern.Flag.CASE_INSENSITIVE)
         public String paymentMethod;
+        @DecimalMin(value = "0.0", inclusive = false)
         public Double amount;
+        @Pattern(regexp = "pending|completed|failed", flags = Pattern.Flag.CASE_INSENSITIVE)
         public String status;
+        @Positive
         public Long userId;
+        @Size(max = 30)
         public String nic;
+        @Email
+        @Size(max = 255)
         public String email;
+        @Size(max = 255)
         public String customerInfo;
 
         public static PaymentDto from(Payment payment) {
@@ -221,12 +247,18 @@ public final class ApiDtos {
     }
 
     public static class DeliveryDto {
+        @Size(max = 30)
         public String nic;
+        @Positive
         public Long appId;
+        @Size(max = 150)
         public String recipient;
         public LocalDate deliveryDate;
+        @Size(max = 50)
         public String method;
+        @Size(max = 50)
         public String status;
+        @Size(max = 255)
         public String address;
 
         public static DeliveryDto from(Delivery delivery) {
@@ -256,11 +288,18 @@ public final class ApiDtos {
 
     public static class AssistanceRequestDto {
         public Long id;
+        @Positive
         public Long userId;
+        @Email
+        @Size(max = 255)
         public String email;
+        @Size(min = 2, max = 1000)
         public String query;
+        @Size(max = 50)
         public String status;
+        @Size(max = 1000)
         public String reply;
+        @Positive
         public Long applicantId;
 
         public static AssistanceRequestDto from(AssistanceRequest request) {
@@ -289,12 +328,20 @@ public final class ApiDtos {
 
     public static class FeedbackDto {
         public Long id;
+        @Size(max = 150)
         public String name;
+        @Email
+        @Size(max = 255)
         public String mail;
+        @Size(max = 50)
         public String type;
+        @Size(max = 150)
         public String subject;
+        @Size(min = 2, max = 1000)
         public String message;
+        @Pattern(regexp = "Pending|In Progress|Resolved|Reviewed", flags = Pattern.Flag.CASE_INSENSITIVE)
         public String status;
+        @Size(max = 1000)
         public String reply;
 
         public static FeedbackDto from(Feedback feedback) {
@@ -325,7 +372,9 @@ public final class ApiDtos {
 
     public static class LogDto {
         public Long id;
+        @PastOrPresent
         public LocalDate date;
+        @Size(min = 2, max = 1000)
         public String description;
 
         public static LogDto from(AssistantLog log) {
@@ -351,5 +400,16 @@ public final class ApiDtos {
         public DeliveryLog toDeliveryLog() {
             return new DeliveryLog(date, description);
         }
+    }
+
+    public static class StatusUpdateRequest {
+        @NotBlank
+        @Pattern(regexp = "PENDING|PROCESSING|APPROVED|REJECTED|DELIVERED|pending|completed|failed|Pending|In Progress|Resolved|Reviewed")
+        public String status;
+    }
+
+    public static class AssistanceUpdateRequest {
+        @Size(min = 2, max = 1000)
+        public String query;
     }
 }

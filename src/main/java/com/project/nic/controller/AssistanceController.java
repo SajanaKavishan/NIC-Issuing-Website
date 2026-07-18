@@ -1,21 +1,26 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.AssistanceUpdateRequest;
 import com.project.nic.dto.ApiDtos.AssistanceRequestDto;
 import com.project.nic.model.AssistanceRequest;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.AssistanceService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assistance")
+@Validated
 public class AssistanceController {
 
     @Autowired
@@ -26,7 +31,7 @@ public class AssistanceController {
 
     @PostMapping("/request")
     public ResponseEntity<String> createRequest(
-            @RequestBody AssistanceRequestDto requestBody,
+            @Valid @RequestBody AssistanceRequestDto requestBody,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         AssistanceRequest request = requestBody.toEntity();
@@ -104,7 +109,7 @@ public class AssistanceController {
     @PutMapping("/request/{id}")
     public ResponseEntity<?> updateRequest(
             @PathVariable Long id,
-            @RequestBody Map<String, Object> body,
+            @Valid @RequestBody AssistanceUpdateRequest body,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         Optional<AuthSessionService.SessionUser> sessionUser = authAccessService.currentUser(token);
@@ -120,9 +125,8 @@ public class AssistanceController {
             return ResponseEntity.status(403).body("You can only update your own assistance requests");
         }
 
-        String newQuery = body.getOrDefault("query", "").toString();
         try {
-            AssistanceRequest updated = assistanceService.updateRequest(id, newQuery);
+            AssistanceRequest updated = assistanceService.updateRequest(id, body.query);
             return ResponseEntity.ok(AssistanceRequestDto.from(updated));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
@@ -136,7 +140,7 @@ public class AssistanceController {
     }
 
     @GetMapping("/requestsByEmail")
-    public ResponseEntity<List<AssistanceRequestDto>> getRequestsByEmail(@RequestParam String email) {
+    public ResponseEntity<List<AssistanceRequestDto>> getRequestsByEmail(@NotBlank @Email @RequestParam String email) {
         List<AssistanceRequest> requests = assistanceService.getRequestsByEmail(email);
         return ResponseEntity.ok(requests.stream().map(AssistanceRequestDto::from).collect(Collectors.toList()));
     }

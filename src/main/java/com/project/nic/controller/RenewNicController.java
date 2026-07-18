@@ -1,19 +1,23 @@
 package com.project.nic.controller;
 
 import com.project.nic.dto.ApiDtos.RenewNicDto;
+import com.project.nic.dto.ApiDtos.StatusUpdateRequest;
 import com.project.nic.model.RenewNic;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.RenewNicService;
 import com.project.nic.util.FileUploadUtil;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/renew-nic")
+@Validated
 public class RenewNicController {
     @Autowired
     private RenewNicService service;
@@ -33,11 +38,11 @@ public class RenewNicController {
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitRenewNic(
-        @RequestParam String oldNicNumber,
-        @RequestParam String birthdate,
-        @RequestParam String reason,
+        @NotBlank @RequestParam String oldNicNumber,
+        @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String birthdate,
+        @NotBlank @RequestParam String reason,
         @RequestParam(required = false) String otherReason,
-        @RequestParam String contactNumber,
+        @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$") @RequestParam String contactNumber,
         @RequestParam("birthCertificate") MultipartFile birthCertificate,
         @RequestParam("photo") MultipartFile photo,
         @RequestHeader(value = "X-Auth-Token", required = false) String token
@@ -106,14 +111,14 @@ public class RenewNicController {
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
-            @RequestBody Map<String, String> payload,
+            @Valid @RequestBody StatusUpdateRequest payload,
             @RequestHeader(value = "X-Auth-Token", required = false) String token
     ) {
         if (!authAccessService.canManageApplications(token)) {
             return ResponseEntity.status(403).body("Application review access required");
         }
         try {
-            return ResponseEntity.ok(RenewNicDto.from(service.updateStatus(id, payload.get("status"))));
+            return ResponseEntity.ok(RenewNicDto.from(service.updateStatus(id, payload.status)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
