@@ -18,10 +18,12 @@ public class AssistanceService {
 
     private final AssistanceRequestRepository repo;
     private final EntityManager entityManager;
+    private final NotificationService notificationService;
 
-    public AssistanceService(AssistanceRequestRepository repo, EntityManager entityManager) {
+    public AssistanceService(AssistanceRequestRepository repo, EntityManager entityManager, NotificationService notificationService) {
         this.repo = repo;
         this.entityManager = entityManager;
+        this.notificationService = notificationService;
     }
 
     public AssistanceRequest createRequest(AssistanceRequest request) {
@@ -46,7 +48,8 @@ public class AssistanceService {
                 .orElseThrow(() -> new RuntimeException("Request not found"));
         request.setReply(replyMessage);
         request.setStatus("resolved");
-        repo.save(request);
+        AssistanceRequest saved = repo.save(request);
+        notificationService.assistanceReplySent(saved);
     }
 
     @Transactional

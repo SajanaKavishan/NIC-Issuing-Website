@@ -16,19 +16,22 @@ public class PaymentService {
     private final NewNicFormService newNicFormService;
     private final RenewNicService renewNicService;
     private final LostNicService lostNicService;
+    private final NotificationService notificationService;
 
     public PaymentService(
             PaymentRepository paymentRepository,
             PaymentRecordService paymentRecordService,
             NewNicFormService newNicFormService,
             RenewNicService renewNicService,
-            LostNicService lostNicService
+            LostNicService lostNicService,
+            NotificationService notificationService
     ) {
         this.paymentRepository = paymentRepository;
         this.paymentRecordService = paymentRecordService;
         this.newNicFormService = newNicFormService;
         this.renewNicService = renewNicService;
         this.lostNicService = lostNicService;
+        this.notificationService = notificationService;
     }
     
     public List<Payment> getAllPayments() {
@@ -66,6 +69,7 @@ public class PaymentService {
 
         Payment saved = createPayment(payment);
         savePaymentRecord(saved, sessionUser);
+        notificationService.paymentRecorded(saved);
         return saved;
     }
     

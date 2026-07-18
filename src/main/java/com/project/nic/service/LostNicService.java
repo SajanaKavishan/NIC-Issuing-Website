@@ -16,13 +16,20 @@ public class LostNicService {
     private static final Logger logger = LoggerFactory.getLogger(LostNicService.class);
 
     private final LostNicRepository repository;
+    private final NotificationService notificationService;
 
-    public LostNicService(LostNicRepository repository) {
+    public LostNicService(LostNicRepository repository, NotificationService notificationService) {
         this.repository = repository;
+        this.notificationService = notificationService;
     }
 
     public LostNic save(LostNic lostNic) {
-        return repository.save(lostNic);
+        boolean isNew = lostNic.getId() == null;
+        LostNic saved = repository.save(lostNic);
+        if (isNew) {
+            notificationService.applicationSubmitted("lost", saved.getId(), saved.getUserEmail(), saved.getContactNumber());
+        }
+        return saved;
     }
 
     // Additions for admin CRUD
@@ -80,9 +87,14 @@ public class LostNicService {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
         return repository.findById(id).map(existing -> {
+            String previousStatus = existing.getStatus();
             existing.setStatus(s);
             logger.info("Updating status of LostNic id {} to {}", id, s);
-            return repository.save(existing);
+            LostNic saved = repository.save(existing);
+            if (!s.equalsIgnoreCase(previousStatus == null ? "" : previousStatus)) {
+                notificationService.applicationStatusChanged("lost", saved.getId(), saved.getStatus(), saved.getUserEmail(), saved.getContactNumber());
+            }
+            return saved;
         }).orElseThrow(() -> new IllegalArgumentException("LostNic with id " + id + " not found"));
     }
 }
