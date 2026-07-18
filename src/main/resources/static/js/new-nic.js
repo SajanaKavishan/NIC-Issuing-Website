@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentBtn = document.getElementById('paymentBtn');
     const helpBtn = document.getElementById('helpBtn');
     let formSubmitted = false;
+    let applicationId = null;
 
     // Age validation
     ageInput.addEventListener('change', function() {
@@ -122,16 +123,17 @@ document.addEventListener('DOMContentLoaded', function() {
             body: formData
         })
             .then(async response => {
-                const text = await response.text();
+                const data = await response.json().catch(() => null);
                 if (!response.ok) {
-                    throw new Error(text || 'Submission failed');
+                    throw new Error((data && data.message) || 'Submission failed');
                 }
-                return text;
+                return data;
             })
-            .then(text => {
+            .then(data => {
+                applicationId = data.applicationId;
                 formSubmitted = true;
                 paymentBtn.disabled = false;
-                alert(text || 'New NIC application submitted successfully!');
+                alert(data.message || 'New NIC application submitted successfully!');
                 document.querySelector('.payment-section').scrollIntoView({ behavior: 'smooth' });
             })
             .catch(err => {
@@ -149,8 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Payment button functionality
     paymentBtn.addEventListener('click', function() {
-        if (formSubmitted) {
-            window.location.href = 'paymentGateway.html?type=new';
+        if (formSubmitted && applicationId) {
+            window.location.href = `paymentGateway.html?type=new&appId=${encodeURIComponent(applicationId)}`;
         } else {
             alert('Please submit your application first before making a payment.');
         }

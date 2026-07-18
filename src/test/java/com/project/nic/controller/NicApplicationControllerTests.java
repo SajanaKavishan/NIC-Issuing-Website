@@ -65,8 +65,9 @@ class NicApplicationControllerTests {
 
         mockMvc.perform(newNicSubmitRequest(tokenFor(101L, "citizen@example.com", "CITIZEN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("New NIC application submitted successfully."));
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value("New NIC application submitted successfully."))
+                .andExpect(jsonPath("$.applicationId").isNumber());
 
         assertThat(newNicFormRepository.findAll())
                 .singleElement()
@@ -105,8 +106,9 @@ class NicApplicationControllerTests {
 
         mockMvc.perform(renewNicSubmitRequest(tokenFor(102L, "renew@example.com", "CITIZEN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("NIC renewal request submitted successfully."));
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value("NIC renewal request submitted successfully."))
+                .andExpect(jsonPath("$.applicationId").isNumber());
 
         assertThat(renewNicRepository.findAll())
                 .singleElement()
@@ -129,8 +131,9 @@ class NicApplicationControllerTests {
 
         mockMvc.perform(lostNicSubmitRequest(tokenFor(103L, "lost@example.com", "CITIZEN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Lost NIC report submitted successfully."));
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value("Lost NIC report submitted successfully."))
+                .andExpect(jsonPath("$.applicationId").isNumber());
 
         assertThat(lostNicRepository.findAll())
                 .singleElement()

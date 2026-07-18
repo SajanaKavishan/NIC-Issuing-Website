@@ -2,9 +2,11 @@ package com.project.nic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.nic.model.Payment;
+import com.project.nic.model.RenewNic;
 import com.project.nic.model.User;
 import com.project.nic.repository.PaymentRecordRepository;
 import com.project.nic.repository.PaymentRepository;
+import com.project.nic.repository.RenewNicRepository;
 import com.project.nic.service.AuthSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +43,16 @@ class PaymentControllerTests {
     private PaymentRecordRepository paymentRecordRepository;
 
     @Autowired
+    private RenewNicRepository renewNicRepository;
+
+    @Autowired
     private AuthSessionService authSessionService;
 
     @BeforeEach
     void setUp() {
         paymentRecordRepository.deleteAll();
         paymentRepository.deleteAll();
+        renewNicRepository.deleteAll();
     }
 
     @Test
@@ -99,11 +106,12 @@ class PaymentControllerTests {
 
     @Test
     void checkoutPaymentRequiresLoginAndCreatesPaymentRecordForCitizen() throws Exception {
+        RenewNic application = renewNicRepository.save(renewNicApplication(202L, "payer@example.com"));
         Map<String, Object> request = Map.of(
                 "serviceType", "Renew NIC",
                 "paymentMethod", "bank deposit",
                 "amount", 2500.0,
-                "nic", "200012345678"
+                "applicationId", application.getId()
         );
 
         mockMvc.perform(post("/api/payments/checkout")
@@ -120,6 +128,7 @@ class PaymentControllerTests {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.userId").value(202))
                 .andExpect(jsonPath("$.data.email").value("payer@example.com"))
+                .andExpect(jsonPath("$.data.applicationId").value(application.getId()))
                 .andExpect(jsonPath("$.data.serviceType").value("renew"))
                 .andExpect(jsonPath("$.data.paymentMethod").value("deposit"))
                 .andExpect(jsonPath("$.data.status").value("pending"));
@@ -129,6 +138,7 @@ class PaymentControllerTests {
         assertThat(saved.getEmail()).isEqualTo("payer@example.com");
         assertThat(saved.getCustomerInfo()).isEqualTo("payer@example.com");
         assertThat(saved.getPaymentId()).startsWith("PAY-");
+        assertThat(saved.getApplicationId()).isEqualTo(application.getId());
 
         assertThat(paymentRecordRepository.findAll())
                 .singleElement()
@@ -141,6 +151,26 @@ class PaymentControllerTests {
                     assertThat(record.getTransactionId()).isEqualTo(saved.getPaymentId());
                     assertThat(record.getTransactionDate()).isNotNull();
                 });
+    }
+
+    @Test
+    void checkoutPaymentRejectsMissingApplicationId() throws Exception {
+        Map<String, Object> request = Map.of(
+                "serviceType", "new",
+                "paymentMethod", "card",
+                "amount", 2100.0
+        );
+
+        mockMvc.perform(post("/api/payments/checkout")
+                        .header("X-Auth-Token", tokenFor(202L, "payer@example.com", "CITIZEN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Application ID is required for payment."));
+
+        assertThat(paymentRepository.findAll()).isEmpty();
+        assertThat(paymentRecordRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -184,6 +214,20 @@ class PaymentControllerTests {
         payment.setAmount(amount);
         payment.setStatus("completed");
         return payment;
+    }
+
+    private RenewNic renewNicApplication(Long userId, String email) {
+        RenewNic form = new RenewNic();
+        form.setOldNicNumber("200012345678");
+        form.setBirthdate(LocalDate.of(2000, 1, 2));
+        form.setReason("Damaged");
+        form.setContactNumber("0771234567");
+        form.setBirthCertificatePath("birth.pdf");
+        form.setPhotoPath("photo.jpg");
+        form.setUserId(userId);
+        form.setUserEmail(email);
+        form.setStatus("PENDING");
+        return form;
     }
 
     private String tokenFor(Long userId, String email, String role) {

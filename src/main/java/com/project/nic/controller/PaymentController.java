@@ -83,7 +83,11 @@ public class PaymentController {
         if (sessionUser.isEmpty()) {
             return ResponseEntity.status(403).body("Login required");
         }
-        return ResponseEntity.ok(PaymentDto.from(paymentService.createCitizenPayment(paymentRequest.toEntity(), sessionUser.get())));
+        try {
+            return ResponseEntity.ok(PaymentDto.from(paymentService.createCitizenPayment(paymentRequest.toEntity(), sessionUser.get())));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     
     @PutMapping("/{id}")

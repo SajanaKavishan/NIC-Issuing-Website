@@ -1,7 +1,10 @@
 package com.project.nic.service;
 
+import com.project.nic.model.LostNic;
+import com.project.nic.model.NewNicForm;
 import com.project.nic.model.Payment;
 import com.project.nic.model.PaymentRecord;
+import com.project.nic.model.RenewNic;
 import com.project.nic.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -67,8 +70,9 @@ public class PaymentService {
         payment.setPaymentMethod(normalizePaymentMethod(payment.getPaymentMethod()));
         payment.setStatus(normalizePaymentStatus(payment.getStatus(), payment.getPaymentMethod()));
 
+        String nicReference = resolveNicReference(payment);
         Payment saved = createPayment(payment);
-        savePaymentRecord(saved, sessionUser);
+        savePaymentRecord(saved, sessionUser, nicReference);
         notificationService.paymentRecorded(saved);
         return saved;
     }
@@ -122,11 +126,11 @@ public class PaymentService {
         return paymentRepository.findByStatus("completed").stream().count();
     }
 
-    private void savePaymentRecord(Payment payment, AuthSessionService.SessionUser sessionUser) {
+    private void savePaymentRecord(Payment payment, AuthSessionService.SessionUser sessionUser, String nicReference) {
         PaymentRecord record = new PaymentRecord();
         record.setUserId(String.valueOf(sessionUser.userId()));
         record.setNicType(payment.getServiceType());
-        record.setNicReference(resolveNicReference(payment));
+        record.setNicReference(nicReference);
         record.setAmount(payment.getAmount() == null ? 0 : payment.getAmount());
         record.setPaymentMethod(payment.getPaymentMethod());
         record.setTransactionId(payment.getPaymentId());
@@ -135,35 +139,37 @@ public class PaymentService {
     }
 
     private String resolveNicReference(Payment payment) {
-        if (payment.getNic() != null && !payment.getNic().isBlank()) {
-            return payment.getNic().trim();
-        }
-
-        Long userId = payment.getUserId();
-        if (userId == null) {
-            return payment.getPaymentId();
+        Long applicationId = payment.getApplicationId();
+        if (applicationId == null) {
+            throw new IllegalArgumentException("Application ID is required for payment.");
         }
 
         String type = normalizeNicType(payment.getServiceType());
         if ("new".equals(type)) {
-            return newNicFormService.findByUserId(userId).stream()
-                    .max((a, b) -> a.getId().compareTo(b.getId()))
-                    .map(form -> "NEW-" + String.format("%05d", form.getId()))
-                    .orElse(payment.getPaymentId());
+            NewNicForm form = newNicFormService.findById(applicationId)
+                    .orElseThrow(() -> new IllegalArgumentException("New NIC application with id " + applicationId + " not found"));
+            ensurePaymentOwnsApplication(payment, form.getUserId());
+            return "NEW-" + String.format("%05d", form.getId());
         }
         if ("renew".equals(type)) {
-            return renewNicService.findByUserId(userId).stream()
-                    .max((a, b) -> a.getId().compareTo(b.getId()))
-                    .map(form -> firstNonBlank(form.getOldNicNumber(), "REN-" + String.format("%05d", form.getId())))
-                    .orElse(payment.getPaymentId());
+            RenewNic form = renewNicService.findById(applicationId)
+                    .orElseThrow(() -> new IllegalArgumentException("Renew NIC application with id " + applicationId + " not found"));
+            ensurePaymentOwnsApplication(payment, form.getUserId());
+            return firstNonBlank(form.getOldNicNumber(), "REN-" + String.format("%05d", form.getId()));
         }
         if ("lost".equals(type)) {
-            return lostNicService.findByUserId(userId).stream()
-                    .max((a, b) -> a.getId().compareTo(b.getId()))
-                    .map(form -> firstNonBlank(form.getNicNumber(), "LST-" + String.format("%05d", form.getId())))
-                    .orElse(payment.getPaymentId());
+            LostNic form = lostNicService.findById(applicationId)
+                    .orElseThrow(() -> new IllegalArgumentException("Lost NIC application with id " + applicationId + " not found"));
+            ensurePaymentOwnsApplication(payment, form.getUserId());
+            return firstNonBlank(form.getNicNumber(), "LST-" + String.format("%05d", form.getId()));
         }
         return payment.getPaymentId();
+    }
+
+    private void ensurePaymentOwnsApplication(Payment payment, Long applicationUserId) {
+        if (payment.getUserId() == null || applicationUserId == null || !payment.getUserId().equals(applicationUserId)) {
+            throw new IllegalArgumentException("Application does not belong to the authenticated user.");
+        }
     }
 
     private String generatePaymentId() {

@@ -992,6 +992,7 @@
     let selectedNicType = 'new';
     let nicPrice = 2000;
     const processingFee = 100;
+    const applicationId = getApplicationIdFromUrl();
     let latestPaymentResult = null;
 
     // Function to record payment in backend
@@ -1004,11 +1005,12 @@
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to record payment: ${response.status}`);
+                const error = await response.json().catch(() => null);
+                throw new Error((error && error.message) || `Failed to record payment: ${response.status}`);
             }
 
             const result = await response.json();
-            latestPaymentResult = result;
+            latestPaymentResult = result.data || result;
             return result;
         } catch (error) {
             console.error('Error recording payment:', error);
@@ -1105,6 +1107,15 @@
         updateSummary();
     }
 
+    function getApplicationIdFromUrl() {
+        try {
+            const value = new URLSearchParams(window.location.search).get('appId');
+            return value && /^\d+$/.test(value) ? Number(value) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     // Payment method tabs
     document.querySelectorAll('.payment-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -1176,6 +1187,10 @@
         if (!validateContactEmail()) {
             return;
         }
+        if (!applicationId) {
+            alert('Missing application reference. Please submit your application again before paying.');
+            return;
+        }
 
         const btn = this;
         const originalText = btn.innerHTML;
@@ -1190,6 +1205,7 @@
                 paymentMethod: 'card',
                 amount: nicPrice + processingFee,
                 status: 'completed',
+                applicationId,
                 nic: getNicFromPreviousStep(),
                 email: getContactEmail(),
                 customerInfo: getContactEmail()
@@ -1217,6 +1233,10 @@
         if (!validateContactEmail()) {
             return;
         }
+        if (!applicationId) {
+            alert('Missing application reference. Please submit your application again before paying.');
+            return;
+        }
 
         if (!onlineReceipt.files.length) {
             alert('Please upload your transfer receipt first.');
@@ -1234,6 +1254,7 @@
                 paymentMethod: 'online',
                 amount: nicPrice + processingFee,
                 status: 'pending',
+                applicationId,
                 nic: getNicFromPreviousStep(),
                 email: getContactEmail(),
                 customerInfo: getContactEmail() + ' - Online Banking Receipt'
@@ -1257,6 +1278,10 @@
         if (!validateContactEmail()) {
             return;
         }
+        if (!applicationId) {
+            alert('Missing application reference. Please submit your application again before paying.');
+            return;
+        }
 
         if (!depositSlip.files.length) {
             alert('Please upload your deposit slip first.');
@@ -1274,6 +1299,7 @@
                 paymentMethod: 'deposit',
                 amount: nicPrice + processingFee,
                 status: 'pending',
+                applicationId,
                 nic: getNicFromPreviousStep(),
                 email: getContactEmail(),
                 customerInfo: getContactEmail() + ' - Bank Deposit Slip'

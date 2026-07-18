@@ -1,6 +1,7 @@
 package com.project.nic.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.nic.dto.ApiDtos.ApplicationSubmissionResponse;
 import com.project.nic.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -92,7 +93,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     private boolean shouldSkip(Object body, MediaType selectedContentType) {
-        if (body instanceof ApiResponse<?> || body instanceof Resource || body instanceof byte[]) {
+        if (body instanceof ApiResponse<?> || body instanceof ApplicationSubmissionResponse || body instanceof Resource || body instanceof byte[]) {
             return true;
         }
         return selectedContentType != null

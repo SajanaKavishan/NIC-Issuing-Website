@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.ApplicationSubmissionResponse;
 import com.project.nic.dto.ApiDtos.LostNicDto;
 import com.project.nic.dto.ApiDtos.LostNicUpdateRequest;
 import com.project.nic.dto.ApiDtos.StatusUpdateRequest;
@@ -56,7 +57,7 @@ public class LostNicController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<String> submitLostNic(
+    public ResponseEntity<?> submitLostNic(
         @NotBlank @RequestParam String nicNumber,
         @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String lostDate,
         @Pattern(regexp = "^[0-9+\\-()\\s]{7,20}$") @RequestParam String contactNumber,
@@ -89,8 +90,8 @@ public class LostNicController {
         lostNic.setUserId(sessionUser.get().userId());
         lostNic.setUserEmail(sessionUser.get().email());
 
-        service.save(lostNic);
-        return ResponseEntity.ok("Lost NIC report submitted successfully.");
+        LostNic saved = service.save(lostNic);
+        return ResponseEntity.ok(new ApplicationSubmissionResponse("Lost NIC report submitted successfully.", saved.getId()));
     }
 
     // New endpoints for admin operations

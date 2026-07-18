@@ -27,6 +27,18 @@ public final class ApiDtos {
     private ApiDtos() {
     }
 
+    public static class ApplicationSubmissionResponse {
+        public String status;
+        public String message;
+        public Long applicationId;
+
+        public ApplicationSubmissionResponse(String message, Long applicationId) {
+            this.status = "SUCCESS";
+            this.message = message;
+            this.applicationId = applicationId;
+        }
+    }
+
     public static String fileNameOnly(String storedPath) {
         if (storedPath == null || storedPath.isBlank()) {
             return storedPath;
@@ -182,6 +194,8 @@ public final class ApiDtos {
         public String status;
         @Positive
         public Long userId;
+        @Positive
+        public Long applicationId;
         @Size(max = 30)
         public String nic;
         @Email
@@ -200,6 +214,7 @@ public final class ApiDtos {
             dto.amount = payment.getAmount();
             dto.status = payment.getStatus();
             dto.userId = payment.getUserId();
+            dto.applicationId = payment.getApplicationId();
             dto.nic = payment.getNic();
             dto.email = payment.getEmail();
             dto.customerInfo = payment.getCustomerInfo();
@@ -215,6 +230,7 @@ public final class ApiDtos {
             payment.setAmount(amount);
             payment.setStatus(status);
             payment.setUserId(userId);
+            payment.setApplicationId(applicationId);
             payment.setNic(nic);
             payment.setEmail(email);
             payment.setCustomerInfo(customerInfo);

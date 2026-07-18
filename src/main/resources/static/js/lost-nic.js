@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const helpBtn = document.getElementById('helpBtn');
     const contactNumberInput = document.getElementById('contactNumber');
     let formSubmitted = false;
+    let applicationId = null;
 
     // NIC number validation (Sri Lankan format)
     nicNumberInput.addEventListener('change', function() {
@@ -96,14 +97,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             });
 
-            const text = await response.text();
+            const data = await response.json().catch(() => null);
             if (!response.ok) {
-                throw new Error(text || 'Submission failed');
+                throw new Error((data && data.message) || 'Submission failed');
             }
 
+            applicationId = data.applicationId;
             formSubmitted = true;
             paymentBtn.disabled = false;
-            alert(text || 'Lost NIC report submitted successfully!');
+            alert(data.message || 'Lost NIC report submitted successfully!');
             document.querySelector('.payment-section').scrollIntoView({ behavior: 'smooth' });
         } catch (err) {
             console.error('Lost NIC submission error:', err);
@@ -113,8 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Payment button functionality
     paymentBtn.addEventListener('click', function() {
-        if (formSubmitted) {
-            window.location.href = 'paymentGateway.html?type=lost';
+        if (formSubmitted && applicationId) {
+            window.location.href = `paymentGateway.html?type=lost&appId=${encodeURIComponent(applicationId)}`;
         } else {
             alert('Please submit your lost NIC report first before making a payment.');
         }

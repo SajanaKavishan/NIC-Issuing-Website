@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.ApplicationSubmissionResponse;
 import com.project.nic.dto.ApiDtos.NewNicFormDto;
 import com.project.nic.dto.ApiDtos.StatusUpdateRequest;
 import com.project.nic.model.NewNicForm;
@@ -44,7 +45,7 @@ public class NewNicFormController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<String> submitForm(
+    public ResponseEntity<?> submitForm(
             @NotBlank @RequestParam String nameWithInitials,
             @NotBlank @RequestParam String gender,
             @Min(1) @Max(120) @RequestParam int age,
@@ -93,12 +94,13 @@ public class NewNicFormController {
         form.setUserId(userId);
         form.setUserEmail(sessionUser.get().email());
 
+        NewNicForm saved;
         try {
-            service.save(form);
+            saved = service.save(form);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok("New NIC application submitted successfully.");
+        return ResponseEntity.ok(new ApplicationSubmissionResponse("New NIC application submitted successfully.", saved.getId()));
     }
 
     @GetMapping("/all")

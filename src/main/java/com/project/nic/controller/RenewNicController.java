@@ -1,5 +1,6 @@
 package com.project.nic.controller;
 
+import com.project.nic.dto.ApiDtos.ApplicationSubmissionResponse;
 import com.project.nic.dto.ApiDtos.RenewNicDto;
 import com.project.nic.dto.ApiDtos.StatusUpdateRequest;
 import com.project.nic.model.RenewNic;
@@ -41,7 +42,7 @@ public class RenewNicController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<String> submitRenewNic(
+    public ResponseEntity<?> submitRenewNic(
         @NotBlank @RequestParam String oldNicNumber,
         @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") @RequestParam String birthdate,
         @NotBlank @RequestParam String reason,
@@ -78,8 +79,8 @@ public class RenewNicController {
         renewNic.setUserId(sessionUser.get().userId());
         renewNic.setUserEmail(sessionUser.get().email());
 
-        service.save(renewNic);
-        return ResponseEntity.ok("NIC renewal request submitted successfully.");
+        RenewNic saved = service.save(renewNic);
+        return ResponseEntity.ok(new ApplicationSubmissionResponse("NIC renewal request submitted successfully.", saved.getId()));
     }
 
     @GetMapping("/all")

@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const helpBtn = document.getElementById('helpBtn');
     const contactNumberInput = document.getElementById('contactNumber');
     let formSubmitted = false;
+    let applicationId = null;
 
     // Show/hide other reason field based on selection
     reasonSelect.addEventListener('change', function() {
@@ -120,14 +121,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             });
 
-            const text = await response.text();
+            const data = await response.json().catch(() => null);
             if (!response.ok) {
-                throw new Error(text || 'Submission failed');
+                throw new Error((data && data.message) || 'Submission failed');
             }
 
+            applicationId = data.applicationId;
             formSubmitted = true;
             paymentBtn.disabled = false;
-            alert(text || 'NIC renewal request submitted successfully!');
+            alert(data.message || 'NIC renewal request submitted successfully!');
             document.querySelector('.payment-section').scrollIntoView({ behavior: 'smooth' });
         } catch (err) {
             console.error('Renew NIC submission error:', err);
@@ -137,8 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Payment button functionality
     paymentBtn.addEventListener('click', function() {
-        if (formSubmitted) {
-            window.location.href = 'paymentGateway.html?type=renew';
+        if (formSubmitted && applicationId) {
+            window.location.href = `paymentGateway.html?type=renew&appId=${encodeURIComponent(applicationId)}`;
         } else {
             alert('Please submit your renewal request first before making a payment.');
         }
