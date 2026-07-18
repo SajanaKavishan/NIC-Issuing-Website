@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.LostNic;
 import com.project.nic.repository.LostNicRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
@@ -16,8 +15,11 @@ import java.util.Set;
 public class LostNicService {
     private static final Logger logger = LoggerFactory.getLogger(LostNicService.class);
 
-    @Autowired
-    private LostNicRepository repository;
+    private final LostNicRepository repository;
+
+    public LostNicService(LostNicRepository repository) {
+        this.repository = repository;
+    }
 
     public LostNic save(LostNic lostNic) {
         return repository.save(lostNic);

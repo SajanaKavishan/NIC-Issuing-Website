@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.AssistantLog;
 import com.project.nic.repository.AssistantLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.Optional;
 @Service
 public class AssistantLogService {
 
-    @Autowired
-    private AssistantLogRepository assistantLogRepository;
+    private final AssistantLogRepository assistantLogRepository;
+
+    public AssistantLogService(AssistantLogRepository assistantLogRepository) {
+        this.assistantLogRepository = assistantLogRepository;
+    }
 
     public List<AssistantLog> getAll() { return assistantLogRepository.findAll(); }
 

@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,14 +29,19 @@ import org.springframework.http.ResponseEntity;
 @Validated
 public class NewNicFormController {
 
-    @Autowired
-    private NewNicFormService service;
+    private final NewNicFormService service;
+    private final AuthAccessService authAccessService;
+    private final String uploadDir;
 
-    @Autowired
-    private AuthAccessService authAccessService;
-
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    public NewNicFormController(
+            NewNicFormService service,
+            AuthAccessService authAccessService,
+            @Value("${app.upload.dir}") String uploadDir
+    ) {
+        this.service = service;
+        this.authAccessService = authAccessService;
+        this.uploadDir = uploadDir;
+    }
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitForm(

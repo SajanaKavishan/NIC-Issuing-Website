@@ -3,7 +3,6 @@ package com.project.nic.service;
 import com.project.nic.model.Payment;
 import com.project.nic.model.PaymentRecord;
 import com.project.nic.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,21 +10,26 @@ import java.util.Optional;
 
 @Service
 public class PaymentService {
-    
-    @Autowired
-    private PaymentRepository paymentRepository;
 
-    @Autowired
-    private PaymentRecordService paymentRecordService;
+    private final PaymentRepository paymentRepository;
+    private final PaymentRecordService paymentRecordService;
+    private final NewNicFormService newNicFormService;
+    private final RenewNicService renewNicService;
+    private final LostNicService lostNicService;
 
-    @Autowired
-    private NewNicFormService newNicFormService;
-
-    @Autowired
-    private RenewNicService renewNicService;
-
-    @Autowired
-    private LostNicService lostNicService;
+    public PaymentService(
+            PaymentRepository paymentRepository,
+            PaymentRecordService paymentRecordService,
+            NewNicFormService newNicFormService,
+            RenewNicService renewNicService,
+            LostNicService lostNicService
+    ) {
+        this.paymentRepository = paymentRepository;
+        this.paymentRecordService = paymentRecordService;
+        this.newNicFormService = newNicFormService;
+        this.renewNicService = renewNicService;
+        this.lostNicService = lostNicService;
+    }
     
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();

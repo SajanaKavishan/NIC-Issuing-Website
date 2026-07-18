@@ -4,12 +4,10 @@ import com.project.nic.model.AssistanceRequest;
 import com.project.nic.repository.AssistanceRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +16,13 @@ public class AssistanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(AssistanceService.class);
 
-    @Autowired
-    private AssistanceRequestRepository repo;
+    private final AssistanceRequestRepository repo;
+    private final EntityManager entityManager;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    public AssistanceService(AssistanceRequestRepository repo, EntityManager entityManager) {
+        this.repo = repo;
+        this.entityManager = entityManager;
+    }
 
     public AssistanceRequest createRequest(AssistanceRequest request) {
         request.setStatus("pending");

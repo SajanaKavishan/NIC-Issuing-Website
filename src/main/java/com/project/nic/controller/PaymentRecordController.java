@@ -4,7 +4,6 @@ import com.project.nic.dto.ApiDtos.PaymentRecordDto;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentRecordService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,11 +17,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/payment-records")
 public class PaymentRecordController {
 
-    @Autowired
-    private PaymentRecordService paymentRecordService;
+    private final PaymentRecordService paymentRecordService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public PaymentRecordController(PaymentRecordService paymentRecordService, AuthAccessService authAccessService) {
+        this.paymentRecordService = paymentRecordService;
+        this.authAccessService = authAccessService;
+    }
 
     @GetMapping
     public ResponseEntity<?> getPaymentRecords(@RequestHeader(value = "X-Auth-Token", required = false) String token) {

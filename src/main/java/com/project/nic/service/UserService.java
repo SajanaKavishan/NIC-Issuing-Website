@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.User;
 import com.project.nic.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +15,13 @@ public class UserService {
             "CITIZEN", "ADMIN", "FINANCE", "DELIVERY", "PRO", "RECOVERY", "ASSISTANT"
     );
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(normalizeEmail(email));

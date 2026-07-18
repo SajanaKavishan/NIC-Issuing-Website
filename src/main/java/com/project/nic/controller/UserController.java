@@ -7,7 +7,6 @@ import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +19,19 @@ import java.util.stream.Collectors;
 @Validated
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthSessionService authSessionService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthSessionService authSessionService;
-
-    @Autowired
-    private AuthAccessService authAccessService;
+    public UserController(
+            UserService userService,
+            AuthSessionService authSessionService,
+            AuthAccessService authAccessService
+    ) {
+        this.userService = userService;
+        this.authSessionService = authSessionService;
+        this.authAccessService = authAccessService;
+    }
 
     @PostMapping("/signup")
     public String signup(@Valid @RequestBody UserRequest request) {

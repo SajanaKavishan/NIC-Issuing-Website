@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.NewNicForm;
 import com.project.nic.repository.NewNicFormRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.Set;
 public class NewNicFormService {
     private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
 
-    @Autowired
-    private NewNicFormRepository repository;
+    private final NewNicFormRepository repository;
+
+    public NewNicFormService(NewNicFormRepository repository) {
+        this.repository = repository;
+    }
 
     public NewNicForm save(NewNicForm form) {
         if (form.getStatus() == null || form.getStatus().isBlank()) {

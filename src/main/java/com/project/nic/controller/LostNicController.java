@@ -11,7 +11,6 @@ import com.project.nic.util.FileUploadUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -42,14 +41,19 @@ import java.nio.file.Paths;
 public class LostNicController {
     private static final Logger logger = LoggerFactory.getLogger(LostNicController.class);
 
-    @Autowired
-    private LostNicService service;
+    private final LostNicService service;
+    private final AuthAccessService authAccessService;
+    private final String uploadDir;
 
-    @Autowired
-    private AuthAccessService authAccessService;
-
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    public LostNicController(
+            LostNicService service,
+            AuthAccessService authAccessService,
+            @Value("${app.upload.dir}") String uploadDir
+    ) {
+        this.service = service;
+        this.authAccessService = authAccessService;
+        this.uploadDir = uploadDir;
+    }
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitLostNic(

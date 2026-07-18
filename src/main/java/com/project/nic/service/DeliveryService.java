@@ -4,7 +4,6 @@ import com.project.nic.model.Delivery;
 import com.project.nic.repository.DeliveryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +18,22 @@ public class DeliveryService {
     private static final Logger logger = LoggerFactory.getLogger(DeliveryService.class);
     private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
 
-    @Autowired
-    private DeliveryRepository deliveryRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final NewNicFormService newNicFormService;
+    private final RenewNicService renewNicService;
+    private final LostNicService lostNicService;
 
-    @Autowired
-    private NewNicFormService newNicFormService;
-
-    @Autowired
-    private RenewNicService renewNicService;
-
-    @Autowired
-    private LostNicService lostNicService;
+    public DeliveryService(
+            DeliveryRepository deliveryRepository,
+            NewNicFormService newNicFormService,
+            RenewNicService renewNicService,
+            LostNicService lostNicService
+    ) {
+        this.deliveryRepository = deliveryRepository;
+        this.newNicFormService = newNicFormService;
+        this.renewNicService = renewNicService;
+        this.lostNicService = lostNicService;
+    }
 
     public List<Delivery> getAllDeliveries(String dateRange, String deliveryMethod, String search) {
         // Fetch all deliveries and filter in-memory to keep logic simple and correct.

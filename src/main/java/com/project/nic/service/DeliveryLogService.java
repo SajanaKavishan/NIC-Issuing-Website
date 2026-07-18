@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.DeliveryLog;
 import com.project.nic.repository.DeliveryLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.Optional;
 @Service
 public class DeliveryLogService {
 
-    @Autowired
-    private DeliveryLogRepository deliveryLogRepository;
+    private final DeliveryLogRepository deliveryLogRepository;
+
+    public DeliveryLogService(DeliveryLogRepository deliveryLogRepository) {
+        this.deliveryLogRepository = deliveryLogRepository;
+    }
 
     public List<DeliveryLog> getAll() {
         return deliveryLogRepository.findAll();

@@ -6,7 +6,6 @@ import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.DeliveryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +23,13 @@ import org.springframework.http.ResponseEntity;
 public class DeliveryController {
     private static final Logger logger = LoggerFactory.getLogger(DeliveryController.class);
 
-    @Autowired
-    private DeliveryService deliveryService;
+    private final DeliveryService deliveryService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public DeliveryController(DeliveryService deliveryService, AuthAccessService authAccessService) {
+        this.deliveryService = deliveryService;
+        this.authAccessService = authAccessService;
+    }
 
     @GetMapping("/nics")
     public ResponseEntity<?> getAllDeliveries(

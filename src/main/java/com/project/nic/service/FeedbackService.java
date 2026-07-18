@@ -2,7 +2,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.Feedback;
 import com.project.nic.repository.FeedbackRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.Set;
 public class FeedbackService {
     private static final Set<String> ALLOWED_STATUSES = Set.of("Pending", "In Progress", "Resolved", "Reviewed");
 
-    @Autowired
-    private FeedbackRepository feedbackRepository;
+    private final FeedbackRepository feedbackRepository;
+
+    public FeedbackService(FeedbackRepository feedbackRepository) {
+        this.feedbackRepository = feedbackRepository;
+    }
 
     public Feedback saveFeedback(Feedback feedback) {
         normalize(feedback);

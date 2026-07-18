@@ -9,7 +9,6 @@ import com.project.nic.service.AssistanceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +22,13 @@ import java.util.stream.Collectors;
 @Validated
 public class AssistanceController {
 
-    @Autowired
-    private AssistanceService assistanceService;
+    private final AssistanceService assistanceService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public AssistanceController(AssistanceService assistanceService, AuthAccessService authAccessService) {
+        this.assistanceService = assistanceService;
+        this.authAccessService = authAccessService;
+    }
 
     @PostMapping("/request")
     public ResponseEntity<String> createRequest(

@@ -3,7 +3,6 @@ package com.project.nic.service;
 
 import com.project.nic.model.RenewNic;
 import com.project.nic.repository.RenewNicRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -13,8 +12,11 @@ import java.util.Set;
 public class RenewNicService {
     private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PROCESSING", "APPROVED", "REJECTED", "DELIVERED");
 
-    @Autowired
-    private RenewNicRepository repository;
+    private final RenewNicRepository repository;
+
+    public RenewNicService(RenewNicRepository repository) {
+        this.repository = repository;
+    }
 
     public RenewNic save(RenewNic renewNic) {
         if (renewNic.getStatus() == null || renewNic.getStatus().isBlank()) {

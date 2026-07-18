@@ -8,7 +8,6 @@ import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.LostNicService;
 import com.project.nic.service.NewNicFormService;
 import com.project.nic.service.RenewNicService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -24,17 +23,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/applications")
 public class ApplicationController {
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    private final AuthAccessService authAccessService;
+    private final NewNicFormService newNicFormService;
+    private final RenewNicService renewNicService;
+    private final LostNicService lostNicService;
 
-    @Autowired
-    private NewNicFormService newNicFormService;
-
-    @Autowired
-    private RenewNicService renewNicService;
-
-    @Autowired
-    private LostNicService lostNicService;
+    public ApplicationController(
+            AuthAccessService authAccessService,
+            NewNicFormService newNicFormService,
+            RenewNicService renewNicService,
+            LostNicService lostNicService
+    ) {
+        this.authAccessService = authAccessService;
+        this.newNicFormService = newNicFormService;
+        this.renewNicService = renewNicService;
+        this.lostNicService = lostNicService;
+    }
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMyApplications(@RequestHeader(value = "X-Auth-Token", required = false) String token) {

@@ -5,7 +5,6 @@ import com.project.nic.model.AssistantLog;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AssistantLogService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/assistant-logs")
 public class AssistantLogController {
 
-    @Autowired
-    private AssistantLogService assistantLogService;
+    private final AssistantLogService assistantLogService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public AssistantLogController(AssistantLogService assistantLogService, AuthAccessService authAccessService) {
+        this.assistantLogService = assistantLogService;
+        this.authAccessService = authAccessService;
+    }
 
     @GetMapping
     public ResponseEntity<?> listAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {

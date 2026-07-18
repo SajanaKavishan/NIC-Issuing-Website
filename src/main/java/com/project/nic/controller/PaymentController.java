@@ -6,7 +6,6 @@ import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.AuthSessionService;
 import com.project.nic.service.PaymentService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -17,12 +16,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
-    
-    @Autowired
-    private PaymentService paymentService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    private final PaymentService paymentService;
+    private final AuthAccessService authAccessService;
+
+    public PaymentController(PaymentService paymentService, AuthAccessService authAccessService) {
+        this.paymentService = paymentService;
+        this.authAccessService = authAccessService;
+    }
     
     @GetMapping
     public ResponseEntity<?> getAllPayments(@RequestHeader(value = "X-Auth-Token", required = false) String token) {

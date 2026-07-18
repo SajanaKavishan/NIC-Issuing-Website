@@ -5,7 +5,6 @@ import com.project.nic.model.DeliveryLog;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.DeliveryLogService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/delivery-logs")
 public class DeliveryLogController {
 
-    @Autowired
-    private DeliveryLogService deliveryLogService;
+    private final DeliveryLogService deliveryLogService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public DeliveryLogController(DeliveryLogService deliveryLogService, AuthAccessService authAccessService) {
+        this.deliveryLogService = deliveryLogService;
+        this.authAccessService = authAccessService;
+    }
 
     @GetMapping
     public ResponseEntity<?> listAll(@RequestHeader(value = "X-Auth-Token", required = false) String token) {

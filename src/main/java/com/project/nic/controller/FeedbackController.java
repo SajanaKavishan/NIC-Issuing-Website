@@ -4,7 +4,6 @@ import com.project.nic.dto.ApiDtos.FeedbackDto;
 import com.project.nic.service.AuthAccessService;
 import com.project.nic.service.FeedbackService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +12,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/feedback")
 public class FeedbackController {
-    @Autowired
-    private FeedbackService feedbackService;
+    private final FeedbackService feedbackService;
+    private final AuthAccessService authAccessService;
 
-    @Autowired
-    private AuthAccessService authAccessService;
+    public FeedbackController(FeedbackService feedbackService, AuthAccessService authAccessService) {
+        this.feedbackService = feedbackService;
+        this.authAccessService = authAccessService;
+    }
 
     @PostMapping
     public FeedbackDto submitFeedback(@Valid @RequestBody FeedbackDto feedback) {
