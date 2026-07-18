@@ -7,6 +7,10 @@
     --c: #FF1F6A;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -216,11 +220,13 @@ nav ul li a:hover {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
+    min-width: 0;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .form-group.full-width {
@@ -235,6 +241,8 @@ nav ul li a:hover {
 
 .form-group input,
 .form-group textarea {
+    width: 100%;
+    min-width: 0;
     padding: 0.8rem;
     border: 1px solid rgba(255,255,255,.18);
     background: rgba(255,255,255,.06);
@@ -245,6 +253,8 @@ nav ul li a:hover {
 }
 
 .form-group select {
+    width: 100%;
+    min-width: 0;
     padding: 0.8rem;
     border: 1px solid rgba(255,255,255,.18);
     background: black;
@@ -288,8 +298,10 @@ nav ul li a:hover {
 /* Radio Button Styles */
 .radio-group {
     display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     margin-top: 0.5rem;
+    min-width: 0;
 }
 
 .radio-group.horizontal {
@@ -299,6 +311,7 @@ nav ul li a:hover {
 .radio-option {
     display: flex;
     align-items: center;
+    min-width: 0;
     cursor: pointer;
     padding: 0.7rem 1rem;
     border-radius: 8px;
@@ -319,6 +332,7 @@ nav ul li a:hover {
 
 .radio-custom {
     position: relative;
+    flex: 0 0 20px;
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -424,8 +438,13 @@ nav ul li a:hover {
 
 /* Responsive tweaks */
 @media (max-width: 700px) {
+    .form-inner {
+        width: 100%;
+    }
+
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .form-buttons {
@@ -435,6 +454,12 @@ nav ul li a:hover {
     .radio-group.horizontal {
         flex-direction: column;
         gap: 0.8rem;
+    }
+
+    .radio-option {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-wrap: anywhere;
     }
 
     .dropdown-content {
@@ -477,6 +502,49 @@ nav ul li a:hover {
     .auth-buttons button {
         margin: 5px 0;
         width: 100%;
+    }
+}
+
+@media (max-width: 380px) {
+    .form-section {
+        padding: 2rem 0;
+    }
+
+    .form-inner {
+        padding: 0 0.75rem;
+    }
+
+    .display {
+        font-size: clamp(1.85rem, 12vw, 2.45rem);
+        line-height: 1.12;
+    }
+
+    .sub {
+        font-size: 0.95rem;
+    }
+
+    .eyebrow {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .radio-option {
+        padding: 0.7rem;
+    }
+
+    .form-buttons .btn-future,
+    .form-buttons .btn-ghost,
+    .payment-section .btn-future,
+    .top-actions .btn-ghost {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .payment-section {
+        padding: 1.5rem 0;
     }
 }
 
